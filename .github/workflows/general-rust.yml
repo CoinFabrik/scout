@@ -35,6 +35,9 @@ jobs:
       - name: Update Rust
         run: rustup update
 
+      - name: Install Rust nightly
+        run: rustup install nightly-2023-01-27 --profile minimal
+
       - name: Run cargo test
         run: make test
 
@@ -75,6 +78,9 @@ jobs:
 
       - name: Update Rust
         run: rustup update
+
+      - name: Install Rust nightly
+        run: rustup install nightly-2023-01-27 --profile minimal
 
       - name: Run clippy
         run: make lint-rust
