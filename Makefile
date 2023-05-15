@@ -7,16 +7,20 @@ lint: lint-rust
 
 fmt-rust:
 	@echo "Formatting Rust code..."
-	@cargo +nightly fmt --all
+	@cd apps/cargo-scout && cargo +nightly fmt --all
+	@cd detectors && cargo +nightly fmt --all
 
 fmt-rust-check:
 	@echo "Checking Rust code formatting..."
-	@cargo +nightly fmt --all -- --check
+	@cd apps/cargo-scout && cargo +nightly fmt --all -- --check
+	@cd detectors && cargo +nightly fmt --all -- --check
 
 lint-rust:
 	@echo "Linting Rust code..."
-	@cargo clippy --all --all-features -- -D warnings
+	@cd apps/cargo-scout && cargo clippy --all --all-features -- -D warnings
+	@cd detectors && cargo clippy --all --all-features -- -D warnings
 
 test:
 	@echo "Running tests..."
-	@cargo test --all --all-features
+	@cd apps/cargo-scout && cargo test --all --all-features
+	@cd detectors && cargo test --all --all-features

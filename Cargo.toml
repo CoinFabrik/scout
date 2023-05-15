@@ -1,4 +1,0 @@
-[workspace]
-members = [
-    "apps/cargo-scout",
-]
