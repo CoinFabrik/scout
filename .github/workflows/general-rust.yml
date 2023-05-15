@@ -38,6 +38,9 @@ jobs:
       - name: Install Rust nightly
         run: rustup install nightly-2023-01-27 --profile minimal
 
+      - name: Install dylint-link
+        run: cargo install dylint-link
+
       - name: Run cargo test
         run: make test
 
@@ -81,6 +84,12 @@ jobs:
 
       - name: Install Rust nightly
         run: rustup install nightly-2023-01-27 --profile minimal
+
+      - name: Install Clippy
+        run: rustup component add clippy --toolchain nightly-2023-01-27
+
+      - name: Install dylint-link
+        run: cargo install dylint-link
 
       - name: Run clippy
         run: make lint-rust
