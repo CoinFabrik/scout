@@ -6,8 +6,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'My Site',
-  tagline: 'Dinosaurs are cool',
+  title: 'Scout',
+  tagline: 'Security Analysis Tool',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
@@ -18,8 +18,8 @@ const config = {
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'facebook', // Usually your GitHub org/user name.
-  projectName: 'docusaurus', // Usually your repo name.
+  organizationName: 'CoinFabrik', // Usually your GitHub org/user name.
+  projectName: 'Scout', // Usually your repo name.
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -64,21 +64,16 @@ const config = {
       // Replace with your project's social card
       image: 'img/docusaurus-social-card.jpg',
       navbar: {
-        title: 'My Site',
+        title: 'Scout',
         logo: {
-          alt: 'My Site Logo',
+          alt: 'Scout Logo',
           src: 'img/logo.svg',
         },
         items: [
-          {
-            type: 'docSidebar',
-            sidebarId: 'tutorialSidebar',
-            position: 'left',
-            label: 'Tutorial',
-          },
+          {type: 'docSidebar', sidebarId: 'docsSidebar', label: 'Docs', position: 'left'},
           {to: '/blog', label: 'Blog', position: 'left'},
           {
-            href: 'https://github.com/facebook/docusaurus',
+            href: 'https://github.com/CoinFabrik/scout',
             label: 'GitHub',
             position: 'right',
           },
@@ -91,8 +86,32 @@ const config = {
             title: 'Docs',
             items: [
               {
-                label: 'Tutorial',
+                label: 'Getting Started',
                 to: '/docs/intro',
+              },
+              {
+                label: 'Vulnerabilities',
+                to: '/docs/vulnerabilities',
+              },
+              {
+                label: 'Detectors',
+                to: '/docs/detectors',
+              },
+              {
+                label: 'Learn',
+                to: '/docs/Learn',
+              },
+              {
+                label: 'Tutorials',
+                to: '/docs/tutorials',
+              },
+              {
+                label: 'Contribute',
+                to: '/docs/contribute',
+              },
+              {
+                label: 'FAQs',
+                to: '/docs/faqs',
               },
             ],
           },
@@ -100,16 +119,16 @@ const config = {
             title: 'Community',
             items: [
               {
-                label: 'Stack Overflow',
-                href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-              },
-              {
-                label: 'Discord',
-                href: 'https://discordapp.com/invite/docusaurus',
-              },
-              {
                 label: 'Twitter',
-                href: 'https://twitter.com/docusaurus',
+                href: 'https://twitter.com/coinfabrik?lang=en',
+              },
+              {
+                label: 'Instagram',
+                href: 'https://www.instagram.com/coinfabrik/',
+              },
+              {
+                label: 'Reddit',
+                href: 'https://www.reddit.com/r/CoinFabrik/',
               },
             ],
           },
@@ -117,20 +136,24 @@ const config = {
             title: 'More',
             items: [
               {
+                label: 'Web Site',
+                to: 'https://www.coinfabrik.com/',
+              },
+              {
                 label: 'Blog',
-                to: '/blog',
+                to: 'https://blog.coinfabrik.com/',
               },
               {
                 label: 'GitHub',
-                href: 'https://github.com/facebook/docusaurus',
+                href: 'https://github.com/CoinFabrik',
               },
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Scout, CoinFabrik.`,
       },
       prism: {
-        theme: lightCodeTheme,
+        theme: darkCodeTheme,
         darkTheme: darkCodeTheme,
       },
     }),

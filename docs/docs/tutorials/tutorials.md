@@ -1,8 +1,8 @@
 ---
-sidebar_position: 1
+sidebar_position: 5
 ---
 
-# Getting Started
+# Tutorials
 
 Let's discover **Docusaurus in less than 5 minutes**.
 
