@@ -92,9 +92,6 @@ impl Command {
         // log::debug!("{:?}", self.command.get_current_dir());
         // log::debug!("{:?}", self.command);
 
-        println!("Literally running command: {:?}", self.command);
-        println!("Current directory: {:?}", self.command.get_current_dir());
-
         let status = self
             .command
             .status()
