@@ -34,6 +34,8 @@ fn main() {
 }
 
 fn run_scout(_opts: Scout) {
+    env_logger::init();
+
     let metadata = MetadataCommand::new()
         .exec()
         .expect("Failed to get metadata");

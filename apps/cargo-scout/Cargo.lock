@@ -274,8 +274,10 @@ dependencies = [
  "cargo_metadata",
  "clap",
  "dylint",
+ "env_logger",
  "glob",
  "itertools",
+ "log",
 ]
 
 [[package]]
