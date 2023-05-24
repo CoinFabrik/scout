@@ -2,6 +2,7 @@ use std::path::PathBuf;
 
 use cargo::Config;
 use cargo_metadata::MetadataCommand;
+use clap::{Parser, Subcommand};
 use dylint::Dylint;
 
 use crate::detectors::Detectors;
@@ -9,7 +10,30 @@ use crate::detectors::Detectors;
 mod detectors;
 mod utils;
 
+#[derive(Debug, Parser)]
+#[clap(display_name = "cargo")]
+struct Cli {
+    #[clap(subcommand)]
+    subcmd: CargoSubCommand,
+}
+
+#[derive(Debug, Subcommand)]
+enum CargoSubCommand {
+    Scout(Scout),
+}
+
+#[derive(Debug, Parser)]
+#[command(author, version, about, long_about = None)]
+struct Scout {}
+
 fn main() {
+    let cli = Cli::parse();
+    match cli.subcmd {
+        CargoSubCommand::Scout(opts) => run_scout(opts),
+    }
+}
+
+fn run_scout(_opts: Scout) {
     let metadata = MetadataCommand::new()
         .exec()
         .expect("Failed to get metadata");
