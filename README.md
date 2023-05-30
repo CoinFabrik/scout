@@ -16,11 +16,10 @@ To improve coverage and precision, we´ll persist in research efforts on static 
 
 ## Quick Start
 
-Scout is currently available only for Linux/Mac. For a quick start, install Scout by running the following commands:
+For a quick start, make sure that [Cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html) is installed on your computer. Then, install Scout by running the following command:
 
 ```bash
-cargo install cargo-scout
-cargo-dylint dylint-link
+cargo install cargo-scout cargo-dylint dylint-link
 ```
 
 To run Scout on your project, navigate to its root directory and execute the following command:
@@ -28,9 +27,6 @@ To run Scout on your project, navigate to its root directory and execute the fol
 ```bash
 cargo scout
 ```
-
-If you're using Windows, you can still run Scout by installing the [Windows Subsistem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install) and using Bash.
-
 
 For more information on installation and usage, please refer to the [Getting Started](http://localhost:3000/docs/intro) section in our documentation below.
 
