@@ -24,7 +24,10 @@ enum CargoSubCommand {
 
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
-struct Scout {}
+struct Scout {
+    #[clap(last = true, help = "Arguments for `cargo check`")]
+    args: Vec<String>,
+}
 
 fn main() {
     let cli = Cli::parse();
@@ -33,7 +36,7 @@ fn main() {
     }
 }
 
-fn run_scout(_opts: Scout) {
+fn run_scout(opts: Scout) {
     env_logger::init();
 
     let metadata = MetadataCommand::new()
@@ -46,10 +49,10 @@ fn run_scout(_opts: Scout) {
     let detectors = Detectors::new(cargo_config, detectors_config, metadata);
     let detectors_paths = detectors.build().expect("Failed to build detectors");
 
-    run_dylint(detectors_paths).expect("Failed to run dylint");
+    run_dylint(detectors_paths, opts).expect("Failed to run dylint");
 }
 
-fn run_dylint(detectors_paths: Vec<PathBuf>) -> anyhow::Result<()> {
+fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> {
     let paths = detectors_paths
         .iter()
         .map(|path| path.to_string_lossy().to_string())
@@ -57,6 +60,7 @@ fn run_dylint(detectors_paths: Vec<PathBuf>) -> anyhow::Result<()> {
 
     let options = Dylint {
         paths,
+        args: opts.args,
         ..Default::default()
     };
     dylint::run(&options)?;
