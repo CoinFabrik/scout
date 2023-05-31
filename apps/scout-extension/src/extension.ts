@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import * as commandExists from "command-exists";
+import commandExists from "command-exists";
 
 const RUST_ANALYZER_CONFIG = "rust-analyzer.check.overrideCommand";
 

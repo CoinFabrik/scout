@@ -10,7 +10,6 @@
 			"type": "extensionHost",
 			"request": "launch",
 			"args": [
-                "/Users/agustin/work/coinfabrik/web3-grant/web3-grant/vulnerabilities/examples/dos-unbounded-operation/vulnerable-example",
 				"--extensionDevelopmentPath=${workspaceFolder}",
 			],
 			"outFiles": [
