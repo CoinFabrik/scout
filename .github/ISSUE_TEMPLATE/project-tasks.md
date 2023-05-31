@@ -1,13 +1,11 @@
 ---
-name: Project tasks
-about: Project tasks details a
+name: Project task
+about: Project task details
 title: ''
-labels: Backlog
+labels: ''
 assignees: ''
 
 ---
-
-# Title: Brief Description of the Task
 
 ## Description
 Detailed explanation of the task. This should include any specific requirements, goals, and desired outcomes. It should also include any necessary context or background information.
