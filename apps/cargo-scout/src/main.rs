@@ -25,6 +25,9 @@ enum CargoSubCommand {
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
 struct Scout {
+    #[clap(short, long, value_name = "path", help = "Path to Cargo.toml.")]
+    manifest_path: Option<String>,
+
     #[clap(last = true, help = "Arguments for `cargo check`")]
     args: Vec<String>,
 }
@@ -39,9 +42,12 @@ fn main() {
 fn run_scout(opts: Scout) {
     env_logger::init();
 
-    let metadata = MetadataCommand::new()
-        .exec()
-        .expect("Failed to get metadata");
+    let mut metadata = MetadataCommand::new();
+    if opts.manifest_path.is_some() {
+        metadata.manifest_path(opts.manifest_path.clone().unwrap());
+    }
+    let metadata = metadata.exec().expect("Failed to get metadata");
+
     let cargo_config = Config::default().expect("Failed to get config");
     let detectors_config =
         detectors::get_detectors_configuration().expect("Failed to get detectors configuration");
@@ -61,6 +67,7 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> 
     let options = Dylint {
         paths,
         args: opts.args,
+        manifest_path: opts.manifest_path,
         ..Default::default()
     };
     dylint::run(&options)?;
