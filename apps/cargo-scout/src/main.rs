@@ -131,6 +131,8 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> 
             .to_string();
         fs::remove_dir_all(format!("{manifest_path}/target/dylint"))
             .expect("Error removing directory");
+    } else {
+        fs::remove_dir_all("target/dylint").expect("Error removing directory");
     }
 
     dylint::run(&options)?;
