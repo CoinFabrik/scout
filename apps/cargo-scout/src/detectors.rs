@@ -1,4 +1,4 @@
-use std::{path::PathBuf, rc::Rc};
+use std::path::PathBuf;
 
 use anyhow::{Ok, Result};
 use cargo::Config;
@@ -17,9 +17,9 @@ mod source;
 use cargo_metadata::Metadata;
 pub use configuration::get_detectors_configuration;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Detectors {
-    cargo_config: Rc<Config>,
+    cargo_config: Config,
     detectors_configs: DetectorsConfigurationList,
     metadata: Metadata,
 }
@@ -27,7 +27,7 @@ pub struct Detectors {
 impl Detectors {
     /// Creates a new instance of `Detectors`
     pub fn new(
-        cargo_config: Rc<Config>,
+        cargo_config: Config,
         detectors_configs: DetectorsConfigurationList,
         metadata: Metadata,
     ) -> Self {

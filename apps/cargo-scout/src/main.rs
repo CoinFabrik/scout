@@ -79,7 +79,7 @@ fn run_scout(opts: Scout) {
     let detectors_config =
         detectors::get_detectors_configuration().expect("Failed to get detectors configuration");
 
-    let detectors = Detectors::new(cargo_config.into(), detectors_config, metadata);
+    let detectors = Detectors::new(cargo_config, detectors_config, metadata);
 
     let detectors_names = detectors
         .get_detector_names()
