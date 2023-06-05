@@ -4,6 +4,7 @@ use cargo::Config;
 use cargo_metadata::MetadataCommand;
 use clap::{Parser, Subcommand};
 use dylint::Dylint;
+use utils::detectors::{get_excluded_detectors, get_filtered_detectors, list_detectors};
 
 use crate::detectors::Detectors;
 
@@ -65,8 +66,7 @@ fn run_scout(opts: Scout) {
     env_logger::init();
 
     if opts.filter.is_some() && opts.exclude.is_some() {
-        println!("You can't use `--exclude` and `--filter` at the same time.");
-        return;
+        panic!("You can't use `--exclude` and `--filter` at the same time.");
     }
 
     let mut metadata = MetadataCommand::new();
@@ -83,17 +83,17 @@ fn run_scout(opts: Scout) {
 
     let detectors_names = detectors
         .clone()
-        .get_detectors_names()
+        .get_detector_names()
         .expect("Failed to build detectors");
     if opts.list_detectors {
-        Detectors::list_detectors(detectors_names).expect("Failed to list detectors");
+        list_detectors(detectors_names).expect("Failed to list detectors");
         return;
     }
 
     let used_detectors: Vec<String> = if opts.filter.is_some() {
-        Detectors::get_filtered_detectors(opts.clone().filter.unwrap(), detectors_names).unwrap()
+        get_filtered_detectors(opts.clone().filter.unwrap(), detectors_names).unwrap()
     } else if opts.exclude.is_some() {
-        Detectors::get_excluded_detectors(opts.clone().exclude.unwrap(), detectors_names).unwrap()
+        get_excluded_detectors(opts.clone().exclude.unwrap(), detectors_names).unwrap()
     } else {
         detectors_names
     };
@@ -112,8 +112,6 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> 
         .collect();
 
     let options = Dylint {
-        all: true,
-        quiet: true,
         paths,
         args: opts.args,
         manifest_path: opts.manifest_path,
@@ -121,18 +119,20 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> 
     };
 
     // TODO: Improve this
-    if let Some(manifest_path) = &options.manifest_path {
-        // Get the directory of manifest path
-        let manifest_path = PathBuf::from(manifest_path)
-            .parent()
-            .unwrap()
-            .to_str()
-            .unwrap()
-            .to_string();
-        fs::remove_dir_all(format!("{manifest_path}/target/dylint"))
-            .expect("Error removing directory");
-    } else {
-        fs::remove_dir_all("target/dylint").expect("Error removing directory");
+    if opts.exclude.is_some() || opts.filter.is_some() {
+        if let Some(manifest_path) = &options.manifest_path {
+            // Get the directory of manifest path
+            let manifest_path = PathBuf::from(manifest_path)
+                .parent()
+                .unwrap()
+                .to_str()
+                .unwrap()
+                .to_string();
+            fs::remove_dir_all(format!("{manifest_path}/target/dylint"))
+                .expect("Error removing directory");
+        } else {
+            fs::remove_dir_all("target/dylint").expect("Error removing directory");
+        }
     }
 
     dylint::run(&options)?;
