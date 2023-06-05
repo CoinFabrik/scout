@@ -40,7 +40,7 @@ impl<'a> DetectorBuilder<'a> {
         Ok(library_paths)
     }
 
-    pub fn get_detectors_names(self) -> Result<Vec<String>> {
+    pub fn get_detector_names(self) -> Result<Vec<String>> {
         let detector_root = self.download_detector()?;
         let paths = self.parse_library_patterns(&detector_root)?;
         let detector_names = paths
