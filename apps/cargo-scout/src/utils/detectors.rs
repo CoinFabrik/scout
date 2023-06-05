@@ -1,15 +1,19 @@
 use anyhow::bail;
 use anyhow::Result;
 
-pub fn get_filtered_detectors(filter: String, detectors_names: Vec<String>) -> Result<Vec<String>> {
-    let mut used_detectors: Vec<String> = Vec::new();
-    let parsed_detectors = filter
+fn get_parsed_detectors(detectors: String) -> Vec<String> {
+    detectors
         .to_lowercase()
         .trim()
         .replace('_', "-")
         .split(',')
         .map(|detector| detector.trim().to_string())
-        .collect::<Vec<String>>();
+        .collect::<Vec<String>>()
+}
+
+pub fn get_filtered_detectors(filter: String, detectors_names: Vec<String>) -> Result<Vec<String>> {
+    let mut used_detectors: Vec<String> = Vec::new();
+    let parsed_detectors = get_parsed_detectors(filter);
     for detector in parsed_detectors {
         if detectors_names.contains(&detector.to_string()) {
             used_detectors.push(detector.to_string());
@@ -25,13 +29,7 @@ pub fn get_excluded_detectors(
     detectors_names: Vec<String>,
 ) -> Result<Vec<String>> {
     let mut used_detectors = detectors_names.clone();
-    let parsed_detectors = excluded
-        .to_lowercase()
-        .trim()
-        .replace('_', "-")
-        .split(',')
-        .map(|detector| detector.trim().to_string())
-        .collect::<Vec<String>>();
+    let parsed_detectors = get_parsed_detectors(excluded);
     for detector in parsed_detectors {
         if detectors_names.contains(&detector.to_string()) {
             let index = used_detectors.iter().position(|x| x == &detector).unwrap();
