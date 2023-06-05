@@ -1,6 +1,5 @@
 use std::{fs, path::PathBuf};
 
-use anyhow::{bail, Result};
 use cargo::Config;
 use cargo_metadata::MetadataCommand;
 use clap::{Parser, Subcommand};
@@ -65,6 +64,11 @@ fn main() {
 fn run_scout(opts: Scout) {
     env_logger::init();
 
+    if opts.filter.is_some() && opts.exclude.is_some() {
+        println!("You can't use `--exclude` and `--filter` at the same time.");
+        return;
+    }
+
     let mut metadata = MetadataCommand::new();
     if opts.manifest_path.is_some() {
         metadata.manifest_path(opts.manifest_path.clone().unwrap());
@@ -75,11 +79,6 @@ fn run_scout(opts: Scout) {
     let detectors_config =
         detectors::get_detectors_configuration().expect("Failed to get detectors configuration");
 
-    if opts.filter.is_some() && opts.exclude.is_some() {
-        println!("You can't use `--exclude` and `--filter` at the same time.");
-        return;
-    }
-
     let detectors = Detectors::new(cargo_config.into(), detectors_config, metadata);
 
     let detectors_names = detectors
@@ -87,17 +86,17 @@ fn run_scout(opts: Scout) {
         .get_detectors_names()
         .expect("Failed to build detectors");
     if opts.list_detectors {
-        println!("--------------------");
-        println!("Available detectors:\n\n");
-        let mut index = 1;
-        for detector_name in detectors_names {
-            println!("{} -> {}", index, detector_name);
-            index += 1;
-        }
+        Detectors::list_detectors(detectors_names).expect("Failed to list detectors");
         return;
     }
 
-    let used_detectors = get_used_detectors(opts.clone(), detectors_names).unwrap();
+    let used_detectors: Vec<String> = if opts.filter.is_some() {
+        Detectors::get_filtered_detectors(opts.clone().filter.unwrap(), detectors_names).unwrap()
+    } else if opts.exclude.is_some() {
+        Detectors::get_excluded_detectors(opts.clone().exclude.unwrap(), detectors_names).unwrap()
+    } else {
+        detectors_names
+    };
 
     let detectors_paths = detectors
         .build(used_detectors)
@@ -121,6 +120,7 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> 
         ..Default::default()
     };
 
+    // TODO: Improve this
     if let Some(manifest_path) = &options.manifest_path {
         // Get the directory of manifest path
         let manifest_path = PathBuf::from(manifest_path)
@@ -138,49 +138,4 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> 
     dylint::run(&options)?;
 
     Ok(())
-}
-
-fn get_used_detectors(opts: Scout, detectors_names: Vec<String>) -> Result<Vec<String>> {
-    let mut used_detectors = Vec::new();
-    if opts.filter.is_some() {
-        let parsed_detectors = opts
-            .filter
-            .unwrap()
-            .to_lowercase()
-            .trim()
-            .replace('_', "-")
-            .split(',')
-            .map(|detector| detector.trim().to_string())
-            .collect::<Vec<String>>();
-        for detector in parsed_detectors {
-            if detectors_names.contains(&detector.to_string()) {
-                used_detectors.push(detector.to_string());
-            } else {
-                bail!("The detector '{}' doesn't exist", detector);
-            }
-        }
-    } else if opts.exclude.is_some() {
-        let parsed_detectors = opts
-            .exclude
-            .unwrap()
-            .to_lowercase()
-            .trim()
-            .replace('_', "-")
-            .split(',')
-            .map(|detector| detector.trim().to_string())
-            .collect::<Vec<String>>();
-        used_detectors = detectors_names.clone();
-        for detector in parsed_detectors {
-            if detectors_names.contains(&detector.to_string()) {
-                let index = used_detectors.iter().position(|x| x == &detector).unwrap();
-                used_detectors.remove(index);
-            } else {
-                bail!("The detector '{}' doesn't exist", detector);
-            }
-        }
-    } else {
-        used_detectors = detectors_names;
-    }
-
-    Ok(used_detectors)
 }
