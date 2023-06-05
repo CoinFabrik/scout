@@ -71,13 +71,5 @@ Install Scout from the Visual Studio Marketplace within the Extensions tab of Vi
 
 ### Usage
 
-After you've installed the extension, simply open a project workspace that contains any ink! (.rs) files. This will trigger the activation of the extension, symbolized by the Scout logo that will appear on the action bar. If you click on this logo, you will see a new panel that has a results explorer and a detector filter tree.
-
-When you move your cursor over the explorer tree, buttons will appear on the upper title bar. These buttons allow you to execute Scout, refresh the panel, change the viewing mode, and remove results.
-
-When you click on a detector filter, you can control its visibility. Moving your cursor over the detector filter tree will cause a flag icon button to appear. This button serves as a toggle all switch.
-
-If you left-click on a result within the result explorer, it will direct you to the associated piece of code. On the other hand, right-clicking on a result will display additional options like showing more information.
-
-In case the source has been modified since the last run of Scout, and there is a discrepancy in the source mapping, the related issue and its annotations will be removed. An "out-of-sync" icon will then appear next to the result in the explorer tree, indicating that the Scout analysis should be initiated again.
+After you've installed the extension, simply open a project workspace that contains any ink! (.rs) files. You will see potential issues and warnings via a wiggle underline of the relevant code.
 
