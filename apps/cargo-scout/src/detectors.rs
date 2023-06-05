@@ -132,7 +132,7 @@ impl Detectors {
         let empty_line = format!("│{:48}│", "");
 
         println!("{}", upper_border);
-        println!("│{:^48}│", "Available detectors:");
+        println!("│{:^47}│", "🔍 Available detectors:");
         println!("{}", empty_line);
 
         for (index, detector_name) in detectors_names.iter().enumerate() {
