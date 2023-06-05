@@ -52,7 +52,7 @@ impl Detectors {
         Ok(detectors_paths)
     }
 
-    pub fn get_detector_names(self) -> Result<Vec<String>> {
+    pub fn get_detector_names(&self) -> Result<Vec<String>> {
         let detectors_names = self
             .detectors_configs
             .iter()

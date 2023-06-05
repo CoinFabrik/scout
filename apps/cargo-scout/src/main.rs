@@ -82,7 +82,6 @@ fn run_scout(opts: Scout) {
     let detectors = Detectors::new(cargo_config.into(), detectors_config, metadata);
 
     let detectors_names = detectors
-        .clone()
         .get_detector_names()
         .expect("Failed to build detectors");
     if opts.list_detectors {
