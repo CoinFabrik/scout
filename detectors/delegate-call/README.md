@@ -1,4 +1,4 @@
-# template
+# Delegate Call
 
 ### What it does
 Checks for delegated calls to contracts passed as arguments.
