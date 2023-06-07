@@ -10,8 +10,11 @@ atty = "0.2.14"
 cargo = "0.70"
 cargo_metadata = "0.15"
 clap = { version = "4.3.0", features = ["derive"] }
+colored = "2.0.0"
+config = "0.13.3"
 dylint = "2.1.9"
 env_logger = "0.10"
 glob = { version = "0.3" }
 itertools = "0.10.5"
 log = "0.4"
+serde = { version = "1.0.163", features = ["derive"] }
