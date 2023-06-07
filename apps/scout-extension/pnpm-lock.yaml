@@ -4,6 +4,9 @@ dependencies:
   command-exists:
     specifier: ^1.2.9
     version: 1.2.9
+  toml:
+    specifier: ^3.0.0
+    version: 3.0.0
 
 devDependencies:
   '@types/command-exists':
@@ -1529,6 +1532,10 @@ packages:
     dependencies:
       is-number: 7.0.0
     dev: true
+
+  /toml@3.0.0:
+    resolution: {integrity: sha512-y/mWCZinnvxjTKYhJ+pYxwD0mRLVvOtdS2Awbgxln6iEnt4rk0yBxeSBHkGJcPucRiG0e55mwWp+g/05rsrd6w==}
+    dev: false
 
   /tslib@1.14.1:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
