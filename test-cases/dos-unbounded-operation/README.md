@@ -2,7 +2,8 @@
 ## Description
 - Vulnerability Category: `Denial of Service`
 - Severity: `Medium`
-- Detector ID: `dos-unbounded-operation`
+- Detectors: [`dos-unbounded-operation`](https://github.com/CoinFabrik/scout/tree/main/test-cases/dos-unbounded-operation/dos-unbounded-operation-1)
+- Test Cases: [`dos-unbounded-operation-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/dos-unbounded-operation/dos-unbounded-operation-1)
 
 Each block in a Substrate Blockchain has an upper bound on the amount of gas 
 that can be spent, and thus the amount computation that can be done. This is 

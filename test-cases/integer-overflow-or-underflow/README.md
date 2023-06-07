@@ -2,7 +2,8 @@
 ## Description
 - Vulnerability Category: `Arithmetic`
 - Severity: `Critical`
-- Detector ID: `integer-overflow-or-underflow`
+- Detectors: [`integer-overflow-or-underflow`](https://github.com/CoinFabrik/scout/tree/main/detectors/integer-overflow-or-underflow)
+- Test Cases: [`integer-overflow-or-underflow-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/integer-overflow-or-underflow/integer-overflow-or-underflow-1)
 
 This type of vulnerability occurs when an arithmetic operation attempts to 
 create a numeric value that is outside the valid range in substrate, e.g, 
@@ -114,3 +115,10 @@ pub fn sub(&mut self, value: u8) -> Result<(), Error> {
 ```
 
 Other rules could be added to improve the checking. The set of rules can be found [here](https://rust-lang.github.io/rust-clippy/master/).
+
+
+## References
+- [SWC-101](https://swcregistry.io/docs/SWC-101)
+- [Ethernaut: Token](https://ethernaut.openzeppelin.com/level/0x63bE8347A617476CA461649897238A31835a32CE)
+- [20 cases of overflow/underflow](https://github.com/ethereum/solidity/issues/796#issuecomment-253578925)
+- https://blog.sigmaprime.io/solidity-security.html#ouflow

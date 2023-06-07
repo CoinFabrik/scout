@@ -2,7 +2,8 @@
 ## Description
 - Vulnerability Category: `Validations and error handling`
 - Vulnerability Severity: `Minor`
-- Detector ID: `unused-return-enum`
+- Detectors: [`unused-return-enum`](https://github.com/CoinFabrik/scout/tree/main/detectors/unused-return-enum)
+- Test Cases: [`unused-return-enum-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/unused-return-enum/unused-return-enum-1)
 
 Ink messages can return a `Result` enum with a custom error type. This is 
 useful for the caller to know what went wrong when the message fails. The

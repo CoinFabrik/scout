@@ -2,7 +2,9 @@
 ## Description
 - Vulnerability Category: `DoS`
 - Severity: `High`
-- Detector ID: `dos-unexpected-revert`
+- Detectors: [`dos-unexpected-revert-with-vector`](https://github.com/CoinFabrik/scout/tree/main/detectors/dos-unexpected-revert-with-vector)
+- Test Cases: [`dos-unexpected-revert-with-vector-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/dos-unexpected-revert-with-vector/dos-unexpected-revert-with-vector-1)
+
 
 This vulnerability of DoS through unexpected revert arises when a smart 
 contract does not handle storage size errors correctly, and a user can add an

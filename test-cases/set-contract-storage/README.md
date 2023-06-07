@@ -3,7 +3,8 @@
 ## Description
 - Vulnerability Category: `Authorization`
 - Severity: `High`
-- Detector ID: `set-contract-storage`
+- Detectors: [`set-contract-storage`](https://github.com/CoinFabrik/scout/tree/main/detectors/set-contract-storage)
+- Test Cases: [`set-contract-storage-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/set-contract-storage/set-contract-storage-1)
 
 Smart contract can store important information in memory which changes 
 through the contract's lifecycle. Changes happen via user interaction with 
