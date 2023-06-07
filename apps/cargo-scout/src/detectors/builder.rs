@@ -1,9 +1,10 @@
 use std::path::PathBuf;
 
-use anyhow::{bail, ensure, Context, Result};
+use anyhow::{bail, ensure, Context, Ok, Result};
 use cargo::Config;
 use cargo_metadata::Metadata;
 use glob::glob;
+use itertools::Itertools;
 
 use super::{configuration::DetectorConfiguration, library::Library, source::download_git_repo};
 use crate::utils::{cargo_package, rustup};
@@ -29,13 +30,30 @@ impl<'a> DetectorBuilder<'a> {
     }
 
     /// Compiles detector library and returns its path.
-    pub fn build(self) -> Result<Vec<PathBuf>> {
+    pub fn build(self, used_detectors: Vec<String>) -> Result<Vec<PathBuf>> {
         let detector_root = self.download_detector()?;
-        let paths = self.parse_library_patterns(&detector_root)?;
-        let packages = self.get_packages(paths)?;
+        let all_paths = self.parse_library_patterns(&detector_root)?;
+        let filtered_paths = self.filter_library_paths(all_paths, used_detectors)?;
+        let packages = self.get_packages(filtered_paths)?;
         let library_paths = self.build_packages(packages)?;
 
         Ok(library_paths)
+    }
+
+    pub fn get_detector_names(self) -> Result<Vec<String>> {
+        let detector_root = self.download_detector()?;
+        let paths = self.parse_library_patterns(&detector_root)?;
+        let detector_names = paths
+            .into_iter()
+            .map(|path| {
+                path.file_name()
+                    .and_then(|file_name| file_name.to_str())
+                    .expect("Error getting path")
+                    .to_string()
+            })
+            .collect_vec();
+
+        Ok(detector_names)
     }
 
     /// Downloads and returns detector root from supported sources.
@@ -84,7 +102,6 @@ impl<'a> DetectorBuilder<'a> {
                 })
             })
             .collect::<Result<Vec<_>, _>>()?;
-
         Ok(paths)
     }
 
@@ -138,5 +155,20 @@ impl<'a> DetectorBuilder<'a> {
             .collect::<Result<Vec<_>>>()?;
 
         Ok(library_paths)
+    }
+
+    fn filter_library_paths(
+        &self,
+        mut all_paths: Vec<PathBuf>,
+        used_detectors: Vec<String>,
+    ) -> Result<Vec<PathBuf>> {
+        all_paths.retain(|path| {
+            let file_name = path
+                .file_name()
+                .and_then(|file_name| file_name.to_str())
+                .expect("Error getting path");
+            used_detectors.contains(&file_name.to_string())
+        });
+        Ok(all_paths)
     }
 }

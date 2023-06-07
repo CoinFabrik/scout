@@ -568,9 +568,9 @@ dependencies = [
 
 [[package]]
 name = "dylint"
-version = "2.1.8"
+version = "2.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3b007246d8a6c27ac39fb9622b2354cfeb9fb2718f782199a5d90e3b08b91dd0"
+checksum = "2f6a802ef3683c2243d858e0e4c7bf686f0d3e2ae1c05625b3282bf69e8bc992"
 dependencies = [
  "ansi_term",
  "anyhow",
@@ -597,9 +597,9 @@ dependencies = [
 
 [[package]]
 name = "dylint_internal"
-version = "2.1.8"
+version = "2.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "27801c2e49b6721edcb3552a019d7be91d1035dbe4e80c15ebe9a2008acb1410"
+checksum = "9d85e1eb0b5e5c04e2a33f95c240a3374bd985a251a965ad956eadfac37f9f8f"
 dependencies = [
  "ansi_term",
  "anyhow",
@@ -1187,9 +1187,9 @@ dependencies = [
 
 [[package]]
 name = "once_cell"
-version = "1.17.1"
+version = "1.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b7e5500299e16ebb147ae15a00a942af264cf3688f47923b8fc2cd5858f23ad3"
+checksum = "dd8b5dd2ae5ed71462c540258bedcb51965123ad7e7ccf4b9a8cafaa4a63576d"
 
 [[package]]
 name = "opener"
