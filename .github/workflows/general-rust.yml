@@ -41,6 +41,9 @@ jobs:
       - name: Install dylint-link
         run: cargo install dylint-link
 
+      - name: Install cargo-scout
+        run: cargo install --path apps/cargo-scout
+
       - name: Run cargo test
         run: make test
 
