@@ -1,0 +1,33 @@
+[package]
+name = "insufficiently-random-values"
+version = "0.1.0"
+authors = ["[your_name] <[your_email]>"]
+edition = "2021"
+
+[lib]
+path = "lib.rs"
+
+[features]
+default = ["std"]
+std = [
+    "ink/std",
+    "scale/std",
+    "scale-info/std",
+]
+ink-as-dependency = []
+e2e-tests = []
+
+[dependencies]
+ink = { version = "4.2.0", default-features = false }
+
+scale = { package = "parity-scale-codec", version = "3.4.0", default-features = false, features = ["derive"] }
+scale-info = { version = "2.7", default-features = false, features = ["derive"], optional = true }
+
+[dev-dependencies]
+ink_e2e = "4.2.0"
+
+[profile.dev]
+overflow-checks = false
+
+[profile.release]
+overflow-checks = false
