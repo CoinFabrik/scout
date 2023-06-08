@@ -104,17 +104,16 @@ fn execute_and_validate_example(warning_message: &str, path: &str, is_vulnerable
         panic!();
     }
 
+    let output = String::from_utf8(output.stderr).expect("Failed to parse output");
     assert!(
-        String::from_utf8(output.stderr)
-            .unwrap()
-            .contains(warning_message)
-            == is_vulnerable,
-        "\n\n{}\n\n",
+        output.contains(warning_message) == is_vulnerable,
+        "\n\n{}\n\n{}\n\n",
         if is_vulnerable {
             "Error: vulnerability not found on a vulnerable path".red()
         } else {
             "Error: vulnerability found on a non vulnerable path".red()
-        }
+        },
+        output
     );
 }
 
