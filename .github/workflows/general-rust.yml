@@ -4,10 +4,11 @@ on:
   push:
     branches:
       - "main"
-    paths-ignore:
-      - "**.md"
-      - "**.png"
-      - "**.yml"
+    paths:
+      - "apps/cargo-scout/**"
+      - "detectors/**"
+      - "test-cases/**"
+      - "Makefile"
   pull_request:
   workflow_dispatch:
 
@@ -29,7 +30,8 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            target
+            ./apps/cargo-scout/target
+            ./detectors/target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Update Rust
@@ -79,7 +81,8 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            target
+            ./apps/cargo-scout/target
+            ./detectors/target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Update Rust
