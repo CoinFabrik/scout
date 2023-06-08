@@ -1,6 +1,6 @@
 detectors:
   panic-error:
-    warning_message: "warning: The panic! macro is used to stop execution when a condition is not met. This is useful for testing and prototyping, but should be avoided in production code"
+    warning_message: "The panic! macro is used to stop execution when a condition is not met. This is useful for testing and prototyping, but should be avoided in production code"
     examples:
       - vulnerable_path: "../../test-cases/panic-error/panic-error-1/vulnerable-example/Cargo.toml"
         remediated_path: "../../test-cases/panic-error/panic-error-1/remediated-example/Cargo.toml"
