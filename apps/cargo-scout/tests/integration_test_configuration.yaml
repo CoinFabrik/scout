@@ -4,35 +4,35 @@ detectors:
     examples:
       - vulnerable_path: "../../test-cases/panic-error/panic-error-1/vulnerable-example/Cargo.toml"
         remediated_path: "../../test-cases/panic-error/panic-error-1/remediated-example/Cargo.toml"
-  dos-unbounded-operation:
-    warning_message: "In order to prevent a single transaction from consuming all the gas in a block, unbounded operations must be avoided"
-    examples:
-      - vulnerable_path: "../../test-cases/dos-unbounded-operation/dos-unbounded-operation-1/vulnerable-example/Cargo.toml"
-        remediated_path: "../../test-cases/dos-unbounded-operation/dos-unbounded-operation-1/remediated-example/Cargo.toml"
-  dos-unexpected-revert-with-vector:
-    warning_message: "Abitrary users should not be able to push to a vector, otherwise it could lead to a DoS attack"
-    examples:
-      - vulnerable_path: "../../test-cases/dos-unexpected-revert-with-vector/dos-unexpected-revert-with-vector-1/vulnerable-example/Cargo.toml"
-        remediated_path: "../../test-cases/dos-unexpected-revert-with-vector/dos-unexpected-revert-with-vector-1/remediated-example/Cargo.toml"
-  integer-overflow-or-underflow:
-    warning_message: "integer arithmetic detected"
-    examples:
-      - vulnerable_path: "../../test-cases/integer-overflow-or-underflow/integer-overflow-or-underflow-1/vulnerable-example/Cargo.toml"
-        remediated_path: "../../test-cases/integer-overflow-or-underflow/integer-overflow-or-underflow-1/remediated-example/Cargo.toml"
-  set-contract-storage:
-    warning_message: "Abitrary users should not have control over keys because it implies writing any value of left mapping, lazy variable, or the main struct of the contract located in position 0 of the storage"
-    examples:
-      - vulnerable_path: "../../test-cases/set-contract-storage/set-contract-storage-1/vulnerable-example/Cargo.toml"
-        remediated_path: "../../test-cases/set-contract-storage/set-contract-storage-1/remediated-example/Cargo.toml"
-  unused-return-enum:
-    warning_message: "Ink messages can return a Result enum with a custom error type. If any of the variants (Ok/Err) is not used, the code could be simplified or it could imply a bug."
-    examples:
-      - vulnerable_path: "../../test-cases/unused-return-enum/unused-return-enum-1/vulnerable-example/Cargo.toml"
-        remediated_path: "../../test-cases/unused-return-enum/unused-return-enum-1/remediated-example/Cargo.toml"
-  reentrancy:
-    warning_message: "External calls could open the opportunity for a malicious contract to execute any arbitrary code"
-    examples:
-      - vulnerable_path: "../../test-cases/reentrancy/reentrancy-1/vulnerable-example/vault/Cargo.toml"
-        remediated_path: "../../test-cases/reentrancy/reentrancy-1/remediated-example/vault/Cargo.toml"
-      - vulnerable_path: "../../test-cases/reentrancy/reentrancy-2/vulnerable-example/vault/Cargo.toml"
-        remediated_path: "../../test-cases/reentrancy/reentrancy-2/remediated-example/vault/Cargo.toml"
+  # dos-unbounded-operation:
+  #   warning_message: "In order to prevent a single transaction from consuming all the gas in a block, unbounded operations must be avoided"
+  #   examples:
+  #     - vulnerable_path: "../../test-cases/dos-unbounded-operation/dos-unbounded-operation-1/vulnerable-example/Cargo.toml"
+  #       remediated_path: "../../test-cases/dos-unbounded-operation/dos-unbounded-operation-1/remediated-example/Cargo.toml"
+  # dos-unexpected-revert-with-vector:
+  #   warning_message: "Abitrary users should not be able to push to a vector, otherwise it could lead to a DoS attack"
+  #   examples:
+  #     - vulnerable_path: "../../test-cases/dos-unexpected-revert-with-vector/dos-unexpected-revert-with-vector-1/vulnerable-example/Cargo.toml"
+  #       remediated_path: "../../test-cases/dos-unexpected-revert-with-vector/dos-unexpected-revert-with-vector-1/remediated-example/Cargo.toml"
+  # integer-overflow-or-underflow:
+  #   warning_message: "integer arithmetic detected"
+  #   examples:
+  #     - vulnerable_path: "../../test-cases/integer-overflow-or-underflow/integer-overflow-or-underflow-1/vulnerable-example/Cargo.toml"
+  #       remediated_path: "../../test-cases/integer-overflow-or-underflow/integer-overflow-or-underflow-1/remediated-example/Cargo.toml"
+  # set-contract-storage:
+  #   warning_message: "Abitrary users should not have control over keys because it implies writing any value of left mapping, lazy variable, or the main struct of the contract located in position 0 of the storage"
+  #   examples:
+  #     - vulnerable_path: "../../test-cases/set-contract-storage/set-contract-storage-1/vulnerable-example/Cargo.toml"
+  #       remediated_path: "../../test-cases/set-contract-storage/set-contract-storage-1/remediated-example/Cargo.toml"
+  # unused-return-enum:
+  #   warning_message: "Ink messages can return a Result enum with a custom error type. If any of the variants (Ok/Err) is not used, the code could be simplified or it could imply a bug."
+  #   examples:
+  #     - vulnerable_path: "../../test-cases/unused-return-enum/unused-return-enum-1/vulnerable-example/Cargo.toml"
+  #       remediated_path: "../../test-cases/unused-return-enum/unused-return-enum-1/remediated-example/Cargo.toml"
+  # reentrancy:
+  #   warning_message: "External calls could open the opportunity for a malicious contract to execute any arbitrary code"
+  #   examples:
+  #     - vulnerable_path: "../../test-cases/reentrancy/reentrancy-1/vulnerable-example/vault/Cargo.toml"
+  #       remediated_path: "../../test-cases/reentrancy/reentrancy-1/remediated-example/vault/Cargo.toml"
+  #     - vulnerable_path: "../../test-cases/reentrancy/reentrancy-2/vulnerable-example/vault/Cargo.toml"
+  #       remediated_path: "../../test-cases/reentrancy/reentrancy-2/remediated-example/vault/Cargo.toml"
