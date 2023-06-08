@@ -5,7 +5,7 @@ use colored::Colorize;
 use config::Config;
 use serde::{Deserialize, Serialize};
 
-const CONFIG_FILENAME: &str = "test-configuration.yaml";
+const CONFIG_FILENAME: &str = "integration_test_configuration.yaml";
 
 #[derive(Debug, Serialize, Deserialize)]
 struct DetectorConfig {
