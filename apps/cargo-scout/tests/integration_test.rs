@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::io::{self, Write};
 use std::process::{Command, Output};
 
 use colored::Colorize;
@@ -84,20 +85,23 @@ fn test() {
 }
 
 fn execute_and_validate_example(warning_message: &str, path: &str, is_vulnerable: bool) {
-    println!("{} {}", "Running example:".green(), path);
-
+    let start_time = std::time::Instant::now();
+    print!("{} {}", "Running example:".green(), path);
+    io::stdout().flush().unwrap();
     let output = execute_command(path);
+    let end_time = std::time::Instant::now();
 
     if !output.status.success() {
         println!(
             "\n\n{}\n\n",
             format!(
-                "Error: failed to execute the command, probably due to an invalid {} path",
+                "Error: failed to execute the command, probably due to an invalid {} path. Elapsed time: {} ms",
                 if is_vulnerable {
                     "vulnerable"
                 } else {
                     "remediated"
-                }
+                },
+                end_time.duration_since(start_time).as_millis() as f64 / 1000.0
             )
             .red()
         );
@@ -114,6 +118,12 @@ fn execute_and_validate_example(warning_message: &str, path: &str, is_vulnerable
             "Error: vulnerability found on a non vulnerable path".red()
         },
         output
+    );
+
+    println!(
+        " - {} {} secs.",
+        "Elapsed time:".bright_purple(),
+        end_time.duration_since(start_time).as_millis() as f64 / 1000.0
     );
 }
 
