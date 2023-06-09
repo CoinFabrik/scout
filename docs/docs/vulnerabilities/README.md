@@ -71,7 +71,7 @@ list.
 
 Check the following [documentation](1-integer-overflow-or-underflow.md) for a more detailed explanation of this vulnerability class.
 
-### 2 - Unauthotized Set Contract Storage
+### 2 - Unauthorized Set Contract Storage
 Smart contracts can store important information in memory which changes through the contract's lifecycle. Changes happen via user interaction with the smart contract. An _unauthorized_ set contract storage vulnerability happens when a smart contract call allows a user to set or modify contract memory when they were not supposed to be authorized.
 
 Common practice is to have functions with the ability to change

@@ -13,6 +13,7 @@ will fail.
 In this smart contract a malicious user may modify the smart contract's
 conditions so that any transaction coming after will fail, thus imposing
 a denial of service for other users.
+
 ## Exploit Scenario
 In the following example, a contract has a function `add_payee` that allows 
 adding a new element to a vector. The function `pay_out` iterates over the 
@@ -40,10 +41,11 @@ pub fn add_payee(&mut self) -> u128 {
     self.next_payee_ix.checked_sub(1).unwrap()
 }
 ```
+The vulnerable code example can be found [here](https://github.com/CoinFabrik/scout/blob/main/test-cases/dos-unbounded-operation/dos-unbounded-operation-1/vulnerable-example/lib.rs).
 
 ### Deployment
 An example can be found under the directory 
-[vulnerable-example](./vulnerable-example). The exploit can be tested by
+[vulnerable-example](https://github.com/CoinFabrik/scout/blob/main/test-cases/dos-unbounded-operation/dos-unbounded-operation-1/vulnerable-example). The exploit can be tested by
 running the end-to-end test called `pay_out_runs_out_of_gas`.
 
 ## Remediation
@@ -56,7 +58,7 @@ If looping over an array of unknown size is absolutely necessary, then it
 should be planned to potentially take multiple blocks, and therefore require
 multiple transactions.
 
-The fixed code can be found [here](remediated-example/lib.rs).
+The remediated code example can be found [here](https://github.com/CoinFabrik/scout/blob/main/test-cases/dos-unbounded-operation/dos-unbounded-operation-1/remediated-example/lib.rs).
 
 ## References
 - https://consensys.github.io/smart-contract-best-practices/attacks/denial-of-service

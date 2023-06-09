@@ -44,7 +44,7 @@ The usage of `panic!` in this example, is not recommended because it will stop
 the execution of the caller contract. If the method was called by the user, 
 then he will receive `ContractTrapped` as the only error message.
 
-The full code can be found [here](vulnerable-example/lib.rs).
+The vulnerable code example can be found [here](https://github.com/CoinFabrik/scout/blob/main/test-cases/panic-error/panic-error-1/vulnerable-example/lib.rs).
 
 ## Remediation
 A possible remediation goes as follows:
@@ -75,7 +75,7 @@ By first defining the `Error` enum and then returning a `Result<(), Error>`,
 more information is added to the caller and, e.g. the caller contract could 
 decide to revert the transaction or to continue execution.
 
-The full code can be found [here](remediated-example/lib.rs).
+The remediated code example can be found [here](https://github.com/CoinFabrik/scout/blob/main/test-cases/panic-error/panic-error-1/remediated-example/lib.rs).
 
 ## References
 

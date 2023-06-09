@@ -23,6 +23,12 @@ imply a bug.
 In order to perform this exploit we work through the following example:
 
 ```rust
+#[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
+#[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
+pub enum TradingPairErrors {
+    Overflow,
+}
+
 #[ink(message)]
 pub fn get_percentage_difference(
     &mut self,
@@ -46,27 +52,21 @@ The function then returns an error enum variant `TradingPairErrors::Overflow`.
 However, the function never returns a `Result` enum variant `Ok`, thus always 
 failing.
 
-The following code can be found [here](vulnerable-example/lib.rs)
+The vulnerable code example can be found [here](https://github.com/CoinFabrik/scout/tree/main/test-cases/unused-return-enum/unused-return-enum-1/vulnerable-example).
 
 ## Remediation
 This function could be easily fixed by returning a `Result` enum variant `Ok`
 when the percentage difference is calculated successfully. By providing a check in 
 the linter that ensures that all the variants of the `Result` enum are used, this 
-bug could have been avoided.
+bug could have been avoided. This is shown in the example below:
 
-First we define the `Error` enum:
-
-````rust
+```rust
 #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
 #[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
 pub enum TradingPairErrors {
     Overflow,
 }
-````
 
-Then we change the function to:
-
-```rust
 #[ink(message)]
 pub fn get_percentage_difference(
     &mut self,
@@ -82,7 +82,7 @@ pub fn get_percentage_difference(
 }
 ```
 
-The full code can be found [here](remediated-example/lib.rs).
+The remediated code example can be found [here](https://github.com/CoinFabrik/scout/tree/main/test-cases/unused-return-enum/unused-return-enum-1/remediated-example).
 
 
 ## References

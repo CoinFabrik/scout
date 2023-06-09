@@ -38,7 +38,7 @@ impl MisusedSetContractStorage for Erc20 {
 }
 ```
 
-The full code can be found [here](vulnerable-example/lib.rs).
+The vulnerable code example can be found [here](https://github.com/CoinFabrik/scout/blob/main/test-cases/set-contract-storage/set-contract-storage-1/vulnerable-example/lib.rs).
 
 ### Deployment
 To compile this example, `cargo-contract` v2.0.1 (or above) is required.
@@ -49,7 +49,8 @@ Afterwards, upload the the binary into the running network with the account `Ali
 
 
 ```bash
-user:example$ cargo contract upload --suri //Alice ./target/ink/my_contract.contract
+$ cargo contract upload --suri //Alice ./target/ink/my_contract.contract
+
       Events
        Event Balances ➜ Withdraw
          who: 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
@@ -74,7 +75,8 @@ Instantiate the uploaded smart contract with 100000 tokens from `Alice` running
 `[Enter]`.
 
 ```bash
-user:example$ cargo contract instantiate --args 100000 --suri //Alice
+$ cargo contract instantiate --args 100000 --suri //Alice
+
  Dry-running new (skip with --skip-dry-run)
     Success! Gas required estimated at Weight(ref_time: 1173504383, proof_size: 0)
 Confirm transaction details: (skip with --skip-confirm)
@@ -134,7 +136,8 @@ Make sure to replace the contract address with the one you obtained. In this
 case, you will see that the allowance is set to zero.
 
 ```bash
-user:example$ cargo contract call --contract 5Gj5Z1Nf8NPkaP2iuBQhkJQRt1f7Nt7H2umwbrRRnonnKEQf --message BaseErc20::allowance --args 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY 5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty --suri //Alice --dry-run
+$ cargo contract call --contract 5Gj5Z1Nf8NPkaP2iuBQhkJQRt1f7Nt7H2umwbrRRnonnKEQf --message BaseErc20::allowance --args 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY 5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty --suri //Alice --dry-run
+
       Result Success!
     Reverted false
         Data Ok(0)
@@ -146,7 +149,8 @@ with the command
 `cargo contract call --contract 5Gj5Z1Nf8NPkaP2iuBQhkJQRt1f7Nt7H2umwbrRRnonnKEQf --message BaseErc20::approve --args 5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty 10 --suri //Alice`.
 
 ```bash
-user:example$ cargo contract call --contract 5Gj5Z1Nf8NPkaP2iuBQhkJQRt1f7Nt7H2umwbrRRnonnKEQf --message BaseErc20::approve --args 5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty 10 --suri //Alice
+$ cargo contract call --contract 5Gj5Z1Nf8NPkaP2iuBQhkJQRt1f7Nt7H2umwbrRRnonnKEQf --message BaseErc20::approve --args 5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty 10 --suri //Alice
+
  Dry-running BaseErc20::approve (skip with --skip-dry-run)
     Success! Gas required estimated at Weight(ref_time: 7983333376, proof_size: 262144)
 Confirm transaction details: (skip with --skip-confirm)
@@ -189,7 +193,8 @@ allowance.
 In order to do this, he runs the following command `cargo contract call --contract 5Gj5Z1Nf8NPkaP2iuBQhkJQRt1f7Nt7H2umwbrRRnonnKEQf --message MisusedSetContractStorage::misused_set_contract_storage --args [255,0,0,0,212,53,147,199,21,253,211,28,97,20,26,189,4,169,159,214,130,44,133,88,133,76,205,227,154,86,132,231,165,109,162,125,142,175,4,21,22,135,115,99,38,201,254,161,126,37,252,82,135,97,54,147,201,18,144,156,178,38,170,71,148,242,106,72] 1000000 --suri //Bob`.
 
 ```bash
-user:example$ cargo contract call --contract 5Gj5Z1Nf8NPkaP2iuBQhkJQRt1f7Nt7H2umwbrRRnonnKEQf --message MisusedSetContractStorage::misused_set_contract_storage --args [255,0,0,0,212,53,147,199,21,253,211,28,97,20,26,189,4,169,159,214,130,44,133,88,133,76,205,227,154,86,132,231,165,109,162,125,142,175,4,21,22,135,115,99,38,201,254,161,126,37,252,82,135,97,54,147,201,18,144,156,178,38,170,71,148,242,106,72] 1000000 --suri //Bob
+$ cargo contract call --contract 5Gj5Z1Nf8NPkaP2iuBQhkJQRt1f7Nt7H2umwbrRRnonnKEQf --message MisusedSetContractStorage::misused_set_contract_storage --args [255,0,0,0,212,53,147,199,21,253,211,28,97,20,26,189,4,169,159,214,130,44,133,88,133,76,205,227,154,86,132,231,165,109,162,125,142,175,4,21,22,135,115,99,38,201,254,161,126,37,252,82,135,97,54,147,201,18,144,156,178,38,170,71,148,242,106,72] 1000000 --suri //Bob
+
  Dry-running MisusedSetContractStorage::misused_set_contract_storage (skip with --skip-dry-run)
     Success! Gas required estimated at Weight(ref_time: 7983333376, proof_size: 262144)
 Confirm transaction details: (skip with --skip-confirm)
@@ -215,7 +220,8 @@ Submit? (Y/n): y
 If we check now Bob's allowance, we see that he has access to 1000000 tokens!
 
 ```bash
-user:example$ cargo contract call --contract 5Gj5Z1Nf8NPkaP2iuBQhkJQRt1f7Nt7H2umwbrRRnonnKEQf --message BaseErc20::allowance --args 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY 5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty --suri //Alice --dry-run
+$ cargo contract call --contract 5Gj5Z1Nf8NPkaP2iuBQhkJQRt1f7Nt7H2umwbrRRnonnKEQf --message BaseErc20::allowance --args 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY 5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty --suri //Alice --dry-run
+
       Result Success!
     Reverted false
         Data Ok(1000000)
@@ -255,7 +261,7 @@ fn misused_set_contract_storage(&mut self, user_input_key: [u8; 68], user_input_
 }
 ```
 
-The full code can be found [here](remediated-example/lib.rs).
+The remediated code example can be found [here](https://github.com/CoinFabrik/scout/blob/main/test-cases/set-contract-storage/set-contract-storage-1/remediated-example/lib.rs).
 
 ## References
 * https://use.ink/datastructures/storage-layout
