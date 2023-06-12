@@ -22,5 +22,5 @@ lint-rust:
 
 test:
 	@echo "Running tests..."
-	@cd apps/cargo-scout && cargo test --all --all-features
+	@cd apps/cargo-scout && cargo test --all --all-features -- --nocapture
 	@cd detectors && cargo test --all --all-features

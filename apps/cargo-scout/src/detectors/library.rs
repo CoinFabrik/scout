@@ -42,14 +42,21 @@ impl Library {
             .sanitize_environment()
             .env_remove(env::RUSTFLAGS)
             .current_dir(&self.root)
-            .args(["--release", "--target-dir", &target_dir.to_string_lossy()])
+            .args(["--release"])
             .success()?;
 
         if !library_path.exists() {
             anyhow::bail!("Could not determine if {library_path:?} exists");
         }
 
-        Ok(library_path)
+        if !target_dir.exists() {
+            std::fs::create_dir_all(&target_dir)?;
+        }
+
+        let new_library_path = target_dir.join(library_path.file_name().unwrap());
+        std::fs::copy(&library_path, &new_library_path)?;
+
+        Ok(new_library_path)
     }
 
     pub fn target_directory(&self) -> PathBuf {
@@ -59,7 +66,7 @@ impl Library {
     }
 
     pub fn path(&self) -> PathBuf {
-        self.target_directory().join("release").join(format!(
+        self.root.join("target").join("release").join(format!(
             "{}{}@{}{}",
             consts::DLL_PREFIX,
             self.lib_name.replace('-', "_"),
