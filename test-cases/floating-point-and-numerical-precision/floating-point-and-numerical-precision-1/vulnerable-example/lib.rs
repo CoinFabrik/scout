@@ -8,11 +8,13 @@ mod floating_point_and_numerical_precision {
     pub struct FloatingPointAndNumericalPrecision {}
 
     impl FloatingPointAndNumericalPrecision {
+        /// Creates a new FloatingPointAndNumericalPrecision contract.
         #[ink(constructor)]
         pub fn new() -> Self {
             Self {}
         }
 
+        /// Calculates the profit for a given percentage of the total profit.
         #[ink(message)]
         pub fn split_profit(&self, percentage: u64, total_profit: u64) -> u64 {
             (percentage / 100) * total_profit
