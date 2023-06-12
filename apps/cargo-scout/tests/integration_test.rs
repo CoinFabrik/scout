@@ -25,30 +25,6 @@ pub struct Detectors {
     detectors: HashMap<String, DetectorConfig>,
 }
 
-fn command_builder(path: &str) -> Command {
-    let mut command = Command::new("cargo");
-    command.arg("scout");
-    command.arg("-m");
-    command.arg(path);
-    command
-}
-
-pub fn get_configuration() -> Result<Detectors, config::ConfigError> {
-    let base_path = std::env::current_dir().expect("Failed to determine the current directory.");
-    let configuration_directory = base_path.join("tests");
-    Config::builder()
-        .add_source(config::File::from(
-            configuration_directory.join(CONFIG_FILENAME),
-        ))
-        .build()?
-        .try_deserialize()
-}
-
-fn execute_command(path: &str) -> Output {
-    let mut command = command_builder(path);
-    command.output().expect("Failed to execute command")
-}
-
 #[test]
 fn test() {
     assert!(
@@ -82,6 +58,17 @@ fn test() {
             );
         }
     }
+}
+
+pub fn get_configuration() -> Result<Detectors, config::ConfigError> {
+    let base_path = std::env::current_dir().expect("Failed to determine the current directory.");
+    let configuration_directory = base_path.join("tests");
+    Config::builder()
+        .add_source(config::File::from(
+            configuration_directory.join(CONFIG_FILENAME),
+        ))
+        .build()?
+        .try_deserialize()
 }
 
 fn execute_and_validate_example(warning_message: &str, path: &str, is_vulnerable: bool) {
@@ -125,6 +112,19 @@ fn execute_and_validate_example(warning_message: &str, path: &str, is_vulnerable
         "Elapsed time:".bright_purple(),
         end_time.duration_since(start_time).as_millis() as f64 / 1000.0
     );
+}
+
+fn execute_command(path: &str) -> Output {
+    let mut command = command_builder(path);
+    command.output().expect("Failed to execute command")
+}
+
+fn command_builder(path: &str) -> Command {
+    let mut command = Command::new("cargo");
+    command.arg("scout");
+    command.arg("-m");
+    command.arg(path);
+    command
 }
 
 fn print_cargo_scout_not_found() {
