@@ -53,12 +53,10 @@ impl Library {
             std::fs::create_dir_all(&target_dir)?;
         }
 
-        std::fs::copy(
-            &library_path,
-            target_dir.join(library_path.file_name().unwrap()),
-        )?;
+        let new_library_path = target_dir.join(library_path.file_name().unwrap());
+        std::fs::copy(&library_path, &new_library_path)?;
 
-        Ok(library_path)
+        Ok(new_library_path)
     }
 
     pub fn target_directory(&self) -> PathBuf {
