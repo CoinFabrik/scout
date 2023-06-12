@@ -65,7 +65,7 @@ mod floating_point_and_numerical_precision {
                 .call(&ink_e2e::bob(), split_profit, 0, None)
                 .await
                 .expect("split_profit failed");
-            assert_ne!(split_profit_res.return_value(), 33);
+            assert_eq!(split_profit_res.return_value(), 0);
 
             Ok(())
         }
