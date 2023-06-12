@@ -34,7 +34,7 @@ mod unsafe_unwrap {
         /// Returns the balance of a given account.
         #[ink(message)]
         pub fn balance_of(&self, owner: AccountId) -> Balance {
-            self.balances.get(owner).unwrap_or(0)
+            self.balances.get(owner).unwrap()
         }
 
         /// Transfers tokens from the caller to the given `to` account.
@@ -77,7 +77,19 @@ mod unsafe_unwrap {
         }
 
         #[ink::test]
-        fn transfer_works() {
+        #[should_panic]
+        fn balance_of_unwraps_on_unknown_account() {
+            // Arrange
+            let initial_balance = 100;
+            let contract = UnsafeUnwrap::new(initial_balance);
+
+            // Act
+            contract.balance_of(test::default_accounts::<DefaultEnvironment>().bob);
+        }
+
+        #[ink::test]
+        #[should_panic]
+        fn transfer_unwraps_to_unknown_account() {
             // Arrange
             let initial_balance = 100;
             let transfer_amount = 20;
@@ -89,17 +101,7 @@ mod unsafe_unwrap {
                     test::default_accounts::<DefaultEnvironment>().bob,
                     transfer_amount,
                 )
-                .expect("Failed to transfer");
-
-            // Assert
-            assert_eq!(
-                contract.balance_of(test::default_accounts::<DefaultEnvironment>().alice),
-                initial_balance - transfer_amount
-            );
-            assert_eq!(
-                contract.balance_of(test::default_accounts::<DefaultEnvironment>().bob),
-                transfer_amount
-            );
+                .unwrap();
         }
     }
 
@@ -140,15 +142,44 @@ mod unsafe_unwrap {
         }
 
         #[ink_e2e::test]
-        async fn transfer_works(mut client: ink_e2e::Client<C, E>) -> E2EResult<()> {
+        async fn balance_of_unwraps_on_unknown_account(
+            mut client: ink_e2e::Client<C, E>,
+        ) -> E2EResult<()> {
+            // Arrange
+            let initial_balance = 100;
+
+            // Act
+            let constructor = UnsafeUnwrapRef::new(initial_balance);
+            let contract_acc_id = client
+                .instantiate("unsafe-unwrap", &ink_e2e::alice(), constructor, 0, None)
+                .await
+                .expect("instantiate failed")
+                .account_id;
+
+            // Assert
+            let bob_account_id = ink_e2e::bob::<ink_e2e::PolkadotConfig>()
+                .account_id()
+                .0
+                .into();
+            let balance_of_bob_call = build_message::<UnsafeUnwrapRef>(contract_acc_id.clone())
+                .call(|contract| contract.balance_of(bob_account_id));
+            let balance_of_bob = client
+                .call(&ink_e2e::alice(), balance_of_bob_call, 0, None)
+                .await;
+
+            assert!(balance_of_bob.is_err());
+
+            Ok(())
+        }
+
+        #[ink_e2e::test]
+        async fn transfer_unwraps_to_unknown_account(
+            mut client: ink_e2e::Client<C, E>,
+        ) -> E2EResult<()> {
             // Arrange
             let initial_balance = 100;
             let transfer_amount = 40;
 
-            let alice_account_id = ink_e2e::alice::<ink_e2e::PolkadotConfig>()
-                .account_id()
-                .0
-                .into();
             let bob_account_id = ink_e2e::bob::<ink_e2e::PolkadotConfig>()
                 .account_id()
                 .0
@@ -164,28 +195,10 @@ mod unsafe_unwrap {
 
             let transfer_call = build_message::<UnsafeUnwrapRef>(contract_acc_id.clone())
                 .call(|contract| contract.transfer(bob_account_id, transfer_amount));
-            client
-                .call(&ink_e2e::alice(), transfer_call, 0, None)
-                .await
-                .expect("transfer failed");
+            let transfer_result = client.call(&ink_e2e::alice(), transfer_call, 0, None).await;
 
             // Assert
-            let balance_of_alice_call = build_message::<UnsafeUnwrapRef>(contract_acc_id.clone())
-                .call(|contract| contract.balance_of(alice_account_id));
-            let balance_of_alice = client
-                .call_dry_run(&ink_e2e::alice(), &balance_of_alice_call, 0, None)
-                .await;
-            let balance_of_bob_call = build_message::<UnsafeUnwrapRef>(contract_acc_id.clone())
-                .call(|contract| contract.balance_of(bob_account_id));
-            let balance_of_bob = client
-                .call_dry_run(&ink_e2e::bob(), &balance_of_bob_call, 0, None)
-                .await;
-
-            assert_eq!(
-                balance_of_alice.return_value(),
-                initial_balance - transfer_amount
-            );
-            assert_eq!(balance_of_bob.return_value(), transfer_amount);
+            assert!(transfer_result.is_err());
 
             Ok(())
         }
