@@ -1,3 +1,4 @@
+#![allow(clippy::new_without_default)]
 #![cfg_attr(not(feature = "std"), no_std, no_main)]
 
 #[ink::contract]
@@ -18,12 +19,6 @@ mod floating_point_and_numerical_precision {
         }
     }
 
-    impl Default for FloatingPointAndNumericalPrecision {
-        fn default() -> Self {
-            Self::new()
-        }
-    }
-
     #[cfg(test)]
     mod tests {
         use super::*;
@@ -31,7 +26,7 @@ mod floating_point_and_numerical_precision {
         #[test]
         fn split_profit_precision() {
             let contract = FloatingPointAndNumericalPrecision::new();
-            assert_ne!(contract.split_profit(33, 100), 33);
+            assert_eq!(contract.split_profit(33, 100), 0);
         }
     }
 
