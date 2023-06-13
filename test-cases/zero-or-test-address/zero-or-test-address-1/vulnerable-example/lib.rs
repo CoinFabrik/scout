@@ -47,7 +47,7 @@ mod zerocheck {
             let zero_address = AccountId::from([0x0; 32]);
 
             let zerocheck = Zerocheck::new(zero_address);
-            assert!(zerocheck.admin == zero_address);
+            assert_eq!(zerocheck.admin, zero_address);
         }
 
         #[ink::test]
