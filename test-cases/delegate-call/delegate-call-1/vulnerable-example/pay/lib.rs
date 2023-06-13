@@ -42,24 +42,6 @@ mod delegate_call {
                 .returns::<(u128, u128, u128)>()
                 .invoke();
 
-            let p1 = result.0;
-            let p2 = result.1;
-            let p3 = result.2;
-
-            ink::env::debug_println!("address of p1 in payer: {:?}", &self.percent1 as *const u128);
-            ink::env::debug_println!("address of p2 in payer: {:?}", &self.percent2 as *const u128);
-            ink::env::debug_println!("address of p3 in payer: {:?}", &self.percent3 as *const u128);
-
-            ink::env::debug_println!("address of result: {:?}", &result as *const (u128, u128, u128));
-            ink::env::debug_println!("address of result.0: {:?}", &result.0 as *const u128);
-            ink::env::debug_println!("address of result.1: {:?}", &result.1 as *const u128);
-            ink::env::debug_println!("address of result.2: {:?}", &result.2 as *const u128);
-
-
-
-            ink::env::debug_println!("requested value: {:?}", result);
-            ink::env::debug_println!("requested values divided by 256: {:?}", (p1/256, p2/256, p3/256));
-
             result
 
         }

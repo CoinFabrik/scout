@@ -32,14 +32,7 @@ mod divider{
             let p1 = self.percent1;
             let p2 = self.percent2;
             let p3 = self.percent3;
-            ink::env::debug_println!("requested value: {:?}", p1);
-            ink::env::debug_println!("requested value: {:?}", p2);
-            ink::env::debug_println!("requested value: {:?}", p3);
-            //print the memory address of the values
-            ink::env::debug_println!("address of p1 in divider: {:?}", &p1 as *const u128);
-            ink::env::debug_println!("address of p2 in divider: {:?}", &p2 as *const u128);
-            ink::env::debug_println!("address of p3 in divider: {:?}", &p3 as *const u128);
-
+d
             (p1, p2, p3)
         }
 
