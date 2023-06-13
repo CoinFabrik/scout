@@ -38,10 +38,10 @@ dylint_linting::declare_late_lint! {
     ///     ```
     /// Use instead:
     ///```rust
-    ///pub fn delegateCall(&mut self, argument: Balance) {
+    ///pub fn delegate_call(&mut self, argument: Balance) {
     ///    let selector_bytes = [0x0, 0x0, 0x0, 0x0];
     ///    let result: T  = build_call::<DefaultEnvironment>()
-    ///       .delegate(self.target)
+    ///        .delegate(self.target)
     ///        .exec_input(
     ///            ExecutionInput::new(Selector::new(selector_bytes))
     ///                .push_arg(argument)
@@ -50,11 +50,15 @@ dylint_linting::declare_late_lint! {
     ///        .invoke();
     ///}
     ///
-    ///pub fn set_target(&mut self, new_target: Hash) {
-    ///    assert_eq!(self.admin, self.env().caller(), "Only admin can set target");
-    ///   self.target = new_target;
+    ///pub fn set_target(&mut self, new_target: Hash) -> Result<(), &'static str> {
+    ///   if self.admin != self.env().caller() {
+    ///        Err("Only admin can set target")
+    ///    } else {
+    ///        self.target = new_target;
+    ///        Ok(())
+     ///   }
     ///}
-    ///```
+
     pub DELEGATE_CALL,
     Warn,
     "Passing arguments to the target of a delegate call is not safe, as it allows the caller to set a malicious hash as the target."
