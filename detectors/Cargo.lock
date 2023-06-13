@@ -142,17 +142,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "clippy_utils"
-version = "0.1.71"
-source = "git+https://github.com/rust-lang/rust-clippy?rev=f16bfa478f131b2ec2ad9742f88dc6a9beea52b7#f16bfa478f131b2ec2ad9742f88dc6a9beea52b7"
-dependencies = [
- "arrayvec",
- "if_chain",
- "itertools",
- "rustc-semver",
-]
-
-[[package]]
 name = "compiletest_rs"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -197,7 +186,7 @@ dependencies = [
 name = "delegate_call"
 version = "0.1.0"
 dependencies = [
- "clippy_utils 0.1.71",
+ "clippy_utils",
  "dylint_linting",
  "dylint_testing",
  "if_chain",
@@ -265,7 +254,7 @@ dependencies = [
 name = "dos-unbounded-operation"
 version = "0.1.0"
 dependencies = [
- "clippy_utils 0.1.69",
+ "clippy_utils",
  "dylint_linting",
  "dylint_testing",
  "if_chain",
@@ -570,7 +559,7 @@ dependencies = [
 name = "integer-overflow-or-underflow"
 version = "0.1.0"
 dependencies = [
- "clippy_utils 0.1.69",
+ "clippy_utils",
  "dylint_linting",
  "dylint_testing",
  "if_chain",
@@ -749,7 +738,7 @@ checksum = "04744f49eae99ab78e0d5c0b603ab218f515ea8cfe5a456d7629ad883a3b6e7d"
 name = "panic-error"
 version = "0.1.0"
 dependencies = [
- "clippy_utils 0.1.69",
+ "clippy_utils",
  "dylint_linting",
  "dylint_testing",
  "if_chain",
@@ -824,7 +813,7 @@ dependencies = [
 name = "reentrancy"
 version = "0.1.0"
 dependencies = [
- "clippy_utils 0.1.69",
+ "clippy_utils",
  "dylint_linting",
  "dylint_testing",
  "if_chain",
@@ -997,7 +986,7 @@ dependencies = [
 name = "set-storage-storage"
 version = "0.1.0"
 dependencies = [
- "clippy_utils 0.1.69",
+ "clippy_utils",
  "dylint_internal",
  "dylint_linting",
  "dylint_testing",
@@ -1162,7 +1151,7 @@ checksum = "497961ef93d974e23eb6f433eb5fe1b7930b659f06d12dec6fc44a8f554c0bba"
 name = "unexpected-revert"
 version = "0.1.0"
 dependencies = [
- "clippy_utils 0.1.69",
+ "clippy_utils",
  "dylint_internal",
  "dylint_linting",
  "dylint_testing",
@@ -1200,7 +1189,7 @@ checksum = "c0edd1e5b14653f783770bce4a4dabb4a5108a5370a5f5d8cfe8710c361f6c8b"
 name = "unused_return_enum"
 version = "0.1.0"
 dependencies = [
- "clippy_utils 0.1.69",
+ "clippy_utils",
  "dylint_linting",
  "dylint_testing",
  "if_chain",
