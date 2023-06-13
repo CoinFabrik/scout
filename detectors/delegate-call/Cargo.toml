@@ -1,5 +1,5 @@
 [package]
-name = "delegate_call"
+name = "delegate-call"
 version = "0.1.0"
 authors = ["authors go here"]
 description = "description goes here"
