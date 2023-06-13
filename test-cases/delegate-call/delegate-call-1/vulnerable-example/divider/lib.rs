@@ -32,7 +32,7 @@ mod divider{
             let p1 = self.percent1;
             let p2 = self.percent2;
             let p3 = self.percent3;
-d
+
             (p1, p2, p3)
         }
 
