@@ -1,40 +1,48 @@
+
 #![cfg_attr(not(feature = "std"), no_std, no_main)]
+//
 
 #[ink::contract]
 mod zerocheck {
-
     #[ink(storage)]
     pub struct Zerocheck {
         admin: AccountId,
     }
 
+    #[derive(Debug, PartialEq, Eq, Clone, scale::Encode, scale::Decode)]
+    #[cfg_attr(feature = "std", derive(::scale_info::TypeInfo))]
+    pub enum Error {
+        /// Caller is not not authorized.
+        NotAuthorized,
+        /// Address is invalid.
+        InvalidAddress
+
+    }
+
     impl Zerocheck {
         #[ink(constructor)]
-        pub fn new(admin: AccountId) -> Self {
-            if admin == AccountId::from([0x0; 32]) {
-                panic!("Admin address cannot be empty");
-            }
-            Self { admin: ink::env:caller()  }
+        pub fn new() -> Self {
+            let admin = Self::env().caller();
+            Self { admin }
         }
 
         #[ink(message)]
-        pub fn modify_admin(&mut self, admin: AccountId) -> AccountId {
-            assert_eq!(
-                self.admin,
-                self.env().caller(),
-                "Only admin can call this function"
-            );
+        pub fn modify_admin(&mut self, admin: AccountId) -> Result<AccountId, Error> {
+            if self.admin != self.env().caller() {
+                return Err(Error::NotAuthorized);
+            }
+
             if admin == AccountId::from([0x0; 32]) {
-                panic!("Admin address cannot be empty");
+                return Err(Error::InvalidAddress);
             }
 
             self.admin = admin;
-            return self.admin;
+            Ok(self.admin)
         }
     }
 
-    #[cfg(test)]
-    mod tests {
+   #[cfg(test)]
+     mod tests {
         use super::*;
         use ink::env::test::DefaultAccounts;
         type AccountId = <ink::env::DefaultEnvironment as ink::env::Environment>::AccountId;
@@ -43,18 +51,8 @@ mod zerocheck {
         fn default_works() {
             let accounts: DefaultAccounts<ink::env::DefaultEnvironment> =
                 ink::env::test::default_accounts::<ink::env::DefaultEnvironment>();
-            let zerocheck = Zerocheck::new(accounts.alice);
+            let zerocheck = Zerocheck::new();
             assert_eq!(zerocheck.admin, accounts.alice);
-        }
-
-        //check contract panics
-        #[ink::test]
-        #[should_panic(expected = "Admin address cannot be empty")]
-        fn allows_zero_account() {
-            let zero_address = AccountId::from([0x0; 32]);
-
-            let zerocheck = Zerocheck::new(zero_address);
-            assert!(zerocheck.admin == zero_address);
         }
 
         #[ink::test]
@@ -62,34 +60,36 @@ mod zerocheck {
             let accounts: DefaultAccounts<ink::env::DefaultEnvironment> =
                 ink::env::test::default_accounts::<ink::env::DefaultEnvironment>();
 
-            let zerocheck = Zerocheck::new(accounts.alice);
+            let zerocheck = Zerocheck::new();
             assert_eq!(zerocheck.admin, accounts.alice);
 
+
         }
 
+
         #[ink::test]
-        #[should_panic(expected = "Admin address cannot be empty")]
-        fn calls_fails_if_zero_admin() {
-            let zero_address = AccountId::from([0x0; 32]);
+        fn modify_admin_fails_if_caller_not_admin() {
 
             let accounts: DefaultAccounts<ink::env::DefaultEnvironment> =
                 ink::env::test::default_accounts::<ink::env::DefaultEnvironment>();
 
-            let mut zerocheck = Zerocheck::new(zero_address);
-            zerocheck.modify_admin(accounts.alice);
+            let mut zerocheck = Zerocheck::new();
+            let res = zerocheck.modify_admin(accounts.alice);
+            assert_eq!(res, Ok(accounts.alice));
         }
 
         #[ink::test]
-        #[should_panic(expected = "Admin address cannot be empty")]
-        fn modify_admin_fails_if_zero() {
+        fn modify_admin_doesnt_fails_if_setting_admin_to_zero() {
             let zero_address = AccountId::from([0x0; 32]);
 
-            let accounts: DefaultAccounts<ink::env::DefaultEnvironment> =
-                ink::env::test::default_accounts::<ink::env::DefaultEnvironment>();
 
-            let mut zerocheck = Zerocheck::new(accounts.alice);
-            zerocheck.modify_admin(zero_address);
+            let mut zerocheck = Zerocheck::new();
+            let res = zerocheck.modify_admin(zero_address);
+            assert_eq!(res, Err(Error::InvalidAddress));
         }
 
     }
 }
+
+
+
