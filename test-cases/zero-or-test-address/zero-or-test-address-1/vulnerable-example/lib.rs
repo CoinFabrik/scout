@@ -58,29 +58,13 @@ mod zerocheck {
             let zerocheck = Zerocheck::new(accounts.alice);
             assert_eq!(zerocheck.admin, accounts.alice);
 
-            let zerocheck = Zerocheck::new(accounts.bob);
-            assert_eq!(zerocheck.admin, accounts.bob);
-
-            let zerocheck = Zerocheck::new(accounts.charlie);
-            assert_eq!(zerocheck.admin, accounts.charlie);
-
-            let zerocheck = Zerocheck::new(accounts.django);
-            assert_eq!(zerocheck.admin, accounts.django);
-
-            let zerocheck = Zerocheck::new(accounts.eve);
-            assert_eq!(zerocheck.admin, accounts.eve);
-
-            let zerocheck = Zerocheck::new(accounts.frank);
-            assert_eq!(zerocheck.admin, accounts.frank);
-
-
 
         }
 
 
         #[ink::test]
         #[should_panic(expected = "Only admin can call this function")]
-        fn calls_fails_if_zero_admin() {
+        fn modify_admin_fails_if_caller_not_admin() {
             let zero_address = AccountId::from([0x0; 32]);
 
             let accounts: DefaultAccounts<ink::env::DefaultEnvironment> =
@@ -89,6 +73,7 @@ mod zerocheck {
             let mut zerocheck = Zerocheck::new(zero_address);
             zerocheck.modify_admin(accounts.alice);
         }
+        
         #[ink::test]
         fn modify_admin_doesnt_fail_if_zero() {
             let zero_address = AccountId::from([0x0; 32]);
