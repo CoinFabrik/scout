@@ -32,3 +32,7 @@ overflow-checks = false
 [profile.dev]
 overflow-checks = false
 
+[workspace.metadata.dylint]
+libraries = [
+    { path = "/home/flerena/coinfabrik/web3grant/scout/detectors/delegate-call" },
+]
