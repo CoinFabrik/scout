@@ -183,7 +183,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "delegate_call"
+name = "delegate-call"
 version = "0.1.0"
 dependencies = [
  "clippy_utils",

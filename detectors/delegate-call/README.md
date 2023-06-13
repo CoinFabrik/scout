@@ -40,8 +40,13 @@ Use instead:
             .invoke();
     }
 
-    pub fn set_target(&mut self, new_target: Hash) {
-        assert_eq!(self.admin, self.env().caller(), "Only admin can set target");
-        self.target = new_target;
+    pub fn set_target(&mut self, new_target: Hash) -> Result<(), &'static str> {
+        if self.admin != self.env().caller() {
+            Err("Only admin can set target")
+        } else {
+            self.target = new_target;
+            Ok(())
+        }
     }
+
 ```
