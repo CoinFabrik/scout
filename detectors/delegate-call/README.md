@@ -28,7 +28,7 @@ Delegated calls to contracts passed as arguments can be used to change the expec
 
 Use instead:
 ```rust
-    pub fn delegateCall(&mut self, argument: Balance) {
+    pub fn delegate_call(&mut self, argument: Balance) {
         let selector_bytes = [0x0, 0x0, 0x0, 0x0];
         let result: T  = build_call::<DefaultEnvironment>()
             .delegate(self.target)
