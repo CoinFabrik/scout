@@ -14,7 +14,7 @@ mod zerocheck {
             if admin == AccountId::from([0x0; 32]) {
                 panic!("Admin address cannot be empty");
             }
-            Self { admin: admin }
+            Self { admin: ink::env:caller()  }
         }
 
         #[ink(message)]
@@ -65,20 +65,6 @@ mod zerocheck {
             let zerocheck = Zerocheck::new(accounts.alice);
             assert_eq!(zerocheck.admin, accounts.alice);
 
-            let zerocheck = Zerocheck::new(accounts.bob);
-            assert_eq!(zerocheck.admin, accounts.bob);
-
-            let zerocheck = Zerocheck::new(accounts.charlie);
-            assert_eq!(zerocheck.admin, accounts.charlie);
-
-            let zerocheck = Zerocheck::new(accounts.django);
-            assert_eq!(zerocheck.admin, accounts.django);
-
-            let zerocheck = Zerocheck::new(accounts.eve);
-            assert_eq!(zerocheck.admin, accounts.eve);
-
-            let zerocheck = Zerocheck::new(accounts.frank);
-            assert_eq!(zerocheck.admin, accounts.frank);
         }
 
         #[ink::test]

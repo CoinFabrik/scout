@@ -10,21 +10,24 @@ mod zerocheck {
 
     impl Zerocheck {
         #[ink(constructor)]
-        pub fn new(admin: AccountId) -> Self {
+        pub fn new() -> Self {
             Self { admin: admin }
         }
 
         #[ink(message)]
-        pub fn modify_admin(&mut self, admin: AccountId) -> AccountId {
-            assert_eq!(
-                self.admin,
-                self.env().caller(),
-                "Only admin can call this function"
-            );
-
+        pub fn modify_admin(&mut self, admin: AccountId) -> Result<AccountId, &'static str> {
+            if self.admin != self.env().caller() {
+                return Err("Only admin can call this function");
+            }
+            if admin == AccountId::from([0x0; 32]) {
+                return Err("Admin address cannot be empty");
+            }
+        
             self.admin = admin;
-            return self.admin;
+            Ok(self.admin)
         }
+        
+        
     }
 
     #[cfg(test)]
@@ -73,9 +76,9 @@ mod zerocheck {
             let mut zerocheck = Zerocheck::new(zero_address);
             zerocheck.modify_admin(accounts.alice);
         }
-        
+
         #[ink::test]
-        fn modify_admin_doesnt_fail_if_zero() {
+        fn modify_admin_doesnt_fails_if_setting_admin_to_zero() {
             let zero_address = AccountId::from([0x0; 32]);
 
             let accounts: DefaultAccounts<ink::env::DefaultEnvironment> =
