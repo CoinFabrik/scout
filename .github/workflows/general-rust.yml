@@ -4,11 +4,17 @@ on:
   push:
     branches:
       - "main"
-    paths-ignore:
-      - "**.md"
-      - "**.png"
-      - "**.yml"
+    paths:
+      - "apps/cargo-scout/**"
+      - "detectors/**"
+      - "test-cases/**"
+      - "Makefile"
   pull_request:
+    paths:
+      - "apps/cargo-scout/**"
+      - "detectors/**"
+      - "test-cases/**"
+      - "Makefile"
   workflow_dispatch:
 
 env:
@@ -29,7 +35,8 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            target
+            ./apps/cargo-scout/target
+            ./detectors/target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Update Rust
@@ -40,6 +47,9 @@ jobs:
 
       - name: Install dylint-link
         run: cargo install dylint-link
+
+      - name: Install cargo-scout
+        run: cargo install --path apps/cargo-scout
 
       - name: Run cargo test
         run: make test
@@ -76,7 +86,8 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            target
+            ./apps/cargo-scout/target
+            ./detectors/target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Update Rust

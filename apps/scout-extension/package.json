@@ -18,10 +18,10 @@
     "workspaceContains:*/Cargo.toml",
     "workspaceContains:*/rust-project.json"
   ],
-  "main": "./out/main.js",
+  "main": "./out/extension.js",
   "scripts": {
     "vscode:prepublish": "npm run esbuild-base -- --minify",
-    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
+    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
     "esbuild": "npm run esbuild-base -- --sourcemap",
     "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
     "package": "pnpm vsce package --no-dependencies",
@@ -34,7 +34,8 @@
     "test": "node ./out/test/runTest.js"
   },
   "dependencies": {
-    "command-exists": "^1.2.9"
+    "command-exists": "^1.2.9",
+    "toml": "^3.0.0"
   },
   "devDependencies": {
     "@types/command-exists": "^1.2.0",

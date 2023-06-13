@@ -152,10 +152,13 @@ const config = {
         ],
         copyright: `Copyright © ${new Date().getFullYear()} Scout, CoinFabrik.`,
       },
+
       prism: {
         theme: darkCodeTheme,
         darkTheme: darkCodeTheme,
+        additionalLanguages: ['rust', 'toml'],
       },
+
     }),
 };
 

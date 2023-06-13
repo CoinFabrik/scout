@@ -16,10 +16,16 @@ To improve coverage and precision, we´ll persist in research efforts on static 
 
 ## Quick Start
 
-For a quick start, make sure that [Cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html) is installed on your computer. Then, install Scout by running the following command:
+For a quick start, make sure that [Cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html) is installed on your computer. Then, install Scout dependencies by running the following command:
 
 ```bash
-cargo install cargo-scout cargo-dylint dylint-link
+cargo install cargo-dylint dylint-link
+```
+
+Afterwards, install Scout with the following command:
+
+```bash
+cargo install --path <PATH_TO_CARGO_SCOUT_FOLDER>
 ```
 
 To run Scout on your project, navigate to its root directory and execute the following command:
