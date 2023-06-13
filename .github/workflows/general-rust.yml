@@ -10,6 +10,11 @@ on:
       - "test-cases/**"
       - "Makefile"
   pull_request:
+    paths:
+      - "apps/cargo-scout/**"
+      - "detectors/**"
+      - "test-cases/**"
+      - "Makefile"
   workflow_dispatch:
 
 env:
