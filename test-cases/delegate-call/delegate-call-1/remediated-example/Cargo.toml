@@ -26,7 +26,3 @@ std = [
 ink-as-dependency = []
 e2e-tests = []
 
-[workspace.metadata.dylint]
-libraries = [
-    { path = "../../../../detectors/zero-or-test-address/delegate-call" },
-]
