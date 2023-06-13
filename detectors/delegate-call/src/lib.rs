@@ -59,7 +59,7 @@ dylint_linting::declare_late_lint! {
     ///```
     pub DELEGATE_CALL,
     Warn,
-    "description goes here"
+    "Passing arguments to the target of a delegate call is not safe, as it allows the caller to set a malicious hash as the target."
 }
 
 impl<'tcx> LateLintPass<'tcx> for DelegateCall {
