@@ -28,5 +28,5 @@ e2e-tests = []
 
 [workspace.metadata.dylint]
 libraries = [
-    { path = "/home/flerena/coinfabrik/web3grant/scout/detectors/delegate-call" },
+    { path = "../../../../detectors/zero-or-test-address/delegate-call" },
 ]
