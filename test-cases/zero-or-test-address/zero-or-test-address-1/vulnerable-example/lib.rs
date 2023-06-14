@@ -1,6 +1,5 @@
 #![cfg_attr(not(feature = "std"), no_std, no_main)]
 
-
 #[ink::contract]
 mod zerocheck {
     #[ink(storage)]
@@ -14,8 +13,7 @@ mod zerocheck {
         /// Caller is not not authorized.
         NotAuthorized,
         /// Address is invalid.
-        InvalidAddress
-
+        InvalidAddress,
     }
 
     impl Zerocheck {
@@ -25,6 +23,7 @@ mod zerocheck {
             Self { admin }
         }
 
+        /// Changes the admin and returns the new admin. Can set to 0x0...
         #[ink(message)]
         pub fn modify_admin(&mut self, admin: AccountId) -> Result<AccountId, Error> {
             if self.admin != self.env().caller() {
@@ -36,8 +35,8 @@ mod zerocheck {
         }
     }
 
-   #[cfg(test)]
-     mod tests {
+    #[cfg(test)]
+    mod tests {
         use super::*;
         use ink::env::test::DefaultAccounts;
         type AccountId = <ink::env::DefaultEnvironment as ink::env::Environment>::AccountId;
@@ -57,14 +56,10 @@ mod zerocheck {
 
             let zerocheck = Zerocheck::new();
             assert_eq!(zerocheck.admin, accounts.alice);
-
-
         }
-
 
         #[ink::test]
         fn modify_admin_fails_if_caller_not_admin() {
-
             let accounts: DefaultAccounts<ink::env::DefaultEnvironment> =
                 ink::env::test::default_accounts::<ink::env::DefaultEnvironment>();
 
@@ -77,11 +72,9 @@ mod zerocheck {
         fn modify_admin_doesnt_fails_if_setting_admin_to_zero() {
             let zero_address = AccountId::from([0x0; 32]);
 
-
             let mut zerocheck = Zerocheck::new();
             let res = zerocheck.modify_admin(zero_address);
             assert_eq!(res, Ok(zero_address));
         }
-
     }
 }
