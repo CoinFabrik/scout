@@ -19,8 +19,6 @@ dylint_linting::declare_late_lint! {
     /// ### Why is this bad?
     /// Division between two integers might return zero.
     ///
-    /// ### Known problems
-    ///
     /// ### Example
     /// ```rust
     /// // example code that raises a warning
@@ -50,34 +48,30 @@ impl<'tcx> LateLintPass<'tcx> for DivideBeforeMultiply {
         _: Span,
         _: rustc_hir::HirId,
     ) {
-        struct DivideBeforeMultiplyVisitor<'a, 'tcx> {
-            cx: &'a LateContext<'tcx>,
-            span: Vec<Option<Span>>,
-            has_division: bool,
+        struct DivideBeforeMultiplyVisitor {
+            has_multiplication: bool,
             is_precision_loss: bool,
+            is_precision_loss_span: Vec<Option<Span>>,
         }
 
-        impl<'a, 'tcx> Visitor<'tcx> for DivideBeforeMultiplyVisitor<'a, 'tcx> {
+        impl<'tcx> Visitor<'tcx> for DivideBeforeMultiplyVisitor {
             fn visit_expr(&mut self, expr: &'tcx Expr<'_>) {
                 if_chain! {
-                    if let ExprKind::Binary(binop, lhs, rhs) = expr.kind;
+                    if let ExprKind::Binary(binop, _, _) = expr.kind;
                     if let BinOpKind::Mul = binop.node;
-                    if let lhs_ty = self.cx.typeck_results().expr_ty(lhs);
-                    if let rhs_ty = self.cx.typeck_results().expr_ty(rhs);
-                    if lhs_ty.is_integral() && rhs_ty.is_integral();
                     then {
-                        self.has_division = true;
+                        self.has_multiplication = true;
                         walk_expr(self, expr);
                     }
                 }
 
                 if_chain!(
-                    if self.has_division;
+                    if self.has_multiplication;
                     if let ExprKind::Binary(binop, _, _) = expr.kind;
                     if let BinOpKind::Div = binop.node;
                     then {
                         self.is_precision_loss = true;
-                        self.span.push(Some(expr.span));
+                        self.is_precision_loss_span.push(Some(expr.span));
                     }
                 );
 
@@ -86,15 +80,14 @@ impl<'tcx> LateLintPass<'tcx> for DivideBeforeMultiply {
         }
 
         let mut visitor = DivideBeforeMultiplyVisitor {
-            cx,
-            span: Vec::new(),
-            has_division: false,
+            has_multiplication: false,
             is_precision_loss: false,
+            is_precision_loss_span: Vec::new(),
         };
         walk_expr(&mut visitor, body.value);
 
         if visitor.is_precision_loss {
-            visitor.span.iter().for_each(|span| {
+            visitor.is_precision_loss_span.iter().for_each(|span| {
                 span_lint_and_help(
                     cx,
                     DIVIDE_BEFORE_MULTIPLY,
