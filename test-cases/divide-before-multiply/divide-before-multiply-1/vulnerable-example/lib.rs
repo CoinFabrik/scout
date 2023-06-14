@@ -2,7 +2,7 @@
 #![cfg_attr(not(feature = "std"), no_std, no_main)]
 
 #[ink::contract]
-mod floating_point_and_numerical_precision {
+mod divide_before_multiply {
 
     #[ink(storage)]
     pub struct FloatingPointAndNumericalPrecision {}

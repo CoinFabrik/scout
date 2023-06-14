@@ -92,7 +92,7 @@ impl<'tcx> LateLintPass<'tcx> for DivideBeforeMultiply {
                     cx,
                     DIVIDE_BEFORE_MULTIPLY,
                     span.unwrap(),
-                    "Division between two integers might return zero",
+                    "Division before multiplication might result in a loss of precision",
                     None,
                     "Consider reversing the order of operations to reduce the loss of precision.",
                 );
