@@ -19,7 +19,6 @@ mod delegate_call {
         forward_to: AccountId,
         admin: AccountId,
         addresses: [AccountId; 3],
-        payouts: [Balance; 3],
         target: Hash,
     }
 
@@ -36,11 +35,11 @@ mod delegate_call {
                 admin: Self::env().caller(),
                 forward_to,
                 addresses: [address1, address2, address3],
-                payouts: [0, 0, 0],
                 target: target,
             }
         }
 
+         /// Delegates the fee calculation and pays the results to the corresponding addresses
         #[ink(message, payable, selector = _)]
         pub fn ask_payouts(&mut self, amount: Balance) -> Result<(), Error> {
             let result: (Balance, Balance, Balance) =
@@ -56,13 +55,24 @@ mod delegate_call {
                     .try_invoke()
                     .map_err(|_e| Error::ErrorInvoking)?;
 
-            self.payouts[0] = result.0;
-            self.payouts[1] = result.1;
-            self.payouts[2] = result.2;
+                if amount <= (result.0 + result.1 + result.2) {
+                    return Err(Error::NotEnoughMoney);
+                }
+    
+                self.env()
+                    .transfer(self.addresses[0], result.0)
+                    .unwrap();
+                self.env()
+                    .transfer(self.addresses[1], result.1)
+                    .unwrap();
+                self.env()
+                    .transfer(self.addresses[2], result.2)
+                    .unwrap();
 
             Ok(())
         }
 
+        /// Sets the target codehash for the delegated call 
         #[ink(message)]
         pub fn set_target(&mut self, new_target: Hash) -> Result<(), Error> {
             if self.admin != self.env().caller() {
@@ -72,30 +82,6 @@ mod delegate_call {
             Ok(())
         }
 
-        #[ink(message, payable)]
-        pub fn pay(&mut self) -> Result<(), Error> {
-            let amount = self.env().transferred_value();
-
-            if amount <= (self.payouts[0] + self.payouts[2] + self.payouts[1]) {
-                return Err(Error::NotEnoughMoney);
-            }
-
-            self.env()
-                .transfer(self.addresses[0], self.payouts[0])
-                .unwrap();
-            self.env()
-                .transfer(self.addresses[1], self.payouts[1])
-                .unwrap();
-            self.env()
-                .transfer(self.addresses[2], self.payouts[2])
-                .unwrap();
-
-            self.payouts[0] = 0;
-            self.payouts[1] = 0;
-            self.payouts[2] = 0;
-
-            Ok(())
-        }
     }
 
     #[cfg(test)]

@@ -33,6 +33,7 @@ mod divider {
             }
         }
 
+        /// Returns the saved percents
         #[ink(message)]
         pub fn get_percents(&self) -> (u128, u128, u128) {
             let p1 = self.percent1;
@@ -42,6 +43,7 @@ mod divider {
             (p1, p2, p3)
         }
 
+        /// Returns the values to pay dependant on the saved percents
         #[ink(message, payable)]
         pub fn payouts(&mut self, amount: Balance) -> (Balance, Balance, Balance) {
             let amount1 = amount * self.percent1 / 100;
@@ -50,6 +52,7 @@ mod divider {
             (amount1, amount2, amount3)
         }
 
+        /// Returns the codehash of the contract
         #[ink(message)]
         pub fn codehash(&self) -> Hash {
             self.env()

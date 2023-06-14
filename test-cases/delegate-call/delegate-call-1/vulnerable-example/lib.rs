@@ -46,6 +46,7 @@ mod delegate_call {
             }
         }
 
+        /// Delegates the getter for the saved percents
         #[ink(message)]
         pub fn get_percents(&self, target: Hash) -> Result<(u128, u128, u128), Error> {
             let result: (u128, u128, u128) = build_call::<DefaultEnvironment>()
@@ -60,12 +61,7 @@ mod delegate_call {
             Ok(result)
         }
 
-        #[ink(message, payable)]
-        pub fn get_msg_money(&self) -> u128 {
-            let amount = self.env().transferred_value();
-            amount
-        }
-
+        /// Delegates the fee calculation and pays the results to the corresponding addresses
         #[ink(message, payable)]
         pub fn ask_payouts(&mut self, target: Hash) -> Result<(Balance, Balance, Balance), Error> {
             let amount = self.env().transferred_value();
