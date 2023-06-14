@@ -12,6 +12,7 @@ Delegated calls to contracts passed as arguments can be used to change the expec
 ### Example
 
 ```rust
+    #[ink(message)]
     pub fn delegate_call(&mut self, target: Hash, argument: Balance) {
         let selector_bytes = [0x0, 0x0, 0x0, 0x0];
         let result: T  = build_call::<DefaultEnvironment>()
@@ -28,6 +29,7 @@ Delegated calls to contracts passed as arguments can be used to change the expec
 
 Use instead:
 ```rust
+    #[ink(message)]
     pub fn delegate_call(&mut self, argument: Balance) {
         let selector_bytes = [0x0, 0x0, 0x0, 0x0];
         let result: T  = build_call::<DefaultEnvironment>()
