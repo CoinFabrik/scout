@@ -36,3 +36,8 @@ detectors:
         remediated_path: "../../test-cases/reentrancy/reentrancy-1/remediated-example/vault/Cargo.toml"
       - vulnerable_path: "../../test-cases/reentrancy/reentrancy-2/vulnerable-example/vault/Cargo.toml"
         remediated_path: "../../test-cases/reentrancy/reentrancy-2/remediated-example/vault/Cargo.toml"
+  divide-before-multiply:
+    warning_message: "Division between two integers might return zero"
+    examples:
+      - vulnerable_path: "../../test-cases/divide-before-multiply/divide-before-multiply-1/vulnerable-example/Cargo.toml"
+        remediated_path: "../../test-cases/divide-before-multiply/divide-before-multiply-1/remediated-example/Cargo.toml"
