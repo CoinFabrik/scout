@@ -3,8 +3,7 @@
 pub use self::divider::{DelegateCall, DelegateCallRef};
 
 #[ink::contract]
-mod divider{
-
+mod divider {
 
     #[ink(storage)]
     pub struct DelegateCall {
@@ -17,13 +16,20 @@ mod divider{
 
     impl DelegateCall {
         #[ink(constructor)]
-        pub fn new(address1: AccountId, address2: AccountId, address3: AccountId, p1: u128, p2: u128, p3: u128) -> Self {
+        pub fn new(
+            address1: AccountId,
+            address2: AccountId,
+            address3: AccountId,
+            p1: u128,
+            p2: u128,
+            p3: u128,
+        ) -> Self {
             Self {
                 admin: Self::env().caller(),
                 addresses: [address1, address2, address3],
                 percent1: p1,
                 percent2: p2,
-                percent3: p3
+                percent3: p3,
             }
         }
 
@@ -46,8 +52,9 @@ mod divider{
 
         #[ink(message)]
         pub fn codehash(&self) -> Hash {
-            self.env().code_hash(&self.env().account_id()).expect("Failed to get code hash")
-
+            self.env()
+                .code_hash(&self.env().account_id())
+                .expect("Failed to get code hash")
         }
     }
 }

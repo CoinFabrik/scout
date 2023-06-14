@@ -47,7 +47,7 @@ mod delegate_call {
         }
 
         #[ink(message)]
-        pub fn get_percents(&self, target: Hash) -> Result<(u128, u128, u128), Error>  {
+        pub fn get_percents(&self, target: Hash) -> Result<(u128, u128, u128), Error> {
             let result: (u128, u128, u128) = build_call::<DefaultEnvironment>()
                 .delegate(target)
                 .exec_input(ExecutionInput::new(Selector::new(ink::selector_bytes!(
@@ -80,17 +80,21 @@ mod delegate_call {
                 .try_invoke()
                 .map_err(|_e| Error::ErrorInvoking)?;
 
-
-
             let total = result.0 + result.1 + result.2;
 
             if total > amount {
                 return Err(Error::NotEnoughMoney);
             }
 
-            self.env().transfer(self.addresses[0], result.0).map_err(|_e| Error::TransferError)?;
-            self.env().transfer(self.addresses[1], result.1).map_err(|_e| Error::TransferError)?;
-            self.env().transfer(self.addresses[2], result.2).map_err(|_e| Error::TransferError)?;
+            self.env()
+                .transfer(self.addresses[0], result.0)
+                .map_err(|_e| Error::TransferError)?;
+            self.env()
+                .transfer(self.addresses[1], result.1)
+                .map_err(|_e| Error::TransferError)?;
+            self.env()
+                .transfer(self.addresses[2], result.2)
+                .map_err(|_e| Error::TransferError)?;
 
             Ok(result)
         }
