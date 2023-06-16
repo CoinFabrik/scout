@@ -1,5 +1,5 @@
 [package]
-name = "floating-point-and-numerical-precision"
+name = "divide-before-multiply"
 version = "0.1.0"
 authors = ["[your_name] <[your_email]>"]
 edition = "2021"
