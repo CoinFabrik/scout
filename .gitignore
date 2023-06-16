@@ -32,3 +32,6 @@ logs
 .env
 .env.*
 node_modules
+
+# Editors
+.vscode/
