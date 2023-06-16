@@ -15,7 +15,7 @@ target/
 
 # Ignore Cargo.lock of library files
 test-cases/**/Cargo.lock
-detectors/Cargo.lock
+detectors/**/Cargo.lock
 
 # -------------------------------------------------------------------------------------
 # -------------------------------------- Misc -----------------------------------------

@@ -42,15 +42,18 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            ./detectors/target
+            ./detectors/**/target
             ./test-cases/**/target
           key: ${{ runner.os }}-other-dependencies
 
       - name: Update Rust
         run: rustup update
 
-      - name: Install Rust nightly
+      - name: Install Rust nightly-2023-01-27
         run: rustup install nightly-2023-01-27 --profile minimal
+
+      - name: Install Rust nightly-2023-04-23
+        run: rustup install nightly-2023-04-23 --profile minimal
 
       - name: Install dylint-link
         run: cargo install dylint-link
@@ -96,11 +99,17 @@ jobs:
       - name: Update Rust
         run: rustup update
 
-      - name: Install Rust nightly
+      - name: Install Rust nightly-2023-01-27
         run: rustup install nightly-2023-01-27 --profile minimal
 
-      - name: Install Clippy
+      - name: Install Rust nightly-2023-04-23
+        run: rustup install nightly-2023-04-23 --profile minimal
+
+      - name: Install Clippy nightly-2023-01-27
         run: rustup component add clippy --toolchain nightly-2023-01-27
+
+      - name: Install Clippy nightly-2023-04-23
+        run: rustup component add clippy --toolchain nightly-2023-04-23
 
       - name: Install dylint-link
         run: cargo install dylint-link
