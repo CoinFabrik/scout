@@ -1,5 +1,6 @@
 #![feature(rustc_private)]
 
+extern crate rustc_ast;
 extern crate rustc_hir;
 extern crate rustc_span;
 
@@ -13,23 +14,38 @@ use rustc_span::{Span, Symbol};
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
+    /// Checks for usage of `expect`
     ///
     /// ### Why is this bad?
-    ///
-    /// ### Known problems
-    /// Remove if none.
+    /// `expect` might panic if the result value is an error or `None`.
     ///
     /// ### Example
     /// ```rust
     /// // example code where a warning is issued
+    /// fn main() {
+    ///    let result = result_fn().expect("error");
+    /// }
+    ///
+    /// fn result_fn() -> Result<u8, Error> {
+    ///     Err(Error::new(ErrorKind::Other, "error"))
+    /// }
     /// ```
     /// Use instead:
     /// ```rust
     /// // example code that does not raise a warning
+    /// fn main() {
+    ///    let result = if let Ok(result) = result_fn() {
+    ///       result
+    ///   }
+    /// }
+    ///
+    /// fn result_fn() -> Result<u8, Error> {
+    ///     Err(Error::new(ErrorKind::Other, "error"))
+    /// }
     /// ```
     pub UNSAFE_EXPECT,
     Warn,
-    "description goes here"
+    "Using the expression `expect` might panic if the result value is an error or `None`"
 }
 
 impl<'tcx> LateLintPass<'tcx> for UnsafeExpect {
@@ -73,9 +89,9 @@ impl<'tcx> LateLintPass<'tcx> for UnsafeExpect {
                         cx,
                         UNSAFE_EXPECT,
                         *span,
-                        "usage of `expect`",
+                        "Unsafe usage of `expect`",
                         None,
-                        "use `unwrap` instead",
+                        "Please, use a custom error instead of `expect`",
                     );
                 }
             });
