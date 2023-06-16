@@ -39,7 +39,7 @@ mod delegate_call {
             }
         }
 
-         /// Delegates the fee calculation and pays the results to the corresponding addresses
+        /// Delegates the fee calculation and pays the results to the corresponding addresses
         #[ink(message, payable, selector = _)]
         pub fn ask_payouts(&mut self, amount: Balance) -> Result<(), Error> {
             let result: (Balance, Balance, Balance) =
@@ -55,24 +55,18 @@ mod delegate_call {
                     .try_invoke()
                     .map_err(|_e| Error::ErrorInvoking)?;
 
-                if amount <= (result.0 + result.1 + result.2) {
-                    return Err(Error::NotEnoughMoney);
-                }
-    
-                self.env()
-                    .transfer(self.addresses[0], result.0)
-                    .unwrap();
-                self.env()
-                    .transfer(self.addresses[1], result.1)
-                    .unwrap();
-                self.env()
-                    .transfer(self.addresses[2], result.2)
-                    .unwrap();
+            if amount <= (result.0 + result.1 + result.2) {
+                return Err(Error::NotEnoughMoney);
+            }
+
+            self.env().transfer(self.addresses[0], result.0).unwrap();
+            self.env().transfer(self.addresses[1], result.1).unwrap();
+            self.env().transfer(self.addresses[2], result.2).unwrap();
 
             Ok(())
         }
 
-        /// Sets the target codehash for the delegated call 
+        /// Sets the target codehash for the delegated call
         #[ink(message)]
         pub fn set_target(&mut self, new_target: Hash) -> Result<(), Error> {
             if self.admin != self.env().caller() {
@@ -81,13 +75,13 @@ mod delegate_call {
             self.target = new_target;
             Ok(())
         }
-
     }
 
     #[cfg(test)]
     mod tests {
-        use super::*;
         use ink::env::test::DefaultAccounts;
+
+        use super::*;
 
         type AccountId = <ink::env::DefaultEnvironment as ink::env::Environment>::AccountId;
 
