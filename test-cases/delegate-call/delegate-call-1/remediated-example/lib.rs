@@ -7,8 +7,7 @@ mod delegate_call {
     #[cfg_attr(feature = "std", derive(::scale_info::TypeInfo))]
     pub enum Error {
         NotEnoughMoney,
-        ErrorInvoking,
-        TransferError,
+        DelegateCallFailed,
         NotAnAdmin,
     }
 
@@ -53,8 +52,8 @@ mod delegate_call {
                 )
                 .returns::<(Balance, Balance, Balance)>()
                 .try_invoke()
-                .map_err(|_| Error::ErrorInvoking)?
-                .map_err(|_| Error::ErrorInvoking)?;
+                .map_err(|_| Error::DelegateCallFailed)?
+                .map_err(|_| Error::DelegateCallFailed)?;
 
             if amount <= (result.0 + result.1 + result.2) {
                 return Err(Error::NotEnoughMoney);
