@@ -58,9 +58,10 @@ mod unsafe_unwrap {
 
     #[cfg(test)]
     mod tests {
-        use super::*;
         use ink::env::test;
         use ink::env::DefaultEnvironment;
+
+        use super::*;
 
         #[ink::test]
         fn constructor_works() {
@@ -119,8 +120,9 @@ mod unsafe_unwrap {
 
     #[cfg(all(test, feature = "e2e-tests"))]
     mod e2e_tests {
-        use super::*;
         use ink_e2e::build_message;
+
+        use super::*;
 
         type E2EResult<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 

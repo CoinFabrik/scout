@@ -163,8 +163,9 @@ mod unexpected_revert {
 
     #[cfg(test)]
     mod tests {
-        use super::*;
         use std::time::SystemTime;
+
+        use super::*;
 
         #[ink::test]
         fn insert_512_candidates() {
@@ -194,9 +195,11 @@ mod unexpected_revert {
 
     #[cfg(all(test, feature = "e2e-tests"))]
     mod e2e_tests {
-        use super::*;
-        use ink_e2e::build_message;
         use std::time::SystemTime;
+
+        use ink_e2e::build_message;
+
+        use super::*;
 
         #[ink_e2e::test]
         async fn insert_512_candidates(mut client: ink_e2e::Client<C, E>) {

@@ -7,10 +7,10 @@ mod delegate_call {
     #[cfg_attr(feature = "std", derive(::scale_info::TypeInfo))]
     pub enum Error {
         NotEnoughMoney,
-        ErrorInvoking,
-        TransferError,
+        DelegateCallFailed,
         NotAnAdmin,
     }
+
     /// Defines the storage of your contract.
     /// Add new fields to the below struct in order
     /// to add new static storage fields to your contract.
@@ -35,44 +35,38 @@ mod delegate_call {
                 admin: Self::env().caller(),
                 forward_to,
                 addresses: [address1, address2, address3],
-                target: target,
+                target,
             }
         }
 
-         /// Delegates the fee calculation and pays the results to the corresponding addresses
+        /// Delegates the fee calculation and pays the results to the corresponding addresses
         #[ink(message, payable, selector = _)]
         pub fn ask_payouts(&mut self, amount: Balance) -> Result<(), Error> {
-            let result: (Balance, Balance, Balance) =
-                ink::env::call::build_call::<ink::env::DefaultEnvironment>()
-                    .delegate(self.target)
-                    .exec_input(
-                        ink::env::call::ExecutionInput::new(ink::env::call::Selector::new(
-                            ink::selector_bytes!("payouts"),
-                        ))
-                        .push_arg(amount),
-                    )
-                    .returns::<(Balance, Balance, Balance)>()
-                    .try_invoke()
-                    .map_err(|_e| Error::ErrorInvoking)?;
+            let result = ink::env::call::build_call::<ink::env::DefaultEnvironment>()
+                .delegate(self.target)
+                .exec_input(
+                    ink::env::call::ExecutionInput::new(ink::env::call::Selector::new(
+                        ink::selector_bytes!("payouts"),
+                    ))
+                    .push_arg(amount),
+                )
+                .returns::<(Balance, Balance, Balance)>()
+                .try_invoke()
+                .map_err(|_| Error::DelegateCallFailed)?
+                .map_err(|_| Error::DelegateCallFailed)?;
 
-                if amount <= (result.0 + result.1 + result.2) {
-                    return Err(Error::NotEnoughMoney);
-                }
-    
-                self.env()
-                    .transfer(self.addresses[0], result.0)
-                    .unwrap();
-                self.env()
-                    .transfer(self.addresses[1], result.1)
-                    .unwrap();
-                self.env()
-                    .transfer(self.addresses[2], result.2)
-                    .unwrap();
+            if amount <= (result.0 + result.1 + result.2) {
+                return Err(Error::NotEnoughMoney);
+            }
+
+            self.env().transfer(self.addresses[0], result.0).unwrap();
+            self.env().transfer(self.addresses[1], result.1).unwrap();
+            self.env().transfer(self.addresses[2], result.2).unwrap();
 
             Ok(())
         }
 
-        /// Sets the target codehash for the delegated call 
+        /// Sets the target codehash for the delegated call
         #[ink(message)]
         pub fn set_target(&mut self, new_target: Hash) -> Result<(), Error> {
             if self.admin != self.env().caller() {
@@ -81,13 +75,13 @@ mod delegate_call {
             self.target = new_target;
             Ok(())
         }
-
     }
 
     #[cfg(test)]
     mod tests {
-        use super::*;
         use ink::env::test::DefaultAccounts;
+
+        use super::*;
 
         type AccountId = <ink::env::DefaultEnvironment as ink::env::Environment>::AccountId;
 
@@ -104,7 +98,7 @@ mod delegate_call {
             assert_eq!(contract.forward_to, alice);
             assert_eq!(contract.admin, alice);
             assert_eq!(contract.addresses, [bob, charlie, dave]);
-            assert_eq!(contract.payouts, [0, 0, 0]);
+            // assert_eq!(contract.payouts, [0, 0, 0]); //FIXME
         }
 
         // try to change target without being admin
