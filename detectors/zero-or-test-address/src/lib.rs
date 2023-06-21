@@ -17,6 +17,8 @@ use rustc_lint::{LateContext, LateLintPass};
 use rustc_middle::thir::Thir;
 use rustc_span::def_id::LocalDefId;
 use rustc_span::Span;
+use rustc_middle::thir::Expr as TypedExpr;
+use rustc_hir::ExprKind as HirExprKind;
 
 // use rustc_middle::query::plumbing::sealed::IntoQueryParam
 
@@ -54,48 +56,74 @@ impl<'tcx> LateLintPass<'tcx> for ZeroOrTestAddress {
         struct ZeroCheckStorage<'tcx> {
             span: Option<Span>,
             passes_account_id_as_arg: bool,
-            doesnt_checks_zero_address_inside: bool,
+            ckeck_zero_addr_inside: bool,
             the_fn_id: LocalDefId,
             the_body: &'tcx Body<'tcx>,
             thir: &'tcx Steal<Thir<'tcx>>,
+            seen: Vec<LocalDefId>,
         }
+
+
 
         fn uses_account_id_as_param(
             expr: &Expr,
             _body: &Body<'_>,
-            _id: LocalDefId,
+            id: LocalDefId,
             thir: &Steal<Thir<'_>>,
+            seen: &mut Vec<LocalDefId>,
         ) -> Option<Span> {
-            let thir_guard = thir.borrow();
-            let thir = &*thir_guard;
-            for param in &thir.params {
-                if_chain! {
+
+
+            if let HirExprKind::Call(_, _) = &expr.kind {
+                let thir_guard = thir.borrow();
+                let thir = &*thir_guard;
+                if thir.params.is_empty() {
+                    return None;
+                }
+                for param in &thir.params {
                     let ty = param.ty.to_string();
-                    if ty == "ink::ink_primitives::AccountId";
-                    then {
-                        dbg!(thir);
+                    if ty == "ink::ink_primitives::AccountId" {
+                        if !seen.contains(&id) {
+                            dbg!(thir);
+                        }
+                        seen.push(id);
                         return Some(expr.span);
                     }
                 }
+                return None;
             }
             return None;
+
         }
 
-        fn check_zero_addr_in(
-            _expr: &Expr,
+        fn _check_zero_addr_in(
+            expr: &Expr,
             _body: &Body<'_>,
             _id: LocalDefId,
             _thir: &Steal<Thir<'_>>,
         ) -> bool {
+
+            if_chain! {
+                if let HirExprKind::If(cond, _, _) = &expr.kind;
+                if let condition_kind = &cond.kind;
+                if let HirExprKind::Binary(op, _, _) = condition_kind;
+                if let op_kind = op.node;
+                if op_kind == rustc_hir::BinOpKind::Ne;
+                then {
+                    dbg!(condition_kind);
+                    return true;
+                }
+            }
             return false;
         }
+
 
         impl<'tcx> Visitor<'tcx> for ZeroCheckStorage<'tcx> {
 /*             fn visit_stmt(&mut self, stmt: &'tcx Stmt<'tcx>) {
                 // check for an statement that modifies the state
                 // the state is modified if the statement is an assignment and modifies an struct
                 // or if if invokes a function and the receiver is a env::balance
-                if self.passes_account_id_as_arg && self.doesnt_checks_zero_address_inside {
+                if self.passes_account_id_as_arg && self.ckeck_zero_addr_inside {
                 } else {
                     walk_stmt(self, stmt);
                 }
@@ -103,17 +131,17 @@ impl<'tcx> LateLintPass<'tcx> for ZeroOrTestAddress {
              */
             fn visit_expr(&mut self, expr: &'tcx Expr<'_>) {
                 let function_takes_acc_id_span =
-                    uses_account_id_as_param(expr, self.the_body, self.the_fn_id, self.thir);
+                    uses_account_id_as_param(expr, self.the_body, self.the_fn_id, self.thir, &mut self.seen);
                 if let Some(span) = function_takes_acc_id_span {
                     self.passes_account_id_as_arg = true;
                     self.span = Some(span);
                 }
-                let doesnt_checks_zero_address =
+/*                 let ckeck_zero_addr =
                     check_zero_addr_in(expr, self.the_body, self.the_fn_id, self.thir);
 
-                if doesnt_checks_zero_address {
-                    self.doesnt_checks_zero_address_inside = true;
-                }
+                if ckeck_zero_addr {
+                    self.ckeck_zero_addr_inside = true;
+                } */
 
 
                 walk_expr(self, expr);
@@ -123,15 +151,16 @@ impl<'tcx> LateLintPass<'tcx> for ZeroOrTestAddress {
         let mut zerocheck_storage = ZeroCheckStorage {
             span: None,
             passes_account_id_as_arg: false,
-            doesnt_checks_zero_address_inside: false,
+            ckeck_zero_addr_inside: true,
             the_fn_id: id,
             the_body: body,
             thir: cx.tcx.thir_body(id).unwrap().0,
+            seen: Vec::new(),
         };
         walk_expr(&mut zerocheck_storage, body.value);
 
         if zerocheck_storage.passes_account_id_as_arg
-            && zerocheck_storage.doesnt_checks_zero_address_inside
+            && !zerocheck_storage.ckeck_zero_addr_inside
         {
             span_lint_and_help(
                 cx,
