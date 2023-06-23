@@ -1,0 +1,33 @@
+[package]
+name = "psp22_base_contract"
+version = "0.1.0"
+authors = ["[your_name] <[your_email]>"]
+edition = "2021"
+
+[dependencies]
+# Import ink!
+ink = { version = "4.1.0", default-features = false}
+
+scale = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive"] }
+scale-info = { version = "2.3", default-features = false, features = ["derive"], optional = true }
+
+# Brush dependency
+openbrush = { git = "https://github.com/727-Ventures/openbrush-contracts", version = "3.1.0", default-features = false, features = ["psp22"]  }
+
+[dev-dependencies]
+ink_e2e = "4.1.0"
+
+[lib]
+path = "lib.rs"
+
+[features]
+default = ["std"]
+std = [
+  "ink/std",
+  "scale/std",
+  "scale-info/std",
+  # Brush dependency
+  "openbrush/std",
+]
+ink-as-dependency = []
+e2e-tests = []
