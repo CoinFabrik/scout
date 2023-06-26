@@ -28,28 +28,52 @@ pub mod integer_overflow_underflow {
             self.value -= value;
         }
 
-        // Multiply the stored value by the given amount.
-        #[ink(message)]
-        pub fn mul(&mut self, value: u8) {
-            self.value *= value;
-        }
-
-        // Raise the stored value to the power of the given amount.
-        #[ink(message)]
-        pub fn pow(&mut self, value: u8) {
-            self.value = self.value.pow(value.into());
-        }
-
-        // Negate the stored value.
-        #[ink(message)]
-        pub fn neg(&mut self) {
-            self.value = self.value.wrapping_neg();
-        }
-
         /// Returns the stored value.
         #[ink(message)]
         pub fn get(&self) -> u8 {
             self.value
+        }
+    }
+
+    #[cfg(feature = "std")]
+    pub mod test_utils {
+        use super::*;
+
+        pub fn constructor_works(initial_value: u8) -> IntegerOverflowUnderflow {
+            // Arrange
+            // Act
+            let contract = IntegerOverflowUnderflow::new(initial_value);
+
+            // Assert
+            assert_eq!(contract.get(), initial_value);
+
+            contract
+        }
+
+        pub fn add_overflows(initial_value: u8, value_to_add: u8) -> IntegerOverflowUnderflow {
+            // Arrange
+            let mut contract = IntegerOverflowUnderflow::new(initial_value);
+
+            // Act
+            contract.add(value_to_add);
+
+            // Assert
+            assert_eq!(contract.get(), initial_value.wrapping_add(value_to_add));
+
+            contract
+        }
+
+        pub fn sub_underflows(initial_value: u8, value_to_sub: u8) -> IntegerOverflowUnderflow {
+            // Arrange
+            let mut contract = IntegerOverflowUnderflow::new(initial_value);
+
+            // Act
+            contract.sub(value_to_sub);
+
+            // Assert
+            assert_eq!(contract.get(), initial_value.wrapping_sub(value_to_sub));
+
+            contract
         }
     }
 
@@ -59,78 +83,17 @@ pub mod integer_overflow_underflow {
 
         #[ink::test]
         fn constructor_works() {
-            // Arrange
-            let value = 42;
-
-            // Act
-            let contract = IntegerOverflowUnderflow::new(value);
-
-            // Assert
-            assert_eq!(contract.get(), value);
+            test_utils::constructor_works(42);
         }
 
         #[ink::test]
         fn add_overflows() {
-            // Arrange
-            let mut contract = IntegerOverflowUnderflow::new(u8::MAX);
-            let value_to_add = 1;
-
-            // Act
-            contract.add(value_to_add);
-
-            // Assert
-            assert_eq!(contract.get(), u8::MAX.wrapping_add(value_to_add));
+            test_utils::add_overflows(u8::MAX, 1);
         }
 
         #[ink::test]
         fn sub_underflows() {
-            // Arrange
-            let mut contract = IntegerOverflowUnderflow::new(u8::MIN);
-            let value_to_sub = 1;
-
-            // Act
-            contract.sub(value_to_sub);
-
-            // Assert
-            assert_eq!(contract.get(), u8::MIN.wrapping_sub(value_to_sub));
-        }
-
-        #[ink::test]
-        fn mul_overflows() {
-            // Arrange
-            let mut contract = IntegerOverflowUnderflow::new(u8::MAX);
-            let value_to_mul = 2;
-
-            // Act
-            contract.mul(value_to_mul);
-
-            // Assert
-            assert_eq!(contract.get(), u8::MAX.wrapping_mul(value_to_mul));
-        }
-
-        #[ink::test]
-        fn pow_overflows() {
-            // Arrange
-            let mut contract = IntegerOverflowUnderflow::new(u8::MAX);
-            let value_to_pow = 2;
-
-            // Act
-            contract.pow(value_to_pow);
-
-            // Assert
-            assert_eq!(contract.get(), u8::MAX.wrapping_pow(value_to_pow.into()));
-        }
-
-        #[ink::test]
-        fn neg_overflows() {
-            // Arrange
-            let mut contract = IntegerOverflowUnderflow::new(u8::MIN);
-
-            // Act
-            contract.neg();
-
-            // Assert
-            assert_eq!(contract.get(), u8::MIN.wrapping_neg());
+            test_utils::sub_underflows(u8::MIN, 1);
         }
     }
 }

@@ -26,20 +26,30 @@ mod integer_overflow_underflow {
             Self { value }
         }
 
-        /// Increments the stored value by the given amount.
+        // Multiply the stored value by the given amount.
         #[ink(message)]
-        pub fn add(&mut self, value: u8) -> Result<(), Error> {
-            match self.value.checked_add(value) {
+        pub fn mul(&mut self, value: u8) -> Result<(), Error> {
+            match self.value.checked_mul(value) {
                 Some(v) => self.value = v,
                 None => return Err(Error::OverflowError),
             };
             Ok(())
         }
 
-        /// Decrements the stored value by the given amount.
+        // Raise the stored value to the power of the given amount.
         #[ink(message)]
-        pub fn sub(&mut self, value: u8) -> Result<(), Error> {
-            match self.value.checked_sub(value) {
+        pub fn pow(&mut self, value: u8) -> Result<(), Error> {
+            match self.value.checked_pow(value.into()) {
+                Some(v) => self.value = v,
+                None => return Err(Error::OverflowError),
+            };
+            Ok(())
+        }
+
+        // Negate the stored value.
+        #[ink(message)]
+        pub fn neg(&mut self) -> Result<(), Error> {
+            match self.value.checked_neg() {
                 Some(v) => self.value = v,
                 None => return Err(Error::UnderflowError),
             };
@@ -70,26 +80,38 @@ mod integer_overflow_underflow {
         }
 
         #[ink::test]
-        fn add_overflows() {
+        fn mul_overflows() {
             // Arrange
             let mut contract = IntegerOverflowUnderflow::new(u8::MAX);
-            let value_to_add = 1;
+            let value_to_mul = 2;
 
             // Act
-            let result = contract.add(value_to_add);
+            let result = contract.mul(value_to_mul);
 
             // Assert
             assert_eq!(result, Err(Error::OverflowError));
         }
 
         #[ink::test]
-        fn sub_underflows() {
+        fn pow_overflows() {
             // Arrange
-            let mut contract = IntegerOverflowUnderflow::new(u8::MIN);
-            let value_to_sub = 1;
+            let mut contract = IntegerOverflowUnderflow::new(u8::MAX);
+            let value_to_pow = 2;
 
             // Act
-            let result = contract.sub(value_to_sub);
+            let result = contract.pow(value_to_pow);
+
+            // Assert
+            assert_eq!(result, Err(Error::OverflowError));
+        }
+
+        #[ink::test]
+        fn neg_underflows() {
+            // Arrange
+            let mut contract = IntegerOverflowUnderflow::new(u8::MAX);
+
+            // Act
+            let result = contract.neg();
 
             // Assert
             assert_eq!(result, Err(Error::UnderflowError));
