@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkscout=self.webpackChunkscout||[]).push([[1699],{9080:s=>{s.exports=JSON.parse('{"label":"hola","permalink":"/scout/blog/tags/hola","allTagsPath":"/scout/blog/tags","count":1}')}}]);
