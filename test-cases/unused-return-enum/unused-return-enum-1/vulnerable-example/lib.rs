@@ -33,7 +33,13 @@ mod unused_return_enum {
                 Some(result) => result,
                 None => panic!("overflow!"),
             };
-            return Err(Error::Overflow);
+            Err(Error::Overflow)
+        }
+    }
+
+    impl Default for UnusedReturnEnum {
+        fn default() -> Self {
+            Self::new()
         }
     }
 
