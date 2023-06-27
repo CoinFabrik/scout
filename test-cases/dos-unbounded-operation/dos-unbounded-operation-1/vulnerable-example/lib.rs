@@ -49,6 +49,22 @@ mod dos_unbounded_operation {
             self.next_payee_ix.checked_sub(1).unwrap()
         }
 
+        /// Add n payees to the operation.
+        #[ink(message, payable)]
+        pub fn add_n_payees(&mut self, n: u128) -> u128 {
+            let address = self.env().caller();
+            let value = self.env().transferred_value().checked_div(n).unwrap();
+            let new_payee = Payee { address, value };
+
+            for _ in 0..n {
+                self.payees.insert(self.next_payee_ix, &new_payee);
+                self.next_payee_ix = self.next_payee_ix.checked_add(1).unwrap();
+            }
+
+            // Return the index of the new payee
+            self.next_payee_ix.checked_sub(1).unwrap()
+        }
+
         /// Returns the payee at the given index.
         #[ink(message)]
         pub fn get_payee(&self, id: u128) -> Option<Payee> {
@@ -59,9 +75,15 @@ mod dos_unbounded_operation {
         #[ink(message)]
         pub fn pay_out(&mut self) {
             for i in 0..self.next_payee_ix {
-                let payee = self.payees.get(&i).unwrap();
+                let payee = self.payees.get(i).unwrap();
                 self.env().transfer(payee.address, payee.value).unwrap();
             }
+        }
+    }
+
+    impl Default for DosUnboundedOperation {
+        fn default() -> Self {
+            Self::new()
         }
     }
 
@@ -93,6 +115,34 @@ mod dos_unbounded_operation {
             // Assert
             assert_eq!(first_payee_id, 0);
             assert_eq!(second_payee_id, 1);
+        }
+
+        #[ink::test]
+        fn add_payee_works() {
+            // Arrange
+            let mut contract = DosUnboundedOperation::new();
+
+            // Act
+            let payee_id = contract.add_payee();
+            let payee = contract.get_payee(payee_id).unwrap();
+
+            // Assert
+            assert_eq!(payee.address, AccountId::from([0x01; 32]));
+            assert_eq!(payee.value, 0);
+        }
+
+        #[ink::test]
+        fn add_n_payees_works() {
+            // Arrange
+            let mut contract = DosUnboundedOperation::new();
+
+            // Act
+            let payee_id = contract.add_n_payees(10);
+            let payee = contract.get_payee(payee_id).unwrap();
+
+            // Assert
+            assert_eq!(payee.address, AccountId::from([0x01; 32]));
+            assert_eq!(payee.value, 0);
         }
     }
 
