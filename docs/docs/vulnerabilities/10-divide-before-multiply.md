@@ -1,9 +1,9 @@
-# Divide Before Multiply
+# Divide before multiply
 
 ## Description
 
-- Vulnerability Category: `Numerical Precision`
-- Vulnerability Severity: `Moderate`
+- Vulnerability Category: `Arithmetic`
+- Vulnerability Severity: `Medium`
 - Detectors: [`divide-before-multiply`](https://github.com/CoinFabrik/scout/tree/main/detectors/divide-before-multiply)
 - Test Cases: [`divide-before-multiply-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/divide-before-multiply/divide-before-multiply-1)
 

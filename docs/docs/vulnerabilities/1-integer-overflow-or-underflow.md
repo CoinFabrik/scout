@@ -1,4 +1,4 @@
-# Integer overflow and integer underflow
+# Integer overflow or underflow
 ## Description
 - Vulnerability Category: `Arithmetic`
 - Severity: `Critical`
