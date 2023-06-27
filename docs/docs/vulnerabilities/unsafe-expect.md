@@ -7,7 +7,7 @@
 - Detectors: [`unsafe-expect`](https://github.com/CoinFabrik/scout/tree/main/detectors/unsafe-expect)
 - Test Cases: [`unsafe-expect-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/unsafe-expect/unsafe-expect-1)
 
-In Rust, the `expect` method is often used for error handling. It returns the contained `Ok` value for a `Result` or `Some` value for an `Option`, and if not, it calls `panic!` with a provided error message.
+In Rust, the `expect` method is often used for error handling. It returns the contained `Ok` value for a `Result` or `Some` value for an `Option`. If an error occurs, it calls `panic!` with a provided error message.
 
 The usage of `expect` can lead to a panic and crash the program, which is not desired behavior in most cases, especially for a smart contract.
 
