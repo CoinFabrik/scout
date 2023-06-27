@@ -62,6 +62,20 @@ Visit [Scout's website](http://localhost:3000/) to view the full documentation.
 | dos-unbounded-operation       | Denial of Service               | [DoS due to unbounded operation.](./vulnerabilities/examples/dos-unbounded-operation/README.md)                                                    | Medium          |
 | dos-unexpected-revert-with-vector         | Denial of Service              |  [DoS due to improper storage.](./vulnerabilities/examples/dos-unexpected-revert-with-vector/README.md)                                                                                | Medium   
 
+
+## Tests
+
+To validate our tool, we provide a set of code examples located in the [test-cases](https://github.com/CoinFabrik/scout/tree/main/test-cases) folder.
+
+In order to run the integration tests, navigate to `apps/cargo-scout` and run:
+
+```console
+cargo test --all --all-features
+```
+
+In order to run the tests for a particular test case, run the same command on that particular test-case folder (e.g: `test-cases/delegate-call/vulnerable-example`)
+
+
 ## About CoinFabrik
 
 We - [CoinFabrik](https://www.coinfabrik.com/) - are a research and development company specialized in Web3, with a strong background in cybersecurity. Founded in 2014, we have worked on over 180 blockchain-related projects, EVM based and also for Solana, Algorand, and Polkadot. Beyond development, we offer security audits through a dedicated in-house team of senior cybersecurity professionals, currently working on code in Substrate, Solidity, Clarity, Rust, and TEAL.
