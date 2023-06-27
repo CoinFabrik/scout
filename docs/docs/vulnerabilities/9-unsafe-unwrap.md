@@ -77,4 +77,4 @@ The remediated code example can be found [`here`](https://github.com/CoinFabrik/
 
 ## References
 
-[Rust documentation: `expect`](https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap)
+[Rust documentation: `unwrap`](https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap)
