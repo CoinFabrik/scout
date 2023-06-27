@@ -6,5 +6,5 @@ directories=$(cat)
 # Run cargo fmt on each directory
 for directory in $directories; do
     echo "Running cargo test on $directory"
-    (cd "$directory" && cargo test --all --all-features)
+    (cd "$directory" && cargo test --all --all-features --quiet)
 done
