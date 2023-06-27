@@ -3,45 +3,52 @@
 #[ink::contract]
 mod delegate_call {
 
+    #[ink(storage)]
+    pub struct DelegateCall {
+        admin: AccountId,
+        addresses: [AccountId; 3],
+        percent1: u128,
+        percent2: u128,
+        percent3: u128,
+        target: Hash,
+    }
+
     #[derive(Debug, PartialEq, Eq, Clone, scale::Encode, scale::Decode)]
     #[cfg_attr(feature = "std", derive(::scale_info::TypeInfo))]
     pub enum Error {
         NotEnoughMoney,
         DelegateCallFailed,
         NotAnAdmin,
-    }
-
-    /// Defines the storage of your contract.
-    /// Add new fields to the below struct in order
-    /// to add new static storage fields to your contract.
-    #[ink(storage)]
-    pub struct DelegateCall {
-        forward_to: AccountId,
-        admin: AccountId,
-        addresses: [AccountId; 3],
-        target: Hash,
+        TransferFailed,
     }
 
     impl DelegateCall {
+        /// Instantiates a new DelegateCall contract
         #[ink(constructor)]
         pub fn new(
-            forward_to: AccountId,
             address1: AccountId,
             address2: AccountId,
             address3: AccountId,
+            percent1: u128,
+            percent2: u128,
+            percent3: u128,
             target: Hash,
         ) -> Self {
             Self {
                 admin: Self::env().caller(),
-                forward_to,
                 addresses: [address1, address2, address3],
+                percent1,
+                percent2,
+                percent3,
                 target,
             }
         }
 
         /// Delegates the fee calculation and pays the results to the corresponding addresses
-        #[ink(message, payable, selector = _)]
-        pub fn ask_payouts(&mut self, amount: Balance) -> Result<(), Error> {
+        #[ink(message, payable)]
+        pub fn ask_payouts(&mut self) -> Result<(), Error> {
+            let amount = self.env().transferred_value();
+
             let result = ink::env::call::build_call::<ink::env::DefaultEnvironment>()
                 .delegate(self.target)
                 .exec_input(
@@ -55,13 +62,20 @@ mod delegate_call {
                 .map_err(|_| Error::DelegateCallFailed)?
                 .map_err(|_| Error::DelegateCallFailed)?;
 
-            if amount <= (result.0 + result.1 + result.2) {
+            let total = result.0 + result.1 + result.2;
+            if total > amount {
                 return Err(Error::NotEnoughMoney);
             }
 
-            self.env().transfer(self.addresses[0], result.0).unwrap();
-            self.env().transfer(self.addresses[1], result.1).unwrap();
-            self.env().transfer(self.addresses[2], result.2).unwrap();
+            self.env()
+                .transfer(self.addresses[0], result.0)
+                .map_err(|_| Error::TransferFailed)?;
+            self.env()
+                .transfer(self.addresses[1], result.1)
+                .map_err(|_| Error::TransferFailed)?;
+            self.env()
+                .transfer(self.addresses[2], result.2)
+                .map_err(|_| Error::TransferFailed)?;
 
             Ok(())
         }
@@ -83,52 +97,175 @@ mod delegate_call {
 
         use super::*;
 
-        type AccountId = <ink::env::DefaultEnvironment as ink::env::Environment>::AccountId;
-
         #[ink::test]
         fn constructor_works() {
+            // Arrange
             let accounts: DefaultAccounts<ink::env::DefaultEnvironment> =
                 ink::env::test::default_accounts::<ink::env::DefaultEnvironment>();
-            let alice: AccountId = accounts.alice;
-            let bob: AccountId = accounts.bob;
-            let charlie: AccountId = accounts.charlie;
-            let dave: AccountId = accounts.eve;
             let hash: Hash = [0x01; 32].into();
-            let contract = DelegateCall::new(alice, bob, charlie, dave, hash);
-            assert_eq!(contract.forward_to, alice);
-            assert_eq!(contract.admin, alice);
-            assert_eq!(contract.addresses, [bob, charlie, dave]);
-            // assert_eq!(contract.payouts, [0, 0, 0]); //FIXME
-        }
 
-        // try to change target without being admin
-        #[ink::test]
-        #[should_panic(expected = "Only admin can set target")]
-        fn set_target_fails() {
-            let accounts: DefaultAccounts<ink::env::DefaultEnvironment> =
-                ink::env::test::default_accounts::<ink::env::DefaultEnvironment>();
-            let alice: AccountId = accounts.alice;
-            let bob: AccountId = accounts.bob;
-            let charlie: AccountId = accounts.charlie;
-            let dave: AccountId = accounts.eve;
-            let hash: Hash = [0x01; 32].into();
-            let mut contract = DelegateCall::new(alice, bob, charlie, dave, hash);
-            ink::env::test::set_caller::<ink::env::DefaultEnvironment>(bob); //alice is the admin
-            contract.set_target([0x02; 32].into()).unwrap();
+            // Act
+            let contract = DelegateCall::new(
+                accounts.bob,
+                accounts.charlie,
+                accounts.eve,
+                10,
+                20,
+                70,
+                hash,
+            );
+
+            // Assert
+            assert_eq!(contract.admin, accounts.alice);
+            assert_eq!(
+                contract.addresses,
+                [accounts.bob, accounts.charlie, accounts.eve]
+            );
+            assert_eq!(contract.percent1, 10);
+            assert_eq!(contract.percent2, 20);
+            assert_eq!(contract.percent3, 70);
         }
 
         #[ink::test]
-        fn set_target_doesnt_fails() {
+        fn set_target_fails_if_not_called_by_admin() {
+            // Arrange
             let accounts: DefaultAccounts<ink::env::DefaultEnvironment> =
                 ink::env::test::default_accounts::<ink::env::DefaultEnvironment>();
-            let alice: AccountId = accounts.alice;
-            let bob: AccountId = accounts.bob;
-            let charlie: AccountId = accounts.charlie;
-            let dave: AccountId = accounts.eve;
             let hash: Hash = [0x01; 32].into();
-            let mut contract = DelegateCall::new(alice, bob, charlie, dave, hash);
-            ink::env::test::set_caller::<ink::env::DefaultEnvironment>(alice); //alice is the admin
-            contract.set_target([0x02; 32].into()).unwrap();
+            let mut contract = DelegateCall::new(
+                accounts.bob,
+                accounts.charlie,
+                accounts.eve,
+                10,
+                20,
+                70,
+                hash,
+            );
+
+            // Act
+            ink::env::test::set_caller::<ink::env::DefaultEnvironment>(accounts.bob);
+            let result = contract.set_target([0x02; 32].into());
+
+            // Assert
+            assert!(result.is_err());
+        }
+
+        #[ink::test]
+        fn set_target_works_called_by_admin() {
+            // Arrange
+            let accounts: DefaultAccounts<ink::env::DefaultEnvironment> =
+                ink::env::test::default_accounts::<ink::env::DefaultEnvironment>();
+            let hash: Hash = [0x01; 32].into();
+            let mut contract = DelegateCall::new(
+                accounts.bob,
+                accounts.charlie,
+                accounts.eve,
+                10,
+                20,
+                70,
+                hash,
+            );
+
+            // Act
+            let result = contract.set_target([0x02; 32].into());
+
+            // Assert
+            assert!(result.is_ok());
+            assert_eq!(contract.target, [0x02; 32].into());
+        }
+    }
+
+    #[cfg(all(test, feature = "e2e-tests"))]
+    mod e2e_tests {
+        use ink_e2e::build_message;
+
+        use super::*;
+        use delegate_call_divider::delegate_call_divider::DelegateCallDividerRef;
+
+        type E2EResult<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+
+        #[ink_e2e::test]
+        async fn payout_works(mut client: ink_e2e::Client<C, E>) -> E2EResult<()> {
+            // Arrange
+            let bob_account_id: ink::primitives::AccountId =
+                ink_e2e::bob::<ink_e2e::PolkadotConfig>()
+                    .account_id()
+                    .0
+                    .into();
+            let bob_initial_balance = client.balance(bob_account_id).await.unwrap();
+            let charlie_account_id: ink::primitives::AccountId =
+                ink_e2e::charlie::<ink_e2e::PolkadotConfig>()
+                    .account_id()
+                    .0
+                    .into();
+            let charlie_initial_balance = client.balance(charlie_account_id).await.unwrap();
+            let dave_account_id: ink::primitives::AccountId =
+                ink_e2e::dave::<ink_e2e::PolkadotConfig>()
+                    .account_id()
+                    .0
+                    .into();
+            let dave_initial_balance = client.balance(dave_account_id).await.unwrap();
+
+            let divider_constructor = DelegateCallDividerRef::new(
+                bob_account_id,
+                charlie_account_id,
+                dave_account_id,
+                10,
+                20,
+                70,
+            );
+            let divider_contract_acc_id = client
+                .instantiate(
+                    "delegate-call-divider",
+                    &ink_e2e::alice(),
+                    divider_constructor,
+                    0,
+                    None,
+                )
+                .await
+                .expect("instantiate failed")
+                .account_id;
+            let divider_contract_codehash_call =
+                build_message::<DelegateCallDividerRef>(divider_contract_acc_id.clone())
+                    .call(|contract| contract.codehash());
+            let divider_contract_codehash = client
+                .call_dry_run(&ink_e2e::alice(), &divider_contract_codehash_call, 0, None)
+                .await
+                .return_value();
+
+            let constructor = DelegateCallRef::new(
+                bob_account_id,
+                charlie_account_id,
+                dave_account_id,
+                10,
+                20,
+                70,
+                divider_contract_codehash,
+            );
+            let contract_acc_id = client
+                .instantiate("delegate-call", &ink_e2e::alice(), constructor, 0, None)
+                .await
+                .expect("instantiate failed")
+                .account_id;
+
+            // Act
+            let ask_payouts_call = build_message::<DelegateCallRef>(contract_acc_id.clone())
+                .call(|contract| contract.ask_payouts());
+            let ask_payouts = client
+                .call(&ink_e2e::alice(), ask_payouts_call, 100, None)
+                .await;
+
+            // Assert
+            let bob_current_balance = client.balance(bob_account_id).await.unwrap();
+            let charlie_current_balance = client.balance(charlie_account_id).await.unwrap();
+            let dave_current_balance = client.balance(dave_account_id).await.unwrap();
+
+            assert!(ask_payouts.is_ok());
+            assert_eq!(bob_current_balance - bob_initial_balance, 10);
+            assert_eq!(charlie_current_balance - charlie_initial_balance, 20);
+            assert_eq!(dave_current_balance - dave_initial_balance, 70);
+
+            Ok(())
         }
     }
 }
