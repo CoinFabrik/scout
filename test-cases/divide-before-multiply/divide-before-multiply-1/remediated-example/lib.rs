@@ -1,4 +1,3 @@
-#![allow(clippy::new_without_default)]
 #![cfg_attr(not(feature = "std"), no_std, no_main)]
 
 #[ink::contract]
@@ -16,6 +15,12 @@ mod divide_before_multiply {
         #[ink(message)]
         pub fn split_profit(&self, percentage: u64, total_profit: u64) -> u64 {
             (percentage * total_profit) / 100
+        }
+    }
+
+    impl Default for FloatingPointAndNumericalPrecision {
+        fn default() -> Self {
+            Self::new()
         }
     }
 
