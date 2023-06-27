@@ -49,7 +49,7 @@ mod dos_unbounded_operation {
             self.next_payee_ix.checked_sub(1).unwrap()
         }
 
-        /// Add n payees to the operation.
+        /// Add n payees to the operation, used only for testing.
         #[ink(message, payable)]
         pub fn add_n_payees(&mut self, n: u128) -> u128 {
             let address = self.env().caller();
@@ -61,7 +61,7 @@ mod dos_unbounded_operation {
                 self.next_payee_ix = self.next_payee_ix.checked_add(1).unwrap();
             }
 
-            // Return the index of the new payee
+            // Return the index of the last added payee
             self.next_payee_ix.checked_sub(1).unwrap()
         }
 
@@ -214,13 +214,14 @@ mod dos_unbounded_operation {
                 .expect("instantiate failed")
                 .account_id;
 
-            for _ in 0..10000 {
-                let add_payee = build_message::<DosUnboundedOperationRef>(contract_acc_id.clone())
-                    .call(|contract| contract.add_payee());
+            for _ in 0..10 {
+                let add_n_payees =
+                    build_message::<DosUnboundedOperationRef>(contract_acc_id.clone())
+                        .call(|contract| contract.add_n_payees(1000));
                 client
-                    .call(&ink_e2e::alice(), add_payee.clone(), 1, None)
+                    .call(&ink_e2e::alice(), add_n_payees.clone(), 1000, None)
                     .await
-                    .expect("add_payee failed");
+                    .expect("add_n_payees failed");
             }
 
             // Act
