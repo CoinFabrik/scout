@@ -24,7 +24,7 @@ let b = a + 1;
 Use instead:
 ```rust
 let a = 0;
-let b = a.checked_add(1);
+let b = a.checked_add(1).ok_or(Error::OverflowDetected)?;
 ```
 ### Implementation
 
