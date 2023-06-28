@@ -94,11 +94,11 @@ mod delegate_call {
 
     #[cfg(all(test, feature = "e2e-tests"))]
     mod e2e_tests {
+        use delegate_call_divider::delegate_call_divider::DelegateCallDividerRef;
+        use delegate_call_exploiter::delegate_call_exploiter::DelegateCallExploiterRef;
         use ink_e2e::build_message;
 
         use super::*;
-        use delegate_call_divider::delegate_call_divider::DelegateCallDividerRef;
-        use delegate_call_exploiter::delegate_call_exploiter::DelegateCallExploiterRef;
 
         type E2EResult<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
