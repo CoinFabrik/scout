@@ -40,6 +40,12 @@ mod zerocheck {
         }
     }
 
+    impl Default for Zerocheck {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+
     #[cfg(test)]
     mod tests {
         use ink::env::test::DefaultAccounts;
@@ -90,7 +96,7 @@ pub fn modify_admin(admin: String) -> String {
         return "NotAuthorized".to_string();
     }
 
-    if admin == "" {
+    if admin.is_empty() {
         return "ZeroAddress".to_string();
     }
 

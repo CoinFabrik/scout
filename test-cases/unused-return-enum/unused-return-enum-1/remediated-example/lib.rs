@@ -36,6 +36,12 @@ mod unused_return_enum {
         }
     }
 
+    impl Default for UnusedReturnEnum {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+
     #[cfg(test)]
     mod tests {
         use super::*;

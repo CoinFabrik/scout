@@ -114,7 +114,7 @@ mod erc20 {
                 total_supply,
                 balances,
                 allowances: Default::default(),
-                owner: owner,
+                owner,
             }
         }
     }
