@@ -98,4 +98,4 @@ The remediated code example can be found [`here`](https://github.com/CoinFabrik/
 
 ## Reference
 
-[Ink! documentation: DelegateCall](https://paritytech.github.io/ink/ink_env/call/struct.DelegateCall.html)
+[ink! documentation: DelegateCall](https://paritytech.github.io/ink/ink_env/call/struct.DelegateCall.html)
