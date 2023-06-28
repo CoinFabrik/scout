@@ -100,20 +100,8 @@ const config = {
                 to: '/docs/detectors',
               },
               {
-                label: 'Learn',
-                to: '/docs/Learn',
-              },
-              {
-                label: 'Tutorials',
-                to: '/docs/tutorials',
-              },
-              {
                 label: 'Contribute',
                 to: '/docs/contribute',
-              },
-              {
-                label: 'FAQs',
-                to: '/docs/faqs',
               },
             ],
           },

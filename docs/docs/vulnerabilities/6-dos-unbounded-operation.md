@@ -1,4 +1,4 @@
-# DoS Unbounded Operation
+# DoS unbounded operation
 ## Description
 - Vulnerability Category: `Denial of Service`
 - Severity: `Medium`

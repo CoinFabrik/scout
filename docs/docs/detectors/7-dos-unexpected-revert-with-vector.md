@@ -1,4 +1,4 @@
-# DoS Unexpected revert with vector
+# DoS unexpected revert with vector
 
 ### What it does
 Checks for array pushes without access control.
@@ -30,3 +30,7 @@ if self.votes.contains(candidate) {
     Ok(())
 }
 ```
+
+### Implementation
+
+The detector's implementation can be found at [this link](https://github.com/CoinFabrik/scout/tree/main/detectors/dos-unexpected-revert-with-vector).

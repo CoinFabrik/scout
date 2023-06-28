@@ -1,4 +1,4 @@
-# Panic_Error
+# Panic error
 
 ### What it does
 The panic! macro is used to stop execution when a condition is not met.
@@ -38,3 +38,7 @@ pub fn add(&mut self, value: u32) -> Result<(), Error>  {
     Ok(())
 }
 ```
+
+### Implementation
+
+The detector's implementation can be found at [this link](https://github.com/CoinFabrik/scout/tree/main/detectors/panic-error).

@@ -1,4 +1,4 @@
-# Set Contract Storage
+# Set contract storage
 
 ### What it does
 Checks for calls to env::set_contract_storage.
@@ -35,3 +35,7 @@ fn set_contract_storage(
     }
 }
 ```
+
+### Implementation
+
+The detector's implementation can be found at [this link](https://github.com/CoinFabrik/scout/tree/main/detectors/set-contract-storage).

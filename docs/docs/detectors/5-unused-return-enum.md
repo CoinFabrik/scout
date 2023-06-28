@@ -1,4 +1,4 @@
-# UNUSED_RETURN_ENUM
+# Unused return enum
 
 ### What it does
 It warns if a fuction that returns a Result type does not return a Result enum variant (Ok/Err)
@@ -50,3 +50,9 @@ Use instead:
         return Err(TradingPairErrors::Overflow);
     }
 ```
+
+### Implementation
+
+The detector's implementation can be found at [this link](https://github.com/CoinFabrik/scout/tree/main/detectors/unused-return-enum).
+
+

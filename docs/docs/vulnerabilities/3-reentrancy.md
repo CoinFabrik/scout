@@ -1,7 +1,7 @@
 # Reentrancy
 ## Description
 * Vulnerability Category: `Reentrancy`
-* Severity: `High`
+* Severity: `Critical`
 * Detectors: [`reentrancy`](https://github.com/CoinFabrik/scout/tree/main/detectors/reentrancy)
 * Test Cases: [`reentrancy-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy/reentrancy-1), [`reentrancy-2`](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy/reentrancy-2) 
 
