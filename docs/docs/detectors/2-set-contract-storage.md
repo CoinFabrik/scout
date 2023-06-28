@@ -1,15 +1,19 @@
 # Set contract storage
 
 ### What it does
+
 Checks for calls to env::set_contract_storage.
 
 ### Why is this bad?
+
 Functions using keys as variables without proper access control or input sanitation can allow users to perform changes in arbitrary memory locations.
 
 ### Known problems
+
 Only check the function call, so false positives could result.
 
 ### Example
+
 ```rust
 fn set_contract_storage(
     &mut self,
@@ -20,7 +24,9 @@ fn set_contract_storage(
     Ok(())
 }
 ```
+
 Use instead:
+
 ```rust
 fn set_contract_storage(
     &mut self,

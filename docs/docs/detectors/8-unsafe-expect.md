@@ -37,4 +37,3 @@ fn result_fn() -> Result<u8, Error> {
 ### Implementation
 
 The detector's implementation can be found at [this link](https://github.com/CoinFabrik/scout/tree/main/detectors/unsafe-expect).
-
