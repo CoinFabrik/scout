@@ -34,21 +34,18 @@ To run Scout on your project, navigate to its root directory and execute the fol
 cargo scout
 ```
 
-For more information on installation and usage, please refer to the [Getting Started](http://localhost:3000/docs/intro) section in our documentation below.
+For more information on installation and usage, please refer to the [Getting Started](https://coinfabrik.github.io/scout/docs/intro) section in our documentation below.
 
 ## Documentation
 
-* [Getting Started](http://localhost:3000/docs/intro)
-* [Vulnerabilities](http://localhost:3000/docs/vulnerabilities)
-* [Detectors](http://localhost:3000/docs/detectors)
-* [Learn](http://localhost:3000/docs/Learn)
-* [Tutorials](http://localhost:3000/docs/tutorials)
-* [Contribute](http://localhost:3000/docs/contribute)
-* [FAQs](http://localhost:3000/docs/faqs)
-* [Blog](http://localhost:3000/blog)
+* [Getting Started](https://coinfabrik.github.io/scout/docs/intro)
+* [Vulnerabilities](https://coinfabrik.github.io/scout/docs/vulnerabilities)
+* [Detectors](https://coinfabrik.github.io/scout/docs/detectors)
+* [Contribute](https://coinfabrik.github.io/scout/docs/contribute)
+* [Blog](https://blog.coinfabrik.com/)
 
 
-Visit [Scout's website](http://localhost:3000/) to view the full documentation.
+Visit [Scout's website](https://coinfabrik.github.io/scout/) to view the full documentation.
 
 
 ## Detectors
