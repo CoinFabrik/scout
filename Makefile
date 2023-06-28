@@ -20,4 +20,4 @@ lint-rust:
 test:
 	@echo "Running tests..."
 	@cd apps/cargo-scout && cargo test --all --all-features -- --nocapture
-	@cd detectors && ../scripts/list-cargo-directories.sh | ../scripts/run-cargo-test.sh
+	@cd test-cases && ../scripts/list-cargo-directories.sh | ../scripts/run-cargo-test.sh
