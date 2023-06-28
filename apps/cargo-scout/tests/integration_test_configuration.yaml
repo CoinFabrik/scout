@@ -10,7 +10,7 @@ detectors:
       - vulnerable_path: "../../test-cases/dos-unexpected-revert-with-vector/dos-unexpected-revert-with-vector-1/vulnerable-example/Cargo.toml"
         remediated_path: "../../test-cases/dos-unexpected-revert-with-vector/dos-unexpected-revert-with-vector-1/remediated-example/Cargo.toml"
   integer-overflow-or-underflow:
-    warning_message: "integer arithmetic detected"
+    warning_message: "integer arithmetic overflow/underflow"
     examples:
       - vulnerable_path: "../../test-cases/integer-overflow-or-underflow/integer-overflow-or-underflow-1/vulnerable-example/Cargo.toml"
         remediated_path: "../../test-cases/integer-overflow-or-underflow/integer-overflow-or-underflow-1/remediated-example/Cargo.toml"
