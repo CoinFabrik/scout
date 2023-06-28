@@ -1,16 +1,20 @@
 # Reentrancy
 
 ### What it does
+
 This linting rule checks whether the 'check-effect' interaction pattern has been properly followed by code that invokes a contract that may call back the original one.
 
 ### Why is this bad?
+
 If state modifications are made after a contract call, reentrant calls may not detect these modifications, potentially leading to unexpected behaviors such as double spending.
 
 ### Known problems
+
 If called method does not perform a malicious reentrancy (i.e. known method from known contract) false positives will arise.
 If the usage of set_allow_reentry(true) or later state changes are performed in an auxiliary function, this detector will not detect the reentrancy.
 
 ### Example
+
 ```rust
 let caller_addr = self.env().caller();
 let caller_balance = self.balance(caller_addr);
@@ -36,7 +40,9 @@ self.env()
 let new_balance = caller_balance.checked_sub(amount).ok_or(Error::Underflow)?;
 self.balances.insert(caller_addr, &new_balance);
 ```
+
 Use instead:
+
 ```rust
 let caller_addr = self.env().caller();
 let caller_balance = self.balances.get(caller_addr).unwrap_or(0);
