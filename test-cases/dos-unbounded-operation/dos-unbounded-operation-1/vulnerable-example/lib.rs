@@ -49,6 +49,22 @@ mod dos_unbounded_operation {
             self.next_payee_ix.checked_sub(1).unwrap()
         }
 
+        /// Add n payees to the operation, used only for testing.
+        #[ink(message, payable)]
+        pub fn add_n_payees(&mut self, n: u128) -> u128 {
+            let address = self.env().caller();
+            let value = self.env().transferred_value().checked_div(n).unwrap();
+            let new_payee = Payee { address, value };
+
+            for _ in 0..n {
+                self.payees.insert(self.next_payee_ix, &new_payee);
+                self.next_payee_ix = self.next_payee_ix.checked_add(1).unwrap();
+            }
+
+            // Return the index of the last added payee
+            self.next_payee_ix.checked_sub(1).unwrap()
+        }
+
         /// Returns the payee at the given index.
         #[ink(message)]
         pub fn get_payee(&self, id: u128) -> Option<Payee> {
@@ -99,6 +115,34 @@ mod dos_unbounded_operation {
             // Assert
             assert_eq!(first_payee_id, 0);
             assert_eq!(second_payee_id, 1);
+        }
+
+        #[ink::test]
+        fn add_payee_works() {
+            // Arrange
+            let mut contract = DosUnboundedOperation::new();
+
+            // Act
+            let payee_id = contract.add_payee();
+            let payee = contract.get_payee(payee_id).unwrap();
+
+            // Assert
+            assert_eq!(payee.address, AccountId::from([0x01; 32]));
+            assert_eq!(payee.value, 0);
+        }
+
+        #[ink::test]
+        fn add_n_payees_works() {
+            // Arrange
+            let mut contract = DosUnboundedOperation::new();
+
+            // Act
+            let payee_id = contract.add_n_payees(10);
+            let payee = contract.get_payee(payee_id).unwrap();
+
+            // Assert
+            assert_eq!(payee.address, AccountId::from([0x01; 32]));
+            assert_eq!(payee.value, 0);
         }
     }
 
@@ -170,13 +214,14 @@ mod dos_unbounded_operation {
                 .expect("instantiate failed")
                 .account_id;
 
-            for _ in 0..10000 {
-                let add_payee = build_message::<DosUnboundedOperationRef>(contract_acc_id.clone())
-                    .call(|contract| contract.add_payee());
+            for _ in 0..10 {
+                let add_n_payees =
+                    build_message::<DosUnboundedOperationRef>(contract_acc_id.clone())
+                        .call(|contract| contract.add_n_payees(1000));
                 client
-                    .call(&ink_e2e::alice(), add_payee.clone(), 1, None)
+                    .call(&ink_e2e::alice(), add_n_payees.clone(), 1000, None)
                     .await
-                    .expect("add_payee failed");
+                    .expect("add_n_payees failed");
             }
 
             // Act

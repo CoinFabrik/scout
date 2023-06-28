@@ -53,7 +53,7 @@ mod divide_before_multiply {
             // When
             let contract_acc_id = client
                 .instantiate(
-                    "divide_before_multiply",
+                    "divide-before-multiply",
                     &ink_e2e::bob(),
                     constructor,
                     0,
