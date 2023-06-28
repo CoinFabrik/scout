@@ -31,7 +31,7 @@ mod vault {
             let caller_balance = self.balances.get(caller_addr).unwrap_or(0);
             let updated_balance = caller_balance + self.env().transferred_value();
             self.balances.insert(caller_addr, &updated_balance);
-            return updated_balance;
+            updated_balance
         }
 
         /// Returns the current balance of the given account.
@@ -51,7 +51,7 @@ mod vault {
                     panic!("requested transfer failed.")
                 }
                 self.balances.insert(caller_addr, &updated_balance);
-                return updated_balance;
+                updated_balance
             } else {
                 panic!("amount > balance")
             }
@@ -88,10 +88,16 @@ mod vault {
                     .unwrap_or_else(|err| panic!("Err {:?}", err))
                     .unwrap_or_else(|err| panic!("LangErr {:?}", err));
 
-                return caller_balance - amount;
+                caller_balance - amount
             } else {
-                return caller_balance;
+                caller_balance
             }
+        }
+    }
+
+    impl Default for Vault {
+        fn default() -> Self {
+            Self::new()
         }
     }
 }

@@ -59,9 +59,15 @@ mod dos_unbounded_operation {
         #[ink(message)]
         pub fn pay_out(&mut self) {
             for i in 0..self.next_payee_ix {
-                let payee = self.payees.get(&i).unwrap();
+                let payee = self.payees.get(i).unwrap();
                 self.env().transfer(payee.address, payee.value).unwrap();
             }
+        }
+    }
+
+    impl Default for DosUnboundedOperation {
+        fn default() -> Self {
+            Self::new()
         }
     }
 

@@ -79,7 +79,9 @@ mod unexpected_revert {
         /// Returns votes for a given candidate.
         #[ink(message)]
         pub fn get_votes_for_a_candidate(&self, candidate: AccountId) -> Result<u64, Errors> {
-            self.votes.get(candidate).ok_or(Errors::CandidateDoesntExist)
+            self.votes
+                .get(candidate)
+                .ok_or(Errors::CandidateDoesntExist)
         }
 
         /// Returns votes for the most voted candidate.
@@ -184,7 +186,7 @@ mod unexpected_revert {
             }
 
             assert_eq!(contract.get_total_candidates(), 512u64);
-            assert_eq!(candidate.is_ok(), true);
+            assert!(candidate.is_ok());
         }
     }
 

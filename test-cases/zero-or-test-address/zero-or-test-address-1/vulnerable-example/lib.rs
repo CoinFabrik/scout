@@ -35,6 +35,12 @@ mod zerocheck {
         }
     }
 
+    impl Default for Zerocheck {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+
     #[cfg(test)]
     mod tests {
         use ink::env::test::DefaultAccounts;
