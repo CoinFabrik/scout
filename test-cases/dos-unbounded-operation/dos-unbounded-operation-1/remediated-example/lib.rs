@@ -58,8 +58,14 @@ mod dos_unbounded_operation {
         /// Pays out to the payee at the given index.
         #[ink(message)]
         pub fn pay_out(&mut self, payee: u128) {
-            let payee = self.payees.get(&payee).unwrap();
+            let payee = self.payees.get(payee).unwrap();
             self.env().transfer(payee.address, payee.value).unwrap();
+        }
+    }
+
+    impl Default for DosUnboundedOperation {
+        fn default() -> Self {
+            Self::new()
         }
     }
 }

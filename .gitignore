@@ -13,6 +13,10 @@ target/
 # MSVC Windows builds of rustc generate these, which store debugging information
 *.pdb
 
+# Ignore Cargo.lock of library files
+test-cases/**/Cargo.lock
+detectors/**/Cargo.lock
+
 # -------------------------------------------------------------------------------------
 # -------------------------------------- Misc -----------------------------------------
 # -------------------------------------------------------------------------------------
@@ -28,3 +32,7 @@ logs
 .env
 .env.*
 node_modules
+
+# Editors
+.vscode/
+!/.vscode/

@@ -36,6 +36,12 @@ mod unused_return_enum {
         }
     }
 
+    impl Default for UnusedReturnEnum {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+
     #[cfg(test)]
     mod tests {
         use super::*;
@@ -57,8 +63,9 @@ mod unused_return_enum {
 
     #[cfg(all(test, feature = "e2e-tests"))]
     mod e2e_tests {
-        use super::*;
         use ink_e2e::build_message;
+
+        use super::*;
 
         type E2EResult<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 

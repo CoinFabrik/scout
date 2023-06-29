@@ -11,15 +11,17 @@ const config = {
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
-  url: 'https://your-docusaurus-test-site.com',
+  url: 'https://coinfabrik.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/',
+  baseUrl: '/scout/',
+  trailingSlash: false,
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: 'CoinFabrik', // Usually your GitHub org/user name.
-  projectName: 'Scout', // Usually your repo name.
+  projectName: 'scout', // Usually your repo name.
+  deploymentBranch: 'gh-pages', // The branch of your docs repo that you are going to deploy to GitHub pages.
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -98,20 +100,8 @@ const config = {
                 to: '/docs/detectors',
               },
               {
-                label: 'Learn',
-                to: '/docs/Learn',
-              },
-              {
-                label: 'Tutorials',
-                to: '/docs/tutorials',
-              },
-              {
                 label: 'Contribute',
                 to: '/docs/contribute',
-              },
-              {
-                label: 'FAQs',
-                to: '/docs/faqs',
               },
             ],
           },
@@ -152,10 +142,13 @@ const config = {
         ],
         copyright: `Copyright © ${new Date().getFullYear()} Scout, CoinFabrik.`,
       },
+
       prism: {
         theme: darkCodeTheme,
         darkTheme: darkCodeTheme,
+        additionalLanguages: ['rust', 'toml'],
       },
+
     }),
 };
 

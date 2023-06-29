@@ -79,12 +79,9 @@ mod unexpected_revert {
         /// Returns votes for a given candidate.
         #[ink(message)]
         pub fn get_votes_for_a_candidate(&self, candidate: AccountId) -> Result<u64, Errors> {
-            let votes_opt = self.votes.get(candidate);
-            if votes_opt.is_none() {
-                Err(Errors::CandidateDoesntExist)
-            } else {
-                Ok(votes_opt.unwrap())
-            }
+            self.votes
+                .get(candidate)
+                .ok_or(Errors::CandidateDoesntExist)
         }
 
         /// Returns votes for the most voted candidate.
@@ -163,8 +160,9 @@ mod unexpected_revert {
 
     #[cfg(test)]
     mod tests {
-        use super::*;
         use std::time::SystemTime;
+
+        use super::*;
 
         #[ink::test]
         fn insert_512_candidates() {
@@ -188,15 +186,17 @@ mod unexpected_revert {
             }
 
             assert_eq!(contract.get_total_candidates(), 512u64);
-            assert_eq!(candidate.is_ok(), true);
+            assert!(candidate.is_ok());
         }
     }
 
     #[cfg(all(test, feature = "e2e-tests"))]
     mod e2e_tests {
-        use super::*;
-        use ink_e2e::build_message;
         use std::time::SystemTime;
+
+        use ink_e2e::build_message;
+
+        use super::*;
 
         #[ink_e2e::test]
         #[should_panic(expected = "add_candidate failed: CallDryRun")]

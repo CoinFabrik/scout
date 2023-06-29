@@ -113,4 +113,10 @@ mod vault {
             Ok(new_balance)
         }
     }
+
+    impl Default for Vault {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
 }

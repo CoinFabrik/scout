@@ -20,11 +20,11 @@ pub fn get_detectors_configuration() -> Result<DetectorsConfigurationList> {
             "library",
             None,
             SourceId::for_git(
-                &"https://github.com/CoinFabrik/web3-grant".into_url()?,
+                &"https://github.com/CoinFabrik/scout".into_url()?,
                 GitReference::DefaultBranch,
             )?,
         )?,
-        pattern: Some("detectors/dylint/smart-contract-linters/*".into()),
+        pattern: Some("detectors/*".into()),
     }];
 
     Ok(detectors)
