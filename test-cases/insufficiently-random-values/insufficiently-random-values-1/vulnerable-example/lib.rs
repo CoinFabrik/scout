@@ -11,7 +11,7 @@ mod weak_prng {
         /// Stores a single `bool` value on the storage.
         owner: AccountId,
         max_bet: Balance,
-        min_bet:Balance
+        min_bet: Balance,
     }
 
     #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
@@ -21,15 +21,14 @@ mod weak_prng {
         NumberOutOfRange,
         BetTooLow,
         BetTooHigh,
-        TransferFailed
+        TransferFailed,
     }
     pub type Result<T> = core::result::Result<T, Error>;
 
     impl WeakPrng {
-
         #[ink(constructor)]
         pub fn new(min: Balance, max: Balance) -> Self {
-            Self { 
+            Self {
                 owner: Self::env().caller(),
                 max_bet: max,
                 min_bet: min,
@@ -38,13 +37,16 @@ mod weak_prng {
 
         #[ink(constructor)]
         pub fn default() -> Self {
-            Self::new(
-                1,
-                1000000000,
-            )
+            Self::new(1, 1000000000)
         }
 
-        pub fn check_inputs(&mut self, multiply_times: u128, min_num:u8, max_num:u8, num: u8) -> Result<bool> {
+        pub fn check_inputs(
+            &mut self,
+            multiply_times: u128,
+            min_num: u8,
+            max_num: u8,
+            num: u8,
+        ) -> Result<bool> {
             if num < min_num || num > max_num {
                 return Err(Error::NumberOutOfRange);
             } else if self.env().transferred_value() < self.min_bet {
@@ -55,7 +57,7 @@ mod weak_prng {
                 return Err(Error::InsufficientBalance);
             } else {
                 return Ok(true);
-            } 
+            }
         }
 
         #[ink(message, payable)]
@@ -65,16 +67,17 @@ mod weak_prng {
                 return Err(inputs.unwrap_err());
             }
 
-            let pseudo_random: u8 = (self.env().block_number()%37).try_into().unwrap();
+            let pseudo_random: u8 = (self.env().block_number() % 37).try_into().unwrap();
             if pseudo_random == number {
-                return self.env().transfer(
-                    self.env().caller(),
-                    self.env().transferred_value() * 36
-                ).map(|_| true).map_err(|_e| Error::TransferFailed);
+                return self
+                    .env()
+                    .transfer(self.env().caller(), self.env().transferred_value() * 36)
+                    .map(|_| true)
+                    .map_err(|_e| Error::TransferFailed);
             }
             return Ok(false);
         }
-        
+
         #[ink(message, payable)]
         pub fn bet_dozen(&mut self, dozen_n: u8) -> Result<bool> {
             let inputs = self.check_inputs(3, 0, 2, dozen_n);
@@ -82,12 +85,16 @@ mod weak_prng {
                 return Err(inputs.unwrap_err());
             }
 
-            let pseudo_random: u8 = (self.env().block_timestamp()%37).try_into().unwrap();
-            if pseudo_random != 0 && pseudo_random > (12*dozen_n) && pseudo_random <= (12*(dozen_n+1)) {
-                return self.env().transfer(
-                    self.env().caller(),
-                    self.env().transferred_value() * 3
-                ).map(|_| true).map_err(|_e| Error::TransferFailed);
+            let pseudo_random: u8 = (self.env().block_timestamp() % 37).try_into().unwrap();
+            if pseudo_random != 0
+                && pseudo_random > (12 * dozen_n)
+                && pseudo_random <= (12 * (dozen_n + 1))
+            {
+                return self
+                    .env()
+                    .transfer(self.env().caller(), self.env().transferred_value() * 3)
+                    .map(|_| true)
+                    .map_err(|_e| Error::TransferFailed);
             }
             return Ok(false);
         }
@@ -99,25 +106,27 @@ mod weak_prng {
                 return Err(inputs.unwrap_err());
             }
 
-            let pseudo_random: u8 = (self.env().block_timestamp()%37).try_into().unwrap();
-            let won = pseudo_random != 0 && if red {
-                if pseudo_random <= 10 || (pseudo_random >= 20 && pseudo_random <= 28) {
-                    pseudo_random % 2 == 1
+            let pseudo_random: u8 = (self.env().block_timestamp() % 37).try_into().unwrap();
+            let won = pseudo_random != 0
+                && if red {
+                    if pseudo_random <= 10 || (pseudo_random >= 20 && pseudo_random <= 28) {
+                        pseudo_random % 2 == 1
+                    } else {
+                        pseudo_random % 2 == 0
+                    }
                 } else {
-                    pseudo_random % 2 == 0
-                }
-            } else {
-                if pseudo_random <= 10 || (pseudo_random >= 20 && pseudo_random <= 28) {
-                    pseudo_random % 2 == 0
-                } else {
-                    pseudo_random % 2 == 1
-                }
-            };
+                    if pseudo_random <= 10 || (pseudo_random >= 20 && pseudo_random <= 28) {
+                        pseudo_random % 2 == 0
+                    } else {
+                        pseudo_random % 2 == 1
+                    }
+                };
             if won {
-                return self.env().transfer(
-                    self.env().caller(),
-                    self.env().transferred_value() * 2
-                ).map(|_| true).map_err(|_e| Error::TransferFailed);
+                return self
+                    .env()
+                    .transfer(self.env().caller(), self.env().transferred_value() * 2)
+                    .map(|_| true)
+                    .map_err(|_e| Error::TransferFailed);
             }
             return Ok(false);
         }
@@ -129,13 +138,14 @@ mod weak_prng {
                 return Err(inputs.unwrap_err());
             }
 
-            let pseudo_random: u8 = (self.env().block_timestamp()%37).try_into().unwrap();
-            
+            let pseudo_random: u8 = (self.env().block_timestamp() % 37).try_into().unwrap();
+
             if pseudo_random != 0 && pseudo_random % 2 == if even { 0 } else { 1 } {
-                return self.env().transfer(
-                    self.env().caller(),
-                    self.env().transferred_value() * 2
-                ).map(|_| true).map_err(|_e| Error::TransferFailed);
+                return self
+                    .env()
+                    .transfer(self.env().caller(), self.env().transferred_value() * 2)
+                    .map(|_| true)
+                    .map_err(|_e| Error::TransferFailed);
             }
             return Ok(false);
         }
@@ -147,18 +157,20 @@ mod weak_prng {
                 return Err(inputs.unwrap_err());
             }
 
-            let pseudo_random: u8 = (self.env().block_timestamp()%37).try_into().unwrap();
-            let won = pseudo_random != 0 && if low {
-                pseudo_random <= 18
-            } else {
-                pseudo_random > 18
-            };
+            let pseudo_random: u8 = (self.env().block_timestamp() % 37).try_into().unwrap();
+            let won = pseudo_random != 0
+                && if low {
+                    pseudo_random <= 18
+                } else {
+                    pseudo_random > 18
+                };
 
             if won {
-                return self.env().transfer(
-                    self.env().caller(),
-                    self.env().transferred_value() * 2
-                ).map(|_| true).map_err(|_e| Error::TransferFailed);
+                return self
+                    .env()
+                    .transfer(self.env().caller(), self.env().transferred_value() * 2)
+                    .map(|_| true)
+                    .map_err(|_e| Error::TransferFailed);
             }
             return Ok(false);
         }
@@ -170,7 +182,7 @@ mod weak_prng {
 
         #[ink::test]
         fn bet_single_test() {
-            let mut contract = WeakPrng::new(0,1000000);
+            let mut contract = WeakPrng::new(0, 1000000);
             ink::env::test::set_block_timestamp::<ink::env::DefaultEnvironment>(35);
             let bet = contract.bet_single(0);
             assert_eq!(bet.is_ok(), true);
@@ -187,7 +199,7 @@ mod weak_prng {
 
         #[ink::test]
         fn bet_dozen() {
-            let mut contract = WeakPrng::new(0,1000000);
+            let mut contract = WeakPrng::new(0, 1000000);
             ink::env::test::set_block_timestamp::<ink::env::DefaultEnvironment>(12);
             let bet = contract.bet_dozen(0);
             assert_eq!(bet.is_ok(), true);
@@ -196,7 +208,7 @@ mod weak_prng {
             let bet = contract.bet_dozen(6);
             assert_eq!(bet.is_ok(), false);
 
-            ink::env::test::set_block_timestamp::<ink::env::DefaultEnvironment>(370+24);
+            ink::env::test::set_block_timestamp::<ink::env::DefaultEnvironment>(370 + 24);
             let bet = contract.bet_dozen(2);
             assert_eq!(bet.is_ok(), true);
             assert_eq!(bet.unwrap(), false);
@@ -204,19 +216,18 @@ mod weak_prng {
 
         #[ink::test]
         fn bet_even_or_odd() {
-            let mut contract = WeakPrng::new(0,1000000);
+            let mut contract = WeakPrng::new(0, 1000000);
             ink::env::test::set_block_timestamp::<ink::env::DefaultEnvironment>(12);
             let bet = contract.bet_even_or_odd(true);
             assert_eq!(bet.is_ok(), true);
             assert_eq!(bet.unwrap(), true);
-
 
             ink::env::test::set_block_timestamp::<ink::env::DefaultEnvironment>(37);
             let bet = contract.bet_even_or_odd(true);
             assert_eq!(bet.is_ok(), true);
             assert_eq!(bet.unwrap(), false);
 
-            ink::env::test::set_block_timestamp::<ink::env::DefaultEnvironment>(370+24);
+            ink::env::test::set_block_timestamp::<ink::env::DefaultEnvironment>(370 + 24);
             let bet = contract.bet_even_or_odd(false);
             assert_eq!(bet.is_ok(), true);
             assert_eq!(bet.unwrap(), false);
@@ -224,19 +235,18 @@ mod weak_prng {
 
         #[ink::test]
         fn bet_low_or_high() {
-            let mut contract = WeakPrng::new(0,1000000);
+            let mut contract = WeakPrng::new(0, 1000000);
             ink::env::test::set_block_timestamp::<ink::env::DefaultEnvironment>(12);
             let bet = contract.bet_low_or_high(true);
             assert_eq!(bet.is_ok(), true);
             assert_eq!(bet.unwrap(), true);
-
 
             ink::env::test::set_block_timestamp::<ink::env::DefaultEnvironment>(37);
             let bet = contract.bet_low_or_high(true);
             assert_eq!(bet.is_ok(), true);
             assert_eq!(bet.unwrap(), false);
 
-            ink::env::test::set_block_timestamp::<ink::env::DefaultEnvironment>(370+14);
+            ink::env::test::set_block_timestamp::<ink::env::DefaultEnvironment>(370 + 14);
             let bet = contract.bet_low_or_high(false);
             assert_eq!(bet.is_ok(), true);
             assert_eq!(bet.unwrap(), false);
@@ -244,19 +254,18 @@ mod weak_prng {
 
         #[ink::test]
         fn bet_red_or_black() {
-            let mut contract = WeakPrng::new(0,1000000);
+            let mut contract = WeakPrng::new(0, 1000000);
             ink::env::test::set_block_timestamp::<ink::env::DefaultEnvironment>(12);
             let bet = contract.bet_red_or_black(true);
             assert_eq!(bet.is_ok(), true);
             assert_eq!(bet.unwrap(), true);
-
 
             ink::env::test::set_block_timestamp::<ink::env::DefaultEnvironment>(37);
             let bet = contract.bet_red_or_black(true);
             assert_eq!(bet.is_ok(), true);
             assert_eq!(bet.unwrap(), false);
 
-            ink::env::test::set_block_timestamp::<ink::env::DefaultEnvironment>(370+14);
+            ink::env::test::set_block_timestamp::<ink::env::DefaultEnvironment>(370 + 14);
             let bet = contract.bet_red_or_black(false);
             assert_eq!(bet.is_ok(), true);
             assert_eq!(bet.unwrap(), false);
