@@ -1,7 +1,7 @@
-# DoS Unexpected Revert With Vector
+# DoS unexpected revert With vector
 ## Description
 - Vulnerability Category: `DoS`
-- Severity: `High`
+- Severity: `Critical`
 - Detectors: [`dos-unexpected-revert-with-vector`](https://github.com/CoinFabrik/scout/tree/main/detectors/dos-unexpected-revert-with-vector)
 - Test Cases: [`dos-unexpected-revert-with-vector-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/dos-unexpected-revert-with-vector/dos-unexpected-revert-with-vector-1)
 

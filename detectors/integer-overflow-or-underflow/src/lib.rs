@@ -63,7 +63,7 @@ impl ArithmeticContext {
                                 cx,
                                 INTEGER_OVERFLOW_UNDERFLOW,
                                 expr.span,
-                                "integer arithmetic detected",
+                                "Potential for integer arithmetic overflow/underflow in unary operation with negative expression. Consider checked, wrapping or saturating arithmetic.",
                             );
                             self.expr_id = Some(expr.hir_id);
                         }
@@ -73,7 +73,7 @@ impl ArithmeticContext {
                             cx,
                             INTEGER_OVERFLOW_UNDERFLOW,
                             expr.span,
-                            "integer arithmetic detected",
+                            &format!("Potential for integer arithmetic overflow/underflow in operation '{}'. Consider checked, wrapping or saturating arithmetic.", op.as_str()),
                         );
                         self.expr_id = Some(expr.hir_id);
                     }
@@ -83,7 +83,7 @@ impl ArithmeticContext {
                         cx,
                         INTEGER_OVERFLOW_UNDERFLOW,
                         expr.span,
-                        "integer arithmetic detected",
+                        &format!("Potential for integer arithmetic overflow/underflow in operation '{}'. Consider checked, wrapping or saturating arithmetic.", op.as_str()),
                     );
                     self.expr_id = Some(expr.hir_id);
                 }
@@ -106,7 +106,9 @@ impl ArithmeticContext {
                 cx,
                 INTEGER_OVERFLOW_UNDERFLOW,
                 expr.span,
-                "integer arithmetic detected",
+                &format!(
+                    "Detected a potential integer arithmetic overflow/underflow in negation of '{arg:?}'. Consider using checked, wrapping, or saturating arithmetic."
+                )
             );
             self.expr_id = Some(expr.hir_id);
         }

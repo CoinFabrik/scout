@@ -11,15 +11,17 @@ const config = {
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
-  url: 'https://your-docusaurus-test-site.com',
+  url: 'https://coinfabrik.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/',
+  baseUrl: '/scout/',
+  trailingSlash: false,
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: 'CoinFabrik', // Usually your GitHub org/user name.
-  projectName: 'Scout', // Usually your repo name.
+  projectName: 'scout', // Usually your repo name.
+  deploymentBranch: 'gh-pages', // The branch of your docs repo that you are going to deploy to GitHub pages.
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -42,14 +44,14 @@ const config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            'https://github.com/CoinFabrik/scout',
         },
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            'https://blog.coinfabrik.com/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -71,7 +73,7 @@ const config = {
         },
         items: [
           {type: 'docSidebar', sidebarId: 'docsSidebar', label: 'Docs', position: 'left'},
-          {to: '/blog', label: 'Blog', position: 'left'},
+          {to: 'https://blog.coinfabrik.com/', label: 'Blog', position: 'left'},
           {
             href: 'https://github.com/CoinFabrik/scout',
             label: 'GitHub',
@@ -98,20 +100,8 @@ const config = {
                 to: '/docs/detectors',
               },
               {
-                label: 'Learn',
-                to: '/docs/Learn',
-              },
-              {
-                label: 'Tutorials',
-                to: '/docs/tutorials',
-              },
-              {
                 label: 'Contribute',
                 to: '/docs/contribute',
-              },
-              {
-                label: 'FAQs',
-                to: '/docs/faqs',
               },
             ],
           },

@@ -10,6 +10,11 @@ on:
       - "test-cases/**"
       - "Makefile"
   pull_request:
+    paths:
+      - "apps/cargo-scout/**"
+      - "detectors/**"
+      - "test-cases/**"
+      - "Makefile"
   workflow_dispatch:
 
 env:
@@ -23,22 +28,32 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Cache dependencies
-        id: cache-dependencies
+      - name: Cache cargo-scout dependencies
+        id: cache-cargo-scout-dependencies
+        uses: actions/cache@v3
+        with:
+          path: ./apps/cargo-scout/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('apps/cargo-scout/Cargo.lock') }}
+
+      - name: Cache other dependencies
+        id: cache-other-dependencies
         uses: actions/cache@v3
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            ./apps/cargo-scout/target
-            ./detectors/target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+            ./detectors/**/target
+            ./test-cases/**/target
+          key: ${{ runner.os }}-other-dependencies
 
       - name: Update Rust
         run: rustup update
 
-      - name: Install Rust nightly
+      - name: Install Rust nightly-2023-01-27
         run: rustup install nightly-2023-01-27 --profile minimal
+
+      - name: Install Rust nightly-2023-04-23
+        run: rustup install nightly-2023-04-23 --profile minimal
 
       - name: Install dylint-link
         run: cargo install dylint-link
@@ -74,25 +89,27 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Cache dependencies
-        id: cache-dependencies
+      - name: Cache cargo-scout dependencies
+        id: cache-cargo-scout-dependencies
         uses: actions/cache@v3
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            ./apps/cargo-scout/target
-            ./detectors/target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          path: ./apps/cargo-scout/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('apps/cargo-scout/Cargo.lock') }}
 
       - name: Update Rust
         run: rustup update
 
-      - name: Install Rust nightly
+      - name: Install Rust nightly-2023-01-27
         run: rustup install nightly-2023-01-27 --profile minimal
 
-      - name: Install Clippy
+      - name: Install Rust nightly-2023-04-23
+        run: rustup install nightly-2023-04-23 --profile minimal
+
+      - name: Install Clippy nightly-2023-01-27
         run: rustup component add clippy --toolchain nightly-2023-01-27
+
+      - name: Install Clippy nightly-2023-04-23
+        run: rustup component add clippy --toolchain nightly-2023-04-23
 
       - name: Install dylint-link
         run: cargo install dylint-link

@@ -282,11 +282,12 @@ pub mod erc20 {
 
     #[cfg(feature = "std")]
     pub mod test_utils {
-        use super::*;
         use ink::{
             env::hash::{Blake2x256, CryptoHash, HashOutput},
             primitives::Clear,
         };
+
+        use super::*;
 
         pub type Event = <Erc20 as ::ink::reflect::ContractEventBase>::Type;
 
@@ -750,8 +751,9 @@ pub mod erc20 {
 
     #[cfg(all(test, feature = "e2e-tests"))]
     mod e2e_tests {
-        use super::*;
         use ink_e2e::build_message;
+
+        use super::*;
 
         type E2EResult<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 

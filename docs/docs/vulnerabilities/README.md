@@ -51,7 +51,7 @@ Check our
 [test-cases](https://github.com/CoinFabrik/scout/tree/main/test-cases)
 for code examples of these vulnerabilities
 
-### 1 - Integer Overflow and Integer Underflow
+### 1 - Integer overflow or underflow
 This type of vulnerability occurs when an arithmetic operation attempts to 
 create a numeric value that is outside the valid range in substrate, e.g, 
 a `u8` unsigned integer can be at most *M:=2^8-1=255*, hence the sum `M+1` 
@@ -71,7 +71,7 @@ list.
 
 Check the following [documentation](1-integer-overflow-or-underflow.md) for a more detailed explanation of this vulnerability class.
 
-### 2 - Unauthorized Set Contract Storage
+### 2 - Set contract storage
 Smart contracts can store important information in memory which changes through the contract's lifecycle. Changes happen via user interaction with the smart contract. An _unauthorized_ set contract storage vulnerability happens when a smart contract call allows a user to set or modify contract memory when they were not supposed to be authorized.
 
 Common practice is to have functions with the ability to change
@@ -132,7 +132,7 @@ with the severity of an Enhancement.
 
 Check the following [documentation](4-panic-error.md) for a more detailed explanation of this vulnerability class.
 
-### 5 - Unused Return enum
+### 5 - Unused return enum
 `Ink!` messages can return a `Result` `enum` with a custom error type. This is
 useful for the caller to know what went wrong when the message fails. The 
 definition of the `Result` type enum consists of two variants: Ok and Err. If 
@@ -147,7 +147,7 @@ and `Err`) leads to code where its intended functionality is not realized.
 
 Check the following [documentation](5-unused-return-enum.md) for a more detailed explanation of this vulnerability class.
 
-### 6 - DoS Unbounded Operation
+### 6 - DoS unbounded operation
 Each block in a Substrate Blockchain has an upper bound on the amount of gas
 that can be spent, and thus the amount of computation that can be done. This
 is the Block Gas Limit. If the gas spent by a function call on an `ink!` smart
@@ -165,13 +165,13 @@ availability of a service rendered by the smart contract. In the context
 of `ink!` smart contracts, it can be caused by the exhaustion of gas,
 storage space, or other failures in the contract's logic.
 
-Needless to say, there are many different ways to cause a DOS vulnerability.
+Needless to say, there are many different ways to cause a DoS vulnerability.
 This case is relevant and introduced repeatedly by the developer untrained in
 web3 environments. 
 
 Check the following [documentation](6-dos-unbounded-operation.md) for a more detailed explanation of this vulnerability class.
 
-### 7 - DoS Unexpected Revert With Vector
+### 7 - DoS unexpected revert with vector
 Another type of Denial of Service attack is called unexpected revert. It occurs
 by preventing transactions by other users from being successfully executed
 forcing the blockchain state to revert to its original state.
@@ -185,3 +185,35 @@ errors correctly. It can be prevented by using Mapping instead of Vec to avoid
 storage limit problems.
 
 Check the following [documentation](7-dos-unexpected-revert-with-vector.md) for a more detailed explanation of this vulnerability class.
+
+### 8 - Unsafe expect
+
+In Rust, the `expect` method is commonly used for error handling. It retrieves the value from a `Result` or `Option` and panics with a specified error message if an error occurs. However, using expect can lead to unexpected program crashes.
+
+This vulnerability again falls under the [Validations and error handling](#vulnerability-categories)
+and similarly has a Medium Severity.
+
+In our example, we see an exploit scenario involving a contract using the `expect` method in a function that retrieves the balance of an account. If there is no entry for the account, the contract panics and halts execution, enabling malicious exploitation.
+
+Check the following [documentation](8-unsafe-expect.md) for a more detailed explanation of this vulnerability class.
+
+### 9 - Unsafe unrwap
+
+This vulnerability class pertains to the inappropriate usage of the `unwrap` method in Rust, which is commonly employed for error handling. The `unwrap` method retrieves the inner value of an `Option` or `Result`, but if an error or `None` occurs, it triggers a panic and crashes the program.
+
+This vulnerability again falls under the [Validations and error handling](#vulnerability-categories)
+and similarly has a Medium Severity.
+
+In our example, we consider an contract that utilizes the `unwrap` method to retrieve the balance of an account from a mapping. If there is no entry for the specified account, the contract will panic and abruptly halt execution, opening avenues for malicious exploitation.
+
+Check the following [documentation](9-unsafe-unwrap.md) for a more detailed explanation of this vulnerability class.
+
+
+### 10 - Divide before multiply
+
+This vulnerability class relates to the order of operations in Rust, specifically in integer arithmetic. Performing a division operation before a multiplication can lead to a loss of precision. This issue becomes significant in programs like smart contracts where numerical precision is crucial.
+
+This vulnerability again falls under the [Arithmetic](#vulnerability-categories)
+and similarly has a Medium Severity.
+
+Check the following [documentation](9-unsafe-unwrap.md) for a more detailed explanation of this vulnerability class.
