@@ -84,18 +84,21 @@ impl<'tcx> LateLintPass<'tcx> for DivideBeforeMultiply {
             is_precision_loss: false,
             is_precision_loss_span: Vec::new(),
         };
+
         walk_expr(&mut visitor, body.value);
 
         if visitor.is_precision_loss {
             visitor.is_precision_loss_span.iter().for_each(|span| {
-                span_lint_and_help(
-                    cx,
-                    DIVIDE_BEFORE_MULTIPLY,
-                    span.unwrap(),
-                    "Division before multiplication might result in a loss of precision",
-                    None,
-                    "Consider reversing the order of operations to reduce the loss of precision.",
-                );
+                if let Some(span) = span {
+                    span_lint_and_help(
+                        cx,
+                        DIVIDE_BEFORE_MULTIPLY,
+                        *span,
+                        "Division before multiplication might result in a loss of precision",
+                        None,
+                        "Consider reversing the order of operations to reduce the loss of precision.",
+                    );
+                }
             });
         }
     }

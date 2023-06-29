@@ -1,8 +1,8 @@
-# Set Contract Storage
+# Set contract storage
 
 ## Description
 - Vulnerability Category: `Authorization`
-- Severity: `High`
+- Severity: `Critical`
 - Detectors: [`set-contract-storage`](https://github.com/CoinFabrik/scout/tree/main/detectors/set-contract-storage)
 - Test Cases: [`set-contract-storage-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/set-contract-storage/set-contract-storage-1)
 

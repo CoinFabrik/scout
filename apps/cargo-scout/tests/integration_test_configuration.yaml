@@ -10,7 +10,7 @@ detectors:
       - vulnerable_path: "../../test-cases/dos-unexpected-revert-with-vector/dos-unexpected-revert-with-vector-1/vulnerable-example/Cargo.toml"
         remediated_path: "../../test-cases/dos-unexpected-revert-with-vector/dos-unexpected-revert-with-vector-1/remediated-example/Cargo.toml"
   integer-overflow-or-underflow:
-    warning_message: "integer arithmetic detected"
+    warning_message: "integer arithmetic overflow/underflow"
     examples:
       - vulnerable_path: "../../test-cases/integer-overflow-or-underflow/integer-overflow-or-underflow-1/vulnerable-example/Cargo.toml"
         remediated_path: "../../test-cases/integer-overflow-or-underflow/integer-overflow-or-underflow-1/remediated-example/Cargo.toml"
@@ -41,3 +41,18 @@ detectors:
     examples:
       - vulnerable_path: "../../test-cases/divide-before-multiply/divide-before-multiply-1/vulnerable-example/Cargo.toml"
         remediated_path: "../../test-cases/divide-before-multiply/divide-before-multiply-1/remediated-example/Cargo.toml"
+  delegate-call:
+    warning_message: "Passing arguments to the target of a delegate call is not safe, as it allows the caller to set a malicious hash as the target."
+    examples:
+      - vulnerable_path: "../../test-cases/delegate-call/delegate-call-1/vulnerable-example/Cargo.toml"
+        remediated_path: "../../test-cases/delegate-call/delegate-call-1/remediated-example/Cargo.toml"
+  unsafe-expect:
+    warning_message: "Unsafe usage of `expect`"
+    examples:
+      - vulnerable_path: "../../test-cases/unsafe-expect/unsafe-expect-1/vulnerable-example/Cargo.toml"
+        remediated_path: "../../test-cases/unsafe-expect/unsafe-expect-1/remediated-example/Cargo.toml"
+  unsafe-unwrap:
+    warning_message: "Unsafe usage of `unwrap`"
+    examples:
+      - vulnerable_path: "../../test-cases/unsafe-unwrap/unsafe-unwrap-1/vulnerable-example/Cargo.toml"
+        remediated_path: "../../test-cases/unsafe-unwrap/unsafe-unwrap-1/remediated-example/Cargo.toml"

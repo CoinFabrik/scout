@@ -35,10 +35,17 @@ mod zerocheck {
         }
     }
 
+    impl Default for Zerocheck {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+
     #[cfg(test)]
     mod tests {
-        use super::*;
         use ink::env::test::DefaultAccounts;
+
+        use super::*;
         type AccountId = <ink::env::DefaultEnvironment as ink::env::Environment>::AccountId;
 
         #[ink::test]

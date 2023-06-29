@@ -114,7 +114,7 @@ mod erc20 {
                 total_supply,
                 balances,
                 allowances: Default::default(),
-                owner: owner,
+                owner,
             }
         }
     }
@@ -287,12 +287,13 @@ mod erc20 {
     /// Unit tests.
     #[cfg(test)]
     mod tests {
-        /// Imports all the definitions from the outer scope so we can use them here.
-        use super::*;
         use ink::{
             env::hash::{Blake2x256, CryptoHash, HashOutput},
             primitives::Clear,
         };
+
+        /// Imports all the definitions from the outer scope so we can use them here.
+        use super::*;
 
         type Event = <Erc20 as ::ink::reflect::ContractEventBase>::Type;
 

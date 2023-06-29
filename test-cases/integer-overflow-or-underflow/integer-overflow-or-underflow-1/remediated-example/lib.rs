@@ -1,5 +1,4 @@
 #![cfg_attr(not(feature = "std"), no_std)]
-#![deny(clippy::integer_arithmetic)]
 
 #[ink::contract]
 mod integer_overflow_underflow {

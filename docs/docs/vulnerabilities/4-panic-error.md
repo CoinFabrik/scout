@@ -2,7 +2,7 @@
 ## Description
 - Detector ID: `panic-error`
 - Vulnerability Category: `Validations and error handling`
-- Severity: `Informational`
+- Severity: `Enhancement`
 - Detectors: [`panic-error`](https://github.com/CoinFabrik/scout/tree/main/detectors/panic-error)
 - Test Cases: [`panic-error-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/panic-error/panic-error-1)
 
