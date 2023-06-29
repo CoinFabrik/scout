@@ -25,7 +25,7 @@ detectors:
       - vulnerable_path: "../../test-cases/set-contract-storage/set-contract-storage-1/vulnerable-example/Cargo.toml"
         remediated_path: "../../test-cases/set-contract-storage/set-contract-storage-1/remediated-example/Cargo.toml"
   unused-return-enum:
-    warning_message: "Ink messages can return a Result enum with a custom error type. If any of the variants (Ok/Err) is not used, the code could be simplified or it could imply a bug."
+    warning_message: "unused return enum"
     examples:
       - vulnerable_path: "../../test-cases/unused-return-enum/unused-return-enum-1/vulnerable-example/Cargo.toml"
         remediated_path: "../../test-cases/unused-return-enum/unused-return-enum-1/remediated-example/Cargo.toml"
