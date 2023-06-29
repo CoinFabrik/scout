@@ -5,14 +5,14 @@ extern crate rustc_hir;
 
 use clippy_utils::diagnostics::span_lint_and_help;
 use if_chain::if_chain;
-use rustc_hir::{Expr, ExprKind, BinOpKind};
+use rustc_hir::{BinOpKind, Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
 
 dylint_linting::declare_late_lint! {
     ///# Insufficiently random values
     ///
     ///### What it does
-    ///This detector prevents the usage of timestamp and modulo operator as a random number source.
+    ///This detector prevents the usage of timestamp/block number and modulo operator as a random number source.
     ///### Why is this bad?
     ///Block timestamp can be influenced by validators.
     ///### Known problems
