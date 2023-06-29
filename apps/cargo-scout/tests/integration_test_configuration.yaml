@@ -29,6 +29,8 @@ detectors:
     examples:
       - vulnerable_path: "../../test-cases/unused-return-enum/unused-return-enum-1/vulnerable-example/Cargo.toml"
         remediated_path: "../../test-cases/unused-return-enum/unused-return-enum-1/remediated-example/Cargo.toml"
+      - vulnerable_path: "../../test-cases/unused-return-enum/unused-return-enum-2/vulnerable-example/Cargo.toml"
+        remediated_path: "../../test-cases/unused-return-enum/unused-return-enum-2/remediated-example/Cargo.toml"
   reentrancy:
     warning_message: "External calls could open the opportunity for a malicious contract to execute any arbitrary code"
     examples:
