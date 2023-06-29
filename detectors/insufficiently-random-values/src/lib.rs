@@ -26,13 +26,14 @@ dylint_linting::declare_late_lint! {
     "weak pseudo random number using timestamp"
 }
 
-impl<'tcx> LateLintPass<'tcx> for WeakPrng {
+impl<'tcx> LateLintPass<'tcx> for InsufficientlyRandomValues {
     fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx Expr<'_>) {
         if_chain! {
             if let ExprKind::Binary(op, lexp, _rexp) = expr.kind;
             if op.node == BinOpKind::Rem;
             if let ExprKind::MethodCall(path, _, _, _) = lexp.kind;
-            if path.ident.as_str() == "block_timestamp";
+            if path.ident.as_str() == "block_timestamp" ||
+                path.ident.as_str() == "block_number";
             then {
                 span_lint_and_help(
                     cx,

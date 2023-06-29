@@ -65,7 +65,7 @@ mod weak_prng {
                 return Err(inputs.unwrap_err());
             }
 
-            let pseudo_random: u8 = (self.env().block_timestamp()%37).try_into().unwrap();
+            let pseudo_random: u8 = (self.env().block_number()%37).try_into().unwrap();
             if pseudo_random == number {
                 return self.env().transfer(
                     self.env().caller(),
@@ -172,7 +172,7 @@ mod weak_prng {
         fn bet_single_test() {
             let mut contract = WeakPrng::new(0,1000000);
             ink::env::test::set_block_timestamp::<ink::env::DefaultEnvironment>(35);
-            let bet = contract.bet_single(35);
+            let bet = contract.bet_single(0);
             assert_eq!(bet.is_ok(), true);
             assert_eq!(bet.unwrap(), true);
 
@@ -180,7 +180,7 @@ mod weak_prng {
             assert_eq!(bet.is_ok(), false);
 
             ink::env::test::set_block_timestamp::<ink::env::DefaultEnvironment>(350);
-            let bet = contract.bet_single(0);
+            let bet = contract.bet_single(1);
             assert_eq!(bet.is_ok(), true);
             assert_eq!(bet.unwrap(), false);
         }
