@@ -10,17 +10,17 @@ This severity classification, although arbitrary, has been used in hundreds
 of security audits and helps to understand the vulnerabilities we introduce
 and measure the utility of this proof of concept.
 * __Critical__: These issues seriously compromise the system and must be addressed immediately.
-* __Medium__: These are potentially exploitable issues which might represent 
+* __Medium__: These are potentially exploitable issues which might represent
 a security risk in the near future. We suggest fixing them as soon as possible.
 * __Minor__: These issues represent problems that are relatively small or difficult to exploit, but might be exploited in combination with other issues. These kinds of issues do not block deployments in production environments. They should be taken into account and fixed when possible.
 * __Enhancement__: This class relates to issues stemming from deviations from best practices or stylistic conventions, which could escalate into higher-priority issues due to other changes. For instance, these issues may lead to development errors in future updates.
 
 ## Vulnerability Categories
-We follow with a taxonomy of Vulnerabilities. Many "top vulnerability" lists 
-can be found covering Ethereum/Solidity smart contracts. This list below is 
+We follow with a taxonomy of Vulnerabilities. Many "top vulnerability" lists
+can be found covering Ethereum/Solidity smart contracts. This list below is
 used by the Coinfabrik Audit Team, when source code (security) audits in
 Ethereum/Solidity, Stacks/Clarity, Algorand/PyTEAL /TEAL, Solana/RUST, etc.
-The team discusses the creation of the list in this 
+The team discusses the creation of the list in this
 [blogpost](https://blog.coinfabrik.com/analysis-categories/).
 
 | Category                  | Description                                                                                                      |
@@ -53,24 +53,24 @@ Check our
 for code examples of these vulnerabilities and their respective remediations.
 
 ### 1 - Integer overflow or underflow
-This type of vulnerability occurs when an arithmetic operation attempts to 
-create a numeric value that is outside the valid range in substrate, e.g, 
-a `u8` unsigned integer can be at most *M:=2^8-1=255*, hence the sum `M+1` 
-produces an overflow. 
+This type of vulnerability occurs when an arithmetic operation attempts to
+create a numeric value that is outside the valid range in substrate, e.g,
+a `u8` unsigned integer can be at most *M:=2^8-1=255*, hence the sum `M+1`
+produces an overflow.
 
-An overflow/underflow is typically caught and generates an error. When it 
-is not caught, the operation will result in an inexact result which could 
-lead to serious problems. 
+An overflow/underflow is typically caught and generates an error. When it
+is not caught, the operation will result in an inexact result which could
+lead to serious problems.
 
-We classified this type of vulnerability under 
+We classified this type of vulnerability under
 the [Arithmetic](#vulnerability-categories) category and assigned it a
 Critical severity.
 
-In the context of Substrate, we found that this vulnerability could only be 
-realized if overflow and underflow checks are disabled during compilation. 
-Notwithstanding, there are contexts where developers do turn off checks for 
-valid reasons and hence the reason for including this vulnerability in the 
-list. 
+In the context of Substrate, we found that this vulnerability could only be
+realized if overflow and underflow checks are disabled during compilation.
+Notwithstanding, there are contexts where developers do turn off checks for
+valid reasons and hence the reason for including this vulnerability in the
+list.
 
 Check the following [documentation](1-integer-overflow-or-underflow.md) for a more detailed explanation of this vulnerability class.
 
@@ -80,10 +80,10 @@ Smart contracts can store important information in memory which changes through 
 Common practice is to have functions with the ability to change
 security-relevant values in memory to be only accessible to specific roles,
 e.g, only an admin can call the function `reset()` which resets auction values.
-When this does not happen, arbitrary users may alter memory which may impose 
-great damage to the smart contract users. 
+When this does not happen, arbitrary users may alter memory which may impose
+great damage to the smart contract users.
 
-We classified this type of vulnerability under 
+We classified this type of vulnerability under
 the [Authorization](#vulnerability-categories) category and assigned it a
 Critical severity.
 
@@ -116,10 +116,10 @@ from the records, then transfer the funds). There's also so-called
 _reentrancy guards_ which prevent the marked piece of code to be called twice
 from the same contract call. When the vulnerability may be exercised, the
 successive calls to the contract may allow the malicious contract to execute a
-function partially many times, e.g., transfering funds many times but 
-substracting the funds only once. 
+function partially many times, e.g., transfering funds many times but
+substracting the funds only once.
 
-We classified this type of vulnerability under 
+We classified this type of vulnerability under
 the [Reentrancy](#vulnerability-categories) category and assigned it a
 Critical severity.
 
@@ -136,7 +136,7 @@ useful for testing and prototyping but should be avoided in production code.
 Using `Result` as the return type for functions that can fail is the idiomatic
 way to handle errors in Rust.
 
-We classified this issue, a deviation from best practices which could have 
+We classified this issue, a deviation from best practices which could have
 security implications, under the [Validations and error handling](#vulnerability-categories) category and assigned it an Enhancement severity.
 
 Check the following [documentation](4-panic-error.md) for a more detailed explanation of this vulnerability class.
@@ -144,12 +144,12 @@ Check the following [documentation](4-panic-error.md) for a more detailed explan
 ### 5 - Unused return enum
 
 `Ink!` messages can return a `Result` `enum` with a custom error type. This is
-useful for the caller to know what went wrong when the message fails. The 
-definition of the `Result` type enum consists of two variants: Ok and Err. If 
+useful for the caller to know what went wrong when the message fails. The
+definition of the `Result` type enum consists of two variants: Ok and Err. If
 any of the variants is not used, the code could be simplified or it could imply
 a bug.
 
-We put this vulnerability under the [Validations and error handling category](#vulnerability-categories) 
+We put this vulnerability under the [Validations and error handling category](#vulnerability-categories)
 with a Minor Severity.
 
 In our example, we see how lack of revision on the usage of both types (`Ok`
@@ -166,22 +166,22 @@ contract exceeds this limit, the transaction will fail. Sometimes it is the
 case that the contract logic allows a malicious user to modify conditions
 so that other users are forced to exhaust gas on standard function calls.
 
-In order to prevent a single transaction from consuming all the gas in a block, 
-unbounded operations must be avoided. This includes loops that do not have a 
-bounded number of iterations, and recursive calls. 
+In order to prevent a single transaction from consuming all the gas in a block,
+unbounded operations must be avoided. This includes loops that do not have a
+bounded number of iterations, and recursive calls.
 
-We classified this type of vulnerability under 
+We classified this type of vulnerability under
 the [Denial of Service](#vulnerability-categories) category and assigned it a
 Medium severity.
 
-A denial of service vulnerability allows the exploiter to hamper the 
-availability of a service rendered by the smart contract. In the context 
+A denial of service vulnerability allows the exploiter to hamper the
+availability of a service rendered by the smart contract. In the context
 of `ink!` smart contracts, it can be caused by the exhaustion of gas,
 storage space, or other failures in the contract's logic.
 
 Needless to say, there are many different ways to cause a DoS vulnerability.
 This case is relevant and introduced repeatedly by the developer untrained in
-web3 environments. 
+web3 environments.
 
 Check the following [documentation](6-dos-unbounded-operation.md) for a more detailed explanation of this vulnerability class.
 
@@ -245,7 +245,7 @@ Check the following [documentation](11-delegate-call.md) for a more detailed exp
 
 ### 12 - Zero or test address
 
-The assignment of the zero address to a variable in a smart contract represents a critical vulnerability because it can lead to loss of control over the contract. This stems from the fact that the zero address does not have an associated private key, which means it's impossible to claim ownership, rendering any contract assets or functions permanently inaccessible. 
+The assignment of the zero address to a variable in a smart contract represents a critical vulnerability because it can lead to loss of control over the contract. This stems from the fact that the zero address does not have an associated private key, which means it's impossible to claim ownership, rendering any contract assets or functions permanently inaccessible.
 
 Assigning a test address can also have similar implications, including the loss of access or granting access to a malicious actor if its private keys are not handled with care.
 
@@ -262,12 +262,3 @@ This vulnerability again falls under the [Block attributes](#vulnerability-categ
 and has a Critical severity.
 
 Check the following [documentation](13-insufficiently-random-values.md) for a more detailed explanation of this vulnerability class.
-
-### 14 - Unrestricted transfer from
-
-In an ink! Substrate smart contract, allowing unrestricted `transfer_from` operations poses a significant vulnerability. When arguments for such functions are provided directly by the user, this might enable the withdrawal of funds from any actor with token approval on the contract. Specifically, a user could pass the address of an actor with approval as an argument to `transfer_from`, allowing the user to transfer tokens from that actor's balance. This could result in unauthorized transfers and loss of funds. To mitigate this vulnerability, instead of allowing an arbitrary from address, the from address should be restricted, ideally to the address of the caller (`self.env().caller()`), ensuring that only the sender can initiate a transfer.
-
-This vulnerability falls under the [Validations and error handling](#vulnerability-categories) category
-and has a Critical severity.
-
-Check the following [documentation](14-unrestricted-transfer-from.md) for a more detailed explanation of this vulnerability class.
