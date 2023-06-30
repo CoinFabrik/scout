@@ -7,8 +7,6 @@ Checks the call of `transfer_from` from a `psp22` contract where the used argume
 ### Why is this bad?
 The user could provide as an argument the address of any actor with a token approval on the contract, and this actor could then withdraw funds from the contract.
 
-### Known problems
-
 ### Example
 
 ```rust
