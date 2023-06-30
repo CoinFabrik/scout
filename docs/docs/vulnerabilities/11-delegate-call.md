@@ -1,101 +1,74 @@
-# Delegate Call
+# Delegate call
 
 ## Description
 
-- Vulnerability Category: `Unsecure delegate calls`
-- Vulnerability Severity: `Major`
+- Vulnerability Category: `Authorization`
+- Vulnerability Severity: `Critical`
 - Detectors: [`delegate-call`](https://github.com/CoinFabrik/scout/tree/main/detectors/delegate-call)
 - Test Cases: [`delegate-call-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/delegate-call/delegate-call-1)
 
-In Rust, the `delegate call` is used to invoke a method from another contract. If the target of the delegate call is passed as an argument, it can be used to change the expected behavior of the contract. This can be exploited maliciously to disrupt the contract's operation.
+Delegate calls can introduce security vulnerabilities if not handled carefully. The main idea is that delegate calls to contracts passed as arguments can be used to change the expected behavior of the contract, leading to potential attacks. It is important to validate and restrict delegate calls to trusted contracts, implement proper access control mechanisms, and carefully review external contracts to prevent unauthorized modifications, unexpected behavior, and potential exploits. By following these best practices, developers can enhance the security of their smart contracts and mitigate the risks associated with delegate calls.
+
 
 ## Exploit Scenario
 
 Consider the following `ink!` contract:
 
 ```rust
-#[ink::contract]
-mod delegate_call {
-
-    use ink::env::{
-        call::{build_call, ExecutionInput, Selector},
-        DefaultEnvironment,
-    };
-
-    #[ink(storage)]
-    pub struct DelegateCall {
-        admin: AccountId,
-        addresses: [AccountId; 3],
-        percent1: u128,
-        percent2: u128,
-        percent3: u128,
-    }
-
-    impl DelegateCall {
-
-        // ...
-
-        /// Delegates the fee calculation and pays the results to the corresponding addresses
-        #[ink(message, payable)]
-        pub fn ask_payouts(&mut self, target: Hash) -> Result<(Balance, Balance, Balance), Error> {
-            let amount = self.env().transferred_value();
-
-            let result: (Balance, Balance, Balance) = build_call::<DefaultEnvironment>()
-                .delegate(target)
-                // ...
-        }
-    }
+#[ink(message)]
+pub fn delegate_call(&mut self, target: Hash, argument: Balance) {
+    let selector_bytes = [0x0, 0x0, 0x0, 0x0];
+    let result: T  = build_call::<DefaultEnvironment>()
+        .delegate(target)
+        .exec_input(
+            ExecutionInput::new(Selector::new(selector_bytes))
+                .push_arg(argument)
+        )
+        .returns::<T>()
+        .invoke();
 }
 ```
 
-In this contract, the `ask_payouts` function takes a `Hash` as a target and delegates a call to that target. A malicious user could potentially manipulate the function to their advantage by providing a malicious `Hash` as the target.
+In this example, the `delegate_call` function allows for delegated calls to contracts passed as arguments without any validation or access control. This creates a vulnerability as it enables potential attackers to pass a malicious contract as the target, leading to unauthorized modifications or unexpected behavior in the smart contract.
 
 The vulnerable code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/delegate-call/delegate-call-1/vulnerable-example).
 
 ## Remediation
 
-Instead of passing the target of a delegate call as an argument, use a storage variable (like `self.target`). Also, provide a function with proper access control to change the target.
+In the following remediated example, the vulnerability is addressed by removing the ability to pass the target contract as an argument in the `delegate_call` function. Instead, the target contract address is stored in a storage variable `self.target`, which can only be modified by calling the `set_target` function. The `set_target` function includes access control logic, allowing only the contract's administrator to update the target contract address. This remediation ensures that only trusted and authorized contracts can be delegated to, preventing the vulnerability associated with unvalidated and uncontrolled delegate calls.
 
 ```rust
-#[ink::contract]
-mod delegate_call {
-
-    #[ink(storage)]
-    pub struct DelegateCall {
-        admin: AccountId,
-        addresses: [AccountId; 3],
-        target: Hash,
+    #[ink(message)]
+    pub fn delegate_call(&mut self, argument: Balance) {
+        let selector_bytes = [0x0, 0x0, 0x0, 0x0];
+        let result: T  = build_call::<DefaultEnvironment>()
+            .delegate(self.target)
+            .exec_input(
+                ExecutionInput::new(Selector::new(selector_bytes))
+                    .push_arg(argument)
+            )
+            .returns::<T>()
+            .invoke();
     }
 
-    impl DelegateCall {
-
-        // ...
-
-        /// Delegates the fee calculation and pays the results to the corresponding addresses
-        #[ink(message, payable)]
-        pub fn ask_payouts(&mut self, amount: Balance) -> Result<(), Error> {
-            let result = ink::env::call::build_call::<ink::env::DefaultEnvironment>()
-                .delegate(self.target)
-                // ...
+    #[ink::message]
+    pub fn set_target(&mut self, new_target: Hash) -> Result<(), Error> {
+        if self.admin != self.env().caller() {
+            Err(Error::Unauthorized)
+        } else {
+            self.target = new_target;
+            Ok(())
         }
-
-        /// Sets the target codehash for the delegated call
-        #[ink(message)]
-        pub fn set_target(&mut self, new_target: Hash) -> Result<(), &'static str> {
-           if self.admin != self.env().caller() {
-                Err("Only admin can set target")
-            } else {
-                self.target = new_target;
-                Ok(())
-            }
-        }
-
     }
-}
+
 ```
-
 The remediated code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/delegate-call/delegate-call-1/remediated-example).
 
-## Reference
+## References
 
-[ink! documentation: DelegateCall](https://paritytech.github.io/ink/ink_env/call/struct.DelegateCall.html)
+- https://solidity-by-example.org/delegatecall/
+- https://solidity-by-example.org/hacks/delegatecall/
+- https://blog.sigmaprime.io/solidity-security.html#delegatecall
+- [SWC-112](https://swcregistry.io/docs/SWC-112)
+- [Ethernaut: Delegation](https://ethernaut.openzeppelin.com/level/0x9451961b7Aea1Df57bc20CC68D72f662241b5493)
+- [Slither: Delegatecall](https://github.com/crytic/slither/wiki/Detector-Documentation#controlled-delegatecall)
