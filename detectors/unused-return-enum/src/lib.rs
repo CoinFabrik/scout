@@ -1,21 +1,15 @@
 #![feature(rustc_private)]
-#![warn(unused_extern_crates)]
 
-extern crate rustc_hir;
+extern crate rustc_ast;
 extern crate rustc_span;
 
 use clippy_utils::diagnostics::span_lint_and_help;
-use if_chain::if_chain;
-use rustc_hir::intravisit::walk_expr;
-use rustc_hir::intravisit::FnKind;
-use rustc_hir::intravisit::Visitor;
-use rustc_hir::FnRetTy;
-use rustc_hir::QPath;
-use rustc_hir::{Body, FnDecl, HirId, TyKind};
-use rustc_lint::{LateContext, LateLintPass};
+use rustc_ast::visit::{self, FnKind, Visitor};
+use rustc_ast::{Expr, ExprKind, FnRetTy};
+use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::Span;
 
-dylint_linting::declare_late_lint! {
+dylint_linting::declare_early_lint! {
     /// ### What it does
     /// It warns if a fuction that returns a Result type does not return a Result enum variant (Ok/Err)
     ///
@@ -72,61 +66,118 @@ dylint_linting::declare_late_lint! {
 struct CounterVisitor {
     count_err: u32,
     count_ok: u32,
+    found_try: bool,
+    span: Vec<Option<Span>>,
 }
 
-impl<'tcx> Visitor<'tcx> for CounterVisitor {
-    fn visit_expr(&mut self, expr: &'tcx rustc_hir::Expr<'tcx>) {
-        if_chain! {
-            if let rustc_hir::ExprKind::Call(fun, _) = &expr.kind;
-            if let rustc_hir::ExprKind::Path(path_method) = &fun.kind;
-            if let QPath::Resolved(None, path) = *path_method;
-            if let Some(segment) = path.segments.last();
-            then {
-                if segment.ident.to_string() == "Err" {
-                    self.count_err += 1
-                }
-                if segment.ident.to_string() == "Ok" {
-                    self.count_ok += 1
+impl<'ast> Visitor<'ast> for CounterVisitor {
+    fn visit_expr(&mut self, ex: &'ast Expr) {
+        match &ex.kind {
+            ExprKind::Call(func, _args) => {
+                if let ExprKind::Path(_, path) = &func.kind {
+                    if let Some(segment) = path.segments.last() {
+                        if segment.ident.to_string() == "Err" {
+                            self.span.push(Some(ex.span));
+                            self.count_err += 1
+                        }
+                        if segment.ident.to_string() == "Ok" {
+                            self.span.push(Some(ex.span));
+                            self.count_ok += 1
+                        }
+                    }
                 }
             }
+            ExprKind::Try(_) => {
+                self.span.push(Some(ex.span));
+                self.found_try = true;
+            }
+            _ => {}
         }
-        walk_expr(self, expr);
+
+        visit::walk_expr(self, ex);
+    }
+
+    fn visit_local(&mut self, l: &'ast rustc_ast::Local) {
+        if let Some(expr) = &l.kind.init() {
+            if let ExprKind::Try(try_expr) = &expr.kind {
+                self.span.push(Some(try_expr.span));
+                self.found_try = true;
+            }
+        }
     }
 }
 
-impl<'tcx> LateLintPass<'tcx> for UnusedReturnEnum {
+impl EarlyLintPass for UnusedReturnEnum {
     fn check_fn(
         &mut self,
-        cx: &LateContext<'tcx>,
-        _: FnKind<'tcx>,
-        decl: &'tcx FnDecl<'tcx>,
-        body: &'tcx Body<'tcx>,
+        cx: &EarlyContext<'_>,
+        fn_kind: FnKind<'_>,
         _: Span,
-        _: HirId,
+        _: rustc_ast::NodeId,
     ) {
-        if_chain! {
-            // Filter functions with that return "Result"
-            if let FnRetTy::Return(ty) = decl.output;
-            if let TyKind::Path(method_path) = &ty.kind;
-            if let QPath::Resolved(None, path) = *method_path;
-            if path.segments.len() == 1 && path.segments[0].ident.name.as_str() == "Result";
-            then {
-                let mut visitor = CounterVisitor {
-                    count_err: 0,
-                    count_ok: 0,
-                };
-                visitor.visit_expr(body.value);
-                if (visitor.count_err < 1 || visitor.count_ok < 1) && (visitor.count_err != visitor.count_ok) {
+        let (fn_sig, block) = match fn_kind {
+            FnKind::Fn(_, _, fn_sig, _, _, body) => (fn_sig, body),
+            _ => return,
+        };
+
+        // If the return type of the function is not a "Result" enum, we don't want to lint it
+        if let FnRetTy::Ty(t) = &fn_sig.decl.output {
+            if let rustc_ast::TyKind::Path(_, path) = &t.kind {
+                if let Some(segment) = path.segments.last() {
+                    if segment.ident.to_string() != "Result" {
+                        return;
+                    }
+                }
+            }
+        }
+
+        let mut visitor = CounterVisitor {
+            count_ok: 0,
+            count_err: 0,
+            found_try: false,
+            span: Vec::new(),
+        };
+
+        block.into_iter().for_each(|item| {
+            for statement in &item.stmts {
+                match &statement.kind {
+                    rustc_ast::StmtKind::Expr(expr) | rustc_ast::StmtKind::Semi(expr) => {
+                        visitor.visit_expr(expr);
+                    }
+                    rustc_ast::StmtKind::Local(l) => {
+                        visitor.visit_local(l);
+                    }
+                    rustc_ast::StmtKind::Item(_) => {}
+                    rustc_ast::StmtKind::Empty => {}
+                    rustc_ast::StmtKind::MacCall(_) => {}
+                }
+            }
+        });
+
+        if !visitor.found_try
+            && (visitor.count_err < 1 || visitor.count_ok < 1)
+            && (visitor.count_err != visitor.count_ok)
+        {
+            visitor.span.iter().for_each(|span| {
+                if let Some(span) = span {
                     span_lint_and_help(
                         cx,
                         UNUSED_RETURN_ENUM,
-                        body.value.span,
-                        "Ink messages can return a Result enum with a custom error type. If any of the variants (Ok/Err) is not used, the code could be simplified or it could imply a bug.",
+                        *span,
+                        "unused return enum",
                         None,
-                        &format!("You are returning '{}' Err but '{}' Ok", visitor.count_err, visitor.count_ok),
+                        "If any of the variants (Ok/Err) is not used, the code could be simplified or it could imply a bug",
                     );
                 }
-            }
+            });
         }
     }
+}
+
+#[test]
+fn ui() {
+    dylint_testing::ui_test(
+        env!("CARGO_PKG_NAME"),
+        &std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("ui"),
+    );
 }
