@@ -6,8 +6,6 @@ Checks whether the zero address is being inputed to a function without validatio
 ### Why is this bad?
 Because if the zero address is assigned ownership of a contract, the control of the contract can be lost and not recovered.
 
-### Known problems
-
 ### Example
 
 ```rust
