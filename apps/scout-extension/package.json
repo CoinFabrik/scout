@@ -2,13 +2,13 @@
   "name": "scout-audit",
   "displayName": "Scout Audit",
   "description": "Ink! smart contract linter",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "repository": "https://github.com/CoinFabrik/scout",
   "engines": {
     "vscode": "^1.78.0"
   },
   "publisher": "CoinFabrik",
-  "icon": "assets/scout.png",
+  "icon": "images/icon.png",
   "keywords": [
     "rust"
   ],

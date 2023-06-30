@@ -23,6 +23,10 @@ Before installing the extension, make sure you have the following requirements:
 
 ## Release Notes
 
+### 0.1.1
+
+Fix icon.
+
 ### 0.1.0
 
 We're excited to announce the initial release of Scout, the vscode extension. This release lays the groundwork for smart contract developers and auditors, to efficiently identify common security issues and deviations from best practices within their ink! smart contracts.
