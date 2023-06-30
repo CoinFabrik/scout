@@ -74,7 +74,7 @@ pub fn deposit(&mut self) -> Result<(), Error>{
         if res.is_ok() {
             self.status = Status::Locked;
         }
-        return res;
+        Ok(())
     }
 
 }
