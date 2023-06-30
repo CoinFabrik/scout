@@ -58,3 +58,8 @@ detectors:
     examples:
       - vulnerable_path: "../../test-cases/unsafe-unwrap/unsafe-unwrap-1/vulnerable-example/Cargo.toml"
         remediated_path: "../../test-cases/unsafe-unwrap/unsafe-unwrap-1/remediated-example/Cargo.toml"
+  zero-or-test-address:
+    warning_message: "Not checking for a zero-address could lead to a locked contract"
+    examples:
+      - vulnerable_path: "../../test-cases/zero-or-test-address/zero-or-test-address-1/vulnerable-example/Cargo.toml"
+        remediated_path: "../../test-cases/zero-or-test-address/zero-or-test-address-1/remediated-example/Cargo.toml"
