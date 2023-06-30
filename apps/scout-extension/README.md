@@ -6,7 +6,7 @@
 
 Scout is an extensible open-source tool intended to assist ink! smart contract developers and auditors detect common security issues and deviations from best practices. This is the vscode extension for Scout.
 
-Visit [Scout's website](http://localhost:3000/) to view the full documentation.
+Visit [Scout's website](https://coinfabrik.github.io/scout/) to view the full documentation.
 
 ## Features
 
@@ -23,11 +23,11 @@ Before installing the extension, make sure you have the following requirements:
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+### 0.1.0
 
-### 0.0.1
+We're excited to announce the initial release of Scout, the vscode extension. This release lays the groundwork for smart contract developers and auditors, to efficiently identify common security issues and deviations from best practices within their ink! smart contracts.
 
-Initial release of Scout extension
+We include in this release [14 detectors and vulnerablity classes with multiple test-cases](https://github.com/CoinFabrik/scout).
 
 ## About CoinFabrik
 
