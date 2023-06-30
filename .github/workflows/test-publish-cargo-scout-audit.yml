@@ -1,0 +1,25 @@
+name: Test Publish Cargo Scout Audit
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    name: Test Publish
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./apps/cargo-scout-audit
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Publish Cargo Scout Audit
+        env:
+          CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
+        run: cargo publish --token ${CRATES_TOKEN} --dry-run
