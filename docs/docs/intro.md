@@ -72,7 +72,9 @@ We built the Scout VSCode Extension to help developers write secure and more rob
 
 ### Installation
 
-Install Scout from the Visual Studio Marketplace within the Extensions tab of Visual Studio Code.
+Install Scout from the Marketplace within the Extensions tab of Visual Studio Code. You can find the extension [here](https://marketplace.visualstudio.com/items?itemName=CoinFabrik.scout-audit).
+
+You'll also need to have installed the CLI, as the extension uses the CLI to perform the analysis. You can find instructions for installing the CLI [here](#command-line-interface-cli).
 
 
 ### Usage
