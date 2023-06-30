@@ -1,8 +1,11 @@
 name: Test Publish Cargo Scout Audit
 
 on:
-  release:
-    types: [created]
+  push:
+    branches:
+      - "main"
+    paths:
+      - "apps/cargo-scout-audit/**"
   workflow_dispatch:
 
 env:
