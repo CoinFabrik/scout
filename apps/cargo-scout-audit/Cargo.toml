@@ -16,7 +16,8 @@ description = "Scout is an extensible open-source tool intended to assist ink! s
 homepage = "https://coinfabrik.github.io/scout"
 repository = "https://github.com/CoinFabrik/scout"
 readme = "../../README.md"
-keywords = [""]
+keywords = ["auditor", "rust", "security", "ink", "smart-contracts"]
+categories = ["development-tools", "command-line-utilities"]
 
 [dependencies]
 ansi_term = "0.12.1"
