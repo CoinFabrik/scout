@@ -7,7 +7,7 @@
 </p>
 
 
-Scout is an extensible open-source tool intended to assist ink! smart contract developers and auditors detect common security issues and deviations from best practices. 
+Scout is an extensible open-source tool intended to assist ink! smart contract developers and auditors detect common security issues and deviations from best practices.
 
 This tool will help developers write secure and more robust smart contracts.
 
@@ -31,7 +31,7 @@ cargo install --path <PATH_TO_CARGO_SCOUT_FOLDER>
 To run Scout on your project, navigate to its root directory and execute the following command:
 
 ```bash
-cargo scout
+cargo scout-audit
 ```
 
 For more information on installation and usage, please refer to the [Getting Started](https://coinfabrik.github.io/scout/docs/intro) section in our documentation below.
@@ -74,7 +74,7 @@ Visit [Scout's website](https://coinfabrik.github.io/scout/) to view the full do
 
 To validate our tool, we provide a set of code examples located in the [test-cases](https://github.com/CoinFabrik/scout/tree/main/test-cases) folder.
 
-In order to run the integration tests, navigate to `apps/cargo-scout` and run:
+In order to run the integration tests, navigate to `apps/cargo-scout-audit` and run:
 
 ```console
 cargo test --all --all-features

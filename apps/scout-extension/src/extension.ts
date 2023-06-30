@@ -22,11 +22,11 @@ export async function activate(_context: vscode.ExtensionContext) {
 
   // Check scout is installed
   try {
-    await commandExists("cargo-scout");
+    await commandExists("cargo-scout-audit");
   } catch (err) {
-    console.error("cargo-scout is not installed");
+    console.error("cargo-scout-audit is not installed");
     await vscode.window.showErrorMessage(
-      "cargo-scout must be installed in order for scout to work"
+      "cargo-scout-audit must be installed in order for scout to work"
     );
     return;
   }
@@ -34,7 +34,7 @@ export async function activate(_context: vscode.ExtensionContext) {
   // Update settings to change rust-analyzer config
   await config.update(RUST_ANALYZER_CONFIG, [
     "cargo",
-    "scout",
+    "scout-audit",
     "--",
     "--message-format=json",
   ]);

@@ -20,7 +20,7 @@ struct Cli {
 
 #[derive(Debug, Subcommand)]
 enum CargoSubCommand {
-    Scout(Scout),
+    ScoutAudit(Scout),
 }
 
 #[derive(Debug, Parser, Clone)]
@@ -58,7 +58,7 @@ struct Scout {
 fn main() {
     let cli = Cli::parse();
     match cli.subcmd {
-        CargoSubCommand::Scout(opts) => run_scout(opts),
+        CargoSubCommand::ScoutAudit(opts) => run_scout(opts),
     }
 }
 
