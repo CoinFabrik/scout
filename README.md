@@ -25,7 +25,7 @@ cargo install cargo-dylint dylint-link
 Afterwards, install Scout with the following command:
 
 ```bash
-cargo install --path <PATH_TO_CARGO_SCOUT_FOLDER>
+cargo install cargo-scout-audit
 ```
 
 To run Scout on your project, navigate to its root directory and execute the following command:

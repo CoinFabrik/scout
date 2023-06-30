@@ -28,10 +28,16 @@ The command line interface is designed to allow you to run Scout on an entire pr
 
 ### Installation
 
-In order to install the Command Line Interface, install Scout by running the following command:
+FIn order to install the Command Line Interface, first install Scout dependencies by running the following command:
 
 ```bash
-cargo install cargo-scout-audit cargo-dylint dylint-link
+cargo install cargo-dylint dylint-link
+```
+
+Afterwards, install Scout with the following command:
+
+```bash
+cargo install cargo-scout-audit
 ```
 
 ### Usage
