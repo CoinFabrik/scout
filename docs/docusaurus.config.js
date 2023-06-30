@@ -64,12 +64,12 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       // Replace with your project's social card
-      image: 'img/docusaurus-social-card.jpg',
+      image: 'img/scout-social-card.jpg',
       navbar: {
         title: 'Scout',
         logo: {
           alt: 'Scout Logo',
-          src: 'img/logo.svg',
+          src: 'img/scout.svg',
         },
         items: [
           {type: 'docSidebar', sidebarId: 'docsSidebar', label: 'Docs', position: 'left'},
@@ -141,6 +141,11 @@ const config = {
           },
         ],
         copyright: `Copyright © ${new Date().getFullYear()} Scout, CoinFabrik.`,
+      },
+      colorMode: {
+        defaultMode: 'light',
+        disableSwitch: true,
+        respectPrefersColorScheme: false,
       },
 
       prism: {
