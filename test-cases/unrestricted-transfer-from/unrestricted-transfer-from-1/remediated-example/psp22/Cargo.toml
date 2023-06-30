@@ -12,7 +12,7 @@ scale = { package = "parity-scale-codec", version = "3", default-features = fals
 scale-info = { version = "2.3", default-features = false, features = ["derive"], optional = true }
 
 # Brush dependency
-openbrush = { git = "https://github.com/727-Ventures/openbrush-contracts", version = "3.2.1", default-features = false, features = ["psp22"]  }
+openbrush = { git = "https://github.com/727-Ventures/openbrush-contracts", version = "3.1.0", default-features = false, features = ["psp22"]  }
 
 [dev-dependencies]
 ink_e2e = "4.2.1"
