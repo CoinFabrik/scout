@@ -6,8 +6,6 @@ Checks for delegated calls to contracts passed as arguments.
 ### Why is this bad?
 Delegated calls to contracts passed as arguments can be used to change the expected behavior of the contract. If you need to change the target of a delegated call, you should use a storage variable, and make a function with proper access control to change it.
 
-### Known problems
-
 ### Example
 
 ```rust
