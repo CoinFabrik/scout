@@ -2,7 +2,7 @@
 sidebar_position: 4
 ---
 
-## Contribute
+# Contribute
 
 Thank you for your interest in contributing to the development of new detectors, test cases, or vulnerability classes for the Scout project. This document outlines the guidelines for contributing to these areas of the project.
 
