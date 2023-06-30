@@ -80,7 +80,7 @@ In order to run the integration tests, navigate to `apps/cargo-scout` and run:
 cargo test --all --all-features
 ```
 
-In order to run the tests for a particular test case, run the same command on that particular test-case folder (e.g: `test-cases/delegate-call/delegate-call-1/vulnerable-example`)
+In order to run the tests for a particular test-case, run the same command on that particular test-case folder (e.g: `test-cases/delegate-call/delegate-call-1/vulnerable-example`)
 
 
 ## About CoinFabrik
