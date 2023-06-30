@@ -2,7 +2,7 @@
   "name": "scout",
   "displayName": "Scout",
   "description": "Ink! smart contract linter",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "repository": "https://github.com/CoinFabrik/scout",
   "engines": {
     "vscode": "^1.78.0"
