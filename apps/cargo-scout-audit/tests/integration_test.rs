@@ -32,7 +32,7 @@ fn test() {
             .arg("scout")
             .arg("--help")
             .output()
-            .expect("Failed to execute 'cargo scout --help'")
+            .expect("Failed to execute 'cargo scout-audit --help'")
             .status
             .success(),
         "{:?}",
@@ -138,7 +138,7 @@ fn print_cargo_scout_not_found() {
     println!(
         "{}{: ^66}{}",
         "│".bright_yellow(),
-        "⚠️  Cargo Scout is not installed, please install it with:".bright_yellow(),
+        "⚠️  Cargo Scout-Audit is not installed, please install it with:".bright_yellow(),
         "│".bright_yellow()
     );
     println!("{}", empty_line);

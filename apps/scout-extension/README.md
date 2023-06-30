@@ -18,7 +18,7 @@ Visit [Scout's website](http://localhost:3000/) to view the full documentation.
 Before installing the extension, make sure you have the following requirements:
 
 - [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer) extension installed.
-- [cargo-scout](https://github.com/CoinFabrik/scout) installed.
+- [cargo-scout-audit](https://github.com/CoinFabrik/scout) installed.
 - Rust components installed.
 
 ## Release Notes

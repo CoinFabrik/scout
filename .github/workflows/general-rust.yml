@@ -5,13 +5,13 @@ on:
     branches:
       - "main"
     paths:
-      - "apps/cargo-scout/**"
+      - "apps/cargo-scout-audit/**"
       - "detectors/**"
       - "test-cases/**"
       - "Makefile"
   pull_request:
     paths:
-      - "apps/cargo-scout/**"
+      - "apps/cargo-scout-audit/**"
       - "detectors/**"
       - "test-cases/**"
       - "Makefile"
@@ -32,8 +32,8 @@ jobs:
         id: cache-cargo-scout-dependencies
         uses: actions/cache@v3
         with:
-          path: ./apps/cargo-scout/target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('apps/cargo-scout/Cargo.lock') }}
+          path: ./apps/cargo-scout-audit/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('apps/cargo-scout-audit/Cargo.lock') }}
 
       - name: Cache other dependencies
         id: cache-other-dependencies
@@ -59,7 +59,7 @@ jobs:
         run: cargo install dylint-link
 
       - name: Install cargo-scout
-        run: cargo install --path apps/cargo-scout
+        run: cargo install --path apps/cargo-scout-audit
 
       - name: Run cargo test
         run: make test
@@ -93,8 +93,8 @@ jobs:
         id: cache-cargo-scout-dependencies
         uses: actions/cache@v3
         with:
-          path: ./apps/cargo-scout/target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('apps/cargo-scout/Cargo.lock') }}
+          path: ./apps/cargo-scout-audit/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('apps/cargo-scout-audit/Cargo.lock') }}
 
       - name: Update Rust
         run: rustup update
