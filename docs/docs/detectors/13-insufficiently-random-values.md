@@ -7,8 +7,6 @@ Checks the usage of `block_timestamp` or `block_number` for generation of random
 ### Why is this bad?
 Using `block_timestamp` is not recommended because it could be potentially manipulated by validator. On the other hand, `block_number` is publicly available, an attacker could predict the random number to be generated.
 
-### Known problems
-
 ### Example
 
 ```rust
