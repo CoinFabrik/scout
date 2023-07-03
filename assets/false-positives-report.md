@@ -1,7 +1,7 @@
 # False Positives Report
 
 ## Summary
-We wanted to test our tool in code that is being used out in the wild. We checked several sources including [Parity's awesome-ink](https://github.com/paritytech/awesome-ink), and the [use-ink examples](https://use.ink/examples/dapps). The main purpose of this runs was to experiment with realistic smart contracts, ensureing that cargo scout ran without problems and measuring false positives (fixing them when possible). 
+We wanted to test our tool in code that is being used out in the wild. We checked several sources including [Parity's awesome-ink](https://github.com/paritytech/awesome-ink), and the [use-ink examples](https://use.ink/examples/dapps). The main purpose of these runs was to experiment with realistic smart contracts, ensuring that cargo scout ran without problems and measuring false positives (fixing them when possible). 
 
 We selected 5 smart contracts, found a some vulnerabilities and two false positives. We fixed one of the false positives, which was a fuction that appeared to return a Result type not of the enum variant (Ok/Err). The second false positive required more work on a detector and remains unfixed (and added to our backlog).
 
