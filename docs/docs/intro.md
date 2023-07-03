@@ -54,13 +54,9 @@ In the table below, we specify all the option available for the CLI.
 | --- | --- |
 | `cargo scout-audit` | The command to run the static analyzer on the current directory |
 | `cargo scout-audit --manifest-path <PATH_TO_CARGO_TOML>` | This option is used to specify the path to the Cargo.toml file that you want to analyze. |
-| `cargo scout-audit --filter-by-categories <CATEGORY_LIST_SEPARATED_BY_COMAS>` | Use this option to analyze only specific categories of code. You can provide a comma-separated list of categories for analysis. |
-| `cargo scout-audit --filter-by-detectors <DETECTOR_LIST_SEPARATED_BY_COMAS>` | This option allows you to analyze code using specific detectors. Provide a comma-separated list of detectors for this purpose. |
-| `cargo scout-audit --exclude-categories <CATEGORY_LIST_SEPARATED_BY_COMAS>` | Use this command to exclude certain categories from the analysis. Provide a comma-separated list of the categories to be excluded. |
-| `cargo scout-audit --exclude-detectors <DETECTOR_LIST_SEPARATED_BY_COMAS>` | With this command, you can exclude specific detectors from the analysis. You need to give a comma-separated list of the detectors to be excluded. |
+| `cargo scout-audit --filter <DETECTOR_LIST_SEPARATED_BY_COMAS>` | This option allows you to analyze code using specific detectors. Provide a comma-separated list of detectors for this purpose. |
+| `cargo scout-audit --exclude <DETECTOR_LIST_SEPARATED_BY_COMAS>` | With this command, you can exclude specific detectors from the analysis. You need to give a comma-separated list of the detectors to be excluded. |
 | `cargo scout-audit --list-detectors` | Use this option to display a list of all available detectors. |
-| `cargo scout-audit --list-categories` | This option is used to display a list of all available categories. |
-| `cargo scout-audit --output-file <OUTPUT_FILE_NAME>` | Use this option to specify the name of the file where the analysis results will be stored. |
 | `cargo scout-audit --help` | This command provides a brief explanation of all the available commands and their usage. |
 | `cargo scout-audit --version` | This command displays the current version of the static analyzer. |
 

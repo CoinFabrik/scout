@@ -117,7 +117,7 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> 
         ..Default::default()
     };
 
-    // TODO: Improve this
+    // If there is a need to exclude or filter by detector, the dylint tool needs to be recompiled.
     if opts.exclude.is_some() || opts.filter.is_some() {
         if let Some(manifest_path) = &options.manifest_path {
             // Get the directory of manifest path

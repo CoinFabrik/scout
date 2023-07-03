@@ -14,7 +14,6 @@ pub type DetectorsConfigurationList = [DetectorConfiguration; 1];
 
 /// Returns list of detectors
 pub fn get_detectors_configuration() -> Result<DetectorsConfigurationList> {
-    // TODO: Make detectors configuration static
     let detectors = [DetectorConfiguration {
         dependency: Dependency::parse(
             "library",
