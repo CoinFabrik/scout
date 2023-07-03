@@ -29,7 +29,7 @@ pub struct Detectors {
 fn test() {
     assert!(
         Command::new("cargo")
-            .arg("scout")
+            .arg("scout-audit")
             .arg("--help")
             .output()
             .expect("Failed to execute 'cargo scout-audit --help'")
@@ -121,7 +121,7 @@ fn execute_command(path: &str) -> Output {
 
 fn command_builder(path: &str) -> Command {
     let mut command = Command::new("cargo");
-    command.arg("scout");
+    command.arg("scout-audit");
     command.arg("-m");
     command.arg(path);
     command
@@ -145,7 +145,7 @@ fn print_cargo_scout_not_found() {
     println!(
         "{}{: ^65}{}",
         "│".bright_yellow(),
-        "cargo install --path <PATH-TO-CARGO-SCOUT>".bright_yellow(),
+        "cargo install --path <PATH-TO-CARGO-SCOUT-AUDIT>".bright_yellow(),
         "│".bright_yellow()
     );
     println!("{}", empty_line);
