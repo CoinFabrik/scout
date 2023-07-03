@@ -88,6 +88,17 @@ We - [CoinFabrik](https://www.coinfabrik.com/) - are a research and development 
 
 Our team has an academic background in computer science and mathematics, with work experience focused on cybersecurity and software development, including academic publications, patents turned into products, and conference presentations. Furthermore, we have an ongoing collaboration on knowledge transfer and open-source projects with the University of Buenos Aires.
 
+## Acknowledgements
+
+This work was supported through grants from the [Web3 Foundation Grants Program](https://github.com/w3f/Grants-Program/tree/master).
+
+Grants:
+| Stage | Grant | Description |
+|:-----:|:------:|:-----------:|
+| [Proof of Concept](https://github.com/CoinFabrik/web3-grant) | [ScoutCoinFabrik](https://github.com/w3f/Grants-Program/blob/master/applications/ScoutCoinFabrik.md) | During the Proof of Concept (PoC) stage, we collaborated with the Laboratory on Foundations and Tools for Software Engineering ([LaFHIS](https://lafhis.dc.uba.ar/)) at the [University of Buenos Aires](https://www.uba.ar/internacionales/index.php?lang=en) to establish analysis techniques and tools for our detectors, as well as to create an initial list of vulnerability classes and code examples.|
+| [Prototype](https://coinfabrik.github.io/scout/) | [ScoutCoinFabrik_2](https://github.com/w3f/Grants-Program/blob/master/applications/ScoutCoinFabrik_2.md) | We built a functioning prototype using linting detectors built with [Dylint](https://github.com/trailofbits/dylint) and expanded the list of vulnerability classes, detectors, and test cases.|
+
 ## License
 
 Scout is licensed and distributed under a MIT license. [Contact us](https://www.coinfabrik.com/) if you're looking for an exception to the terms.
+

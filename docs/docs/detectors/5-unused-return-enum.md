@@ -2,7 +2,7 @@
 
 ### What it does
 
-It warns if a fuction that returns a Result type does not return a Result enum variant (Ok/Err)
+It warns if a function that returns a Result type does not return the Result enum variant (Ok/Err).
 
 ### Why is this bad?
 
