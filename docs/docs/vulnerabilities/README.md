@@ -44,7 +44,7 @@ We used the above Vulnerability Categories, along with common examples of vulner
 
 ## Vulnerability Classes
 
-As a result of our research, we have so far identified fourteen types of vulnerabilities.
+As a result of our research, we have so far identified thirteen types of vulnerabilities.
 
 What follows is a description of each vulnerability in the context of ink! smart contracts. In each case, we have produced at least one [test-case](https://github.com/CoinFabrik/scout/tree/main/test-cases) smart contract that exposes one of these vulnerabilities.
 
