@@ -9,6 +9,7 @@ use rustc_ast::{Expr, ExprKind, FnRetTy};
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::Span;
 
+
 dylint_linting::declare_early_lint! {
     /// ### What it does
     /// It warns if a fuction that returns a Result type does not return a Result enum variant (Ok/Err)
@@ -29,7 +30,7 @@ dylint_linting::declare_early_lint! {
     ///     #[ink(message)]
     ///     pub fn get_percentage_difference(&mut self, value1: Balance, value2: Balance) -> Result<Balance, TradingPairErrors>  {
     ///         let absolute_difference = value1.abs_diff(value2);
-    ///         let sum = value1 + value2;
+    ///         let sum = value1.checked_add(value2).ok_or(TradingPairErrors::Overflow)?;
     ///         let percentage_difference =
     ///         match 100u128.checked_mul(absolute_difference / sum) {
     ///            Some(result) => result,
@@ -49,13 +50,10 @@ dylint_linting::declare_early_lint! {
     ///     #[ink(message)]
     ///     pub fn get_percentage_difference(&mut self, value1: Balance, value2: Balance) -> Result<Balance, TradingPairErrors>  {
     ///         let absolute_difference = value1.abs_diff(value2);
-    ///         let sum = value1 + value2;
-    ///         let percentage_difference =
-    ///         match 100u128.checked_mul(absolute_difference / sum) {
-    ///            Some(result) => Ok(result),
-    ///            None => panic!("overflow!"),
-    ///         };
-    ///         return Err(TradingPairErrors::Overflow);
+    ///         let sum = value1.checked_add(value2).ok_or(TradingPairErrors::Overflow)?;
+    ///         let coeff = absolute_difference.checked_div(sum).ok_or(TradingPairErrors::DivisionByZero)?;
+    ///         let percentage_difference = 100_u128.checked_mul().ok_or(TradingPairErrors::Overflow)?;
+    ///         Ok(percentage_difference)
     ///     }
     /// ```
     pub UNUSED_RETURN_ENUM,
