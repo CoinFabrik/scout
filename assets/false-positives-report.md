@@ -1,0 +1,20 @@
+# False Positives Report
+
+## Summary
+We wanted to test our tool in code that is being used out in the wild. We checked several sources including [Parity's awesome-ink](https://github.com/paritytech/awesome-ink), and the [use-ink examples](https://use.ink/examples/dapps). The main purpose of these runs was to experiment with realistic smart contracts, ensuring that cargo scout ran without problems and measuring false positives (fixing them when possible).  
+
+We selected 5 smart contracts, found some vulnerabilities and two false positives. We fixed one of the false positives, which was a function that appeared to return a Result type not of the enum variant (Ok/Err). We also found, after reviewing the code for our detectors, that the `set-contract-storage` detector needed some work, as it was validating if a check was being made looking at an equality in one direction missing its reflection. We further added a second example of vulnerable remediated smart contracts for the `delegate call`, `integer overflow or underflow`, `reentrancy` and `unused-return-enum` security vulnerability classes.
+
+## Detailed Description
+We selected five smart contracts to work on.
+- The **Phat Bricks Version of Oracle** smart contract. Find the code [here](https://github.com/Phala-Network/phat-bricks) and its deployment [here](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fpoc5.phala.network%2Fws#/explorer) in the Phala Network.
+- The **psp22**, **trading_pair_psp22**, **vesting_contract** and **multi_sig** smart contracts, all to be found in [this](https://github.com/RottenKiwi/Panorama-Swap-INK-SC) repository. We did not find this were deployed.
+
+
+There follow some of our findings.
+- `psp22` is a smart contract that implements OpenBrush's PSP22 standard, allowing the creation of PSP22 tokens with metadata extensions such as token name and symbol. The contract provides the functionality to manage PSP22 tokens on the Panorama Swap platform. We found a minor issue, an unsafely use of `expect()` which may lead to `panic!` reverting the state and ending the execution with the possibility of incorrectly catching the error, e.g., if the caller is a contract.
+- `trading_pair_psp22` is a contract used in deploying PSP22/PSP22 trading pairs and pools on the Panorama Swap platform. The contract provides the necessary functionality to enable trading and liquidity provision for the PSP22/PSP22 pair. We found a few small security issues. This contract receives an address in some of its functions which is not checked to be nonzero. Also, functions involve arithmetic operations that do not use safe math and could result in overflows or underflows, and there are to be seen unsafe uses of `unwrap()` that leads to problems analogous to that of the unsafe used of `expect()` described above.
+- `vesting_contract` is the smart contract that contains all the logic for the vesting program on the Panorama Swap platform. We found a few small security issues. This contract receives an address in its constructor which is not checked to be nonzero, and something similar happens in other functions. Also, functions involve arithmetic operations that do not use safe math and could result in overflows or underflows.
+- `multi_sig` is a smart contract that contains all the logic for a multiple signatures wallet on the Panorama Swap platform. The contract provides a secure and decentralized way to manage funds by requiring multiple signatures for certain operations, ensuring increased security and accountability.
+- `phat_bricks`. Interestingly, in the phat bricks contract we found a false positive in `action_evm_transaction` with the `unused_return_enum` detector. The detector relied on the HIM (high-order intermediate) representation (provided by `rustc_him`) which would not propagate correctly errors on the question mark operator. A new version, relying on the AST (Abstract-Syntax Tree) and the `rustc_ast`library fixed this. Moreover, we added a second pair of smart contracts (vulnerable & remediated) to the `unused_return_enum` folder with an abridged version of this bug.
+

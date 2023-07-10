@@ -11,16 +11,16 @@ type FeatureItem = {
 const FeatureList: FeatureItem[] = [
   {
     title: 'The Tool',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    Svg: require('@site/static/img/scout_tool.svg').default,
     description: (
       <>
-        Scout is an extensible open-source tool intended to assist ink! smart contract developers and auditors detect common security issues and deviations from best practices. 
+        Scout is an extensible open-source tool intended to assist ink! smart contract developers and auditors detect common security issues and deviations from best practices.
       </>
     ),
   },
   {
     title: 'Security',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
+    Svg: require('@site/static/img/scout_security.svg').default,
     description: (
       <>
         This tool will help developers write secure and more robust smart contracts. Our interest in this project comes from our experience in manual auditing and our usage of comparable tools in other blockchains.
@@ -30,7 +30,7 @@ const FeatureList: FeatureItem[] = [
   },
   {
     title: 'Research',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
+    Svg: require('@site/static/img/scout_research.svg').default,
     description: (
       <>
         To improve coverage and precision, we persist in research efforts on static and dynamic analysis techniques. Find more about our ongoing research at our associated repository.

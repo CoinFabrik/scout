@@ -55,6 +55,23 @@ dylint_linting::declare_late_lint! {
     "set_contract_storage only must be used with proper access control or input sanitation"
 }
 
+fn expr_check_owner(expr: &Expr) -> bool {
+    if let ExprKind::Field(_, ident) = expr.kind {
+        ident.as_str().contains("owner")
+    } else {
+        false
+    }
+}
+
+fn expr_check_caller(expr: &Expr) -> bool {
+    if let ExprKind::MethodCall(func, ..) = expr.kind {
+        let function_name = func.ident.name.to_string();
+        function_name.contains("caller")
+    } else {
+        false
+    }
+}
+
 impl<'tcx> LateLintPass<'tcx> for SetStorageWarn {
     fn check_fn(
         &mut self,
@@ -65,9 +82,6 @@ impl<'tcx> LateLintPass<'tcx> for SetStorageWarn {
         _: Span,
         _: HirId,
     ) {
-        // TODO: La razón por la que se usó un visitor de esta forma (para almacenar la info "global" en el scope de un if)
-        // es porque no encontré una forma de poner un struct por fuera al que se pueda acceder desde la implementación
-        // de los métodos de LateLintPass. Cambiar esta forma, o borrar comentario.
         struct SetContractStorage {
             span: Option<Span>,
             unprotected: bool,
@@ -81,17 +95,8 @@ impl<'tcx> LateLintPass<'tcx> for SetStorageWarn {
             fn visit_expr(&mut self, expr: &'tcx Expr<'_>) {
                 if self.in_conditional {
                     if let ExprKind::Binary(_, left, right) = &expr.kind {
-                        // TODO: falta chequear al reves
-                        // TODO: se puede agregar si la operación que se realiza es "Eq"
-                        if let ExprKind::Field(_, ident) = right.kind {
-                            self.has_owner_in_if = ident.as_str().contains("owner");
-                        }
-                        if let ExprKind::MethodCall(func, ..) = &left.kind {
-                            let function_name = func.ident.name.to_string();
-                            if self.in_conditional {
-                                self.has_caller_in_if = function_name.contains("caller");
-                            }
-                        }
+                        self.has_owner_in_if = expr_check_owner(right) || expr_check_owner(left);
+                        self.has_caller_in_if = expr_check_caller(right) || expr_check_caller(left);
                     }
                 }
                 if let ExprKind::If(..) = &expr.kind {
@@ -102,14 +107,15 @@ impl<'tcx> LateLintPass<'tcx> for SetStorageWarn {
                     if_chain! {
                         if let ExprKind::Path(method_path) = &callee.kind;
                         if let QPath::Resolved(None, path) = *method_path;
-                        if path.segments.len() == 2 && path.segments[0].ident.name.as_str() == "env" && path.segments[1].ident.name.as_str() == "set_contract_storage";
+                        if path.segments.len() == 2;
+                        if path.segments[0].ident.name.as_str() == "env";
+                        if path.segments[1].ident.name.as_str() == "set_contract_storage";
                         then {
                             self.has_set_contract = true;
                             if !self.in_conditional && (!self.has_owner_in_if || !self.has_caller_in_if) {
                                     self.unprotected = true;
                                     self.span = Some(expr.span);
                             }
-                            // dbg!("has_caller:{} - has_owner:{} - in_conditional: {}", self.has_caller_in_if, self.has_owner_in_if, self.in_conditional);
                         }
                     }
                 }

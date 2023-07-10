@@ -20,7 +20,7 @@ struct Cli {
 
 #[derive(Debug, Subcommand)]
 enum CargoSubCommand {
-    Scout(Scout),
+    ScoutAudit(Scout),
 }
 
 #[derive(Debug, Parser, Clone)]
@@ -58,7 +58,7 @@ struct Scout {
 fn main() {
     let cli = Cli::parse();
     match cli.subcmd {
-        CargoSubCommand::Scout(opts) => run_scout(opts),
+        CargoSubCommand::ScoutAudit(opts) => run_scout(opts),
     }
 }
 
@@ -117,7 +117,7 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> 
         ..Default::default()
     };
 
-    // TODO: Improve this
+    // If there is a need to exclude or filter by detector, the dylint tool needs to be recompiled.
     if opts.exclude.is_some() || opts.filter.is_some() {
         if let Some(manifest_path) = &options.manifest_path {
             // Get the directory of manifest path
