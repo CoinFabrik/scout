@@ -113,6 +113,7 @@ impl<'tcx> LateLintPass<'tcx> for Reentrancy {
             current_method_call: Option<Symbol>,
             bool_var_values: HashMap<HirId, bool>,
             reentrancy_spans: Vec<Span>,
+            should_look_for_insert: bool,
             has_insert_operation: bool,
         }
 
@@ -171,6 +172,7 @@ impl<'tcx> LateLintPass<'tcx> for Reentrancy {
                     for path_segment in path.segments {
                         // If the argument is a tainted contract, add the span of this expression to the span vector
                         if visitor.contracts_tainted_for_reentrancy.contains(&path_segment.ident.name) {
+                            visitor.should_look_for_insert = true;
                             visitor.reentrancy_spans.push(expr.span);
                         }
                     }
@@ -242,7 +244,11 @@ impl<'tcx> LateLintPass<'tcx> for Reentrancy {
                         // The function "invoke_contract" is being called
                         INVOKE_CONTRACT => handle_invoke_contract(self, args, expr),
                         // The function "insert" is being called
-                        INSERT => handle_insert(self, expr),
+                        INSERT => {
+                            if self.should_look_for_insert {
+                                handle_insert(self, expr)
+                            }
+                        }
                         _ => (),
                     }
                 }
@@ -258,6 +264,7 @@ impl<'tcx> LateLintPass<'tcx> for Reentrancy {
             bool_var_values: HashMap::new(),
             reentrancy_spans: Vec::new(),
             has_insert_operation: false,
+            should_look_for_insert: false,
         };
         walk_expr(&mut reentrancy_visitor, body.value);
 
