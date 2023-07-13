@@ -11,7 +11,6 @@ use std::collections::{HashMap, HashSet};
 
 use clippy_utils::diagnostics::span_lint_and_help;
 use if_chain::if_chain;
-
 use rustc_abi::VariantIdx;
 use rustc_ast::ast::LitKind;
 use rustc_hir::def::Res;
@@ -25,7 +24,7 @@ use rustc_span::def_id::LocalDefId;
 use rustc_span::{Span, Symbol};
 
 dylint_linting::declare_late_lint! {
-    pub NEW_REENTRANCY,
+    pub REENTRANCY,
     Warn,
     "description goes here"
 }
@@ -37,7 +36,7 @@ const MAPPING: &str = "Mapping";
 const ACCOUNT_ID: &str = "AccountId";
 const U128: &str = "u128";
 
-impl<'tcx> LateLintPass<'tcx> for NewReentrancy {
+impl<'tcx> LateLintPass<'tcx> for Reentrancy {
     fn check_fn(
         &mut self,
         cx: &LateContext<'tcx>,
@@ -206,7 +205,7 @@ impl<'tcx> LateLintPass<'tcx> for NewReentrancy {
             reentrancy_visitor.reentrancy_spans.into_iter().for_each(|span| {
                 span_lint_and_help(
                     cx,
-                    NEW_REENTRANCY,
+                    REENTRANCY,
                     span,
                     "External calls could open the opportunity for a malicious contract to execute any arbitrary code",
                     None,
