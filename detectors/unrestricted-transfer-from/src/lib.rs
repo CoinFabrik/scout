@@ -9,14 +9,12 @@ extern crate rustc_span;
 use clippy_utils::diagnostics::span_lint;
 use if_chain::if_chain;
 use rustc_ast::{ast::UintTy, LitIntType, LitKind};
-use rustc_hir::{
-    Body,
-    intravisit::{walk_expr, Visitor},
-    Expr, ExprKind, FnRetTy,
-};
 use rustc_hir::def::Res;
-use rustc_hir::{ PatKind, QPath};
-
+use rustc_hir::{
+    intravisit::{walk_expr, Visitor},
+    Body, Expr, ExprKind, FnRetTy,
+};
+use rustc_hir::{PatKind, QPath};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_middle::mir::{BasicBlock, BasicBlocks, Local, Operand, StatementKind, TerminatorKind};
 use rustc_span::Span;
@@ -53,9 +51,7 @@ impl<'tcx> LateLintPass<'tcx> for UnrestrictedTransferFrom {
             span: Option<Span>,
             from_ref: bool,
             the_body: &'tcx Body<'tcx>,
-
         }
-
 
         impl<'tcx> Visitor<'tcx> for UnrestrictedTransferFromFinder<'tcx, '_> {
             fn visit_expr(&mut self, expr: &'tcx Expr<'_>) {
@@ -88,7 +84,6 @@ impl<'tcx> LateLintPass<'tcx> for UnrestrictedTransferFrom {
                                     self.def_id = self.cx.typeck_results().type_dependent_def_id(path.hir_id);
                                 }
                         }
-
 
                         if_chain! {
                             if let ExprKind::Path(qpath) = &path.kind;
@@ -138,7 +133,6 @@ impl<'tcx> LateLintPass<'tcx> for UnrestrictedTransferFrom {
                             }
 
                         }
-
                     }
                     ExprKind::MethodCall(path, ..) => {
                         if path.ident.name.to_string() == "push_arg" {
@@ -152,7 +146,6 @@ impl<'tcx> LateLintPass<'tcx> for UnrestrictedTransferFrom {
                 walk_expr(self, expr);
             }
         }
-
 
         let mut utf_storage = UnrestrictedTransferFromFinder {
             cx,
@@ -179,8 +172,12 @@ impl<'tcx> LateLintPass<'tcx> for UnrestrictedTransferFrom {
         walk_expr(&mut utf_storage, body.value);
 
         if utf_storage.from_ref {
-            span_lint(cx, UNRESTRICTED_TRANSFER_FROM, utf_storage.span.unwrap(), "this argument comes from a user-supplied argument");
-
+            span_lint(
+                cx,
+                UNRESTRICTED_TRANSFER_FROM,
+                utf_storage.span.unwrap(),
+                "this argument comes from a user-supplied argument",
+            );
         }
 
         if utf_storage.def_id.is_none() {
@@ -271,6 +268,5 @@ impl<'tcx> LateLintPass<'tcx> for UnrestrictedTransferFrom {
                 }
             }
         }
-
     }
 }
