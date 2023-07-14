@@ -65,3 +65,8 @@ detectors:
     examples:
       - vulnerable_path: "../../test-cases/zero-or-test-address/zero-or-test-address-1/vulnerable-example/Cargo.toml"
         remediated_path: "../../test-cases/zero-or-test-address/zero-or-test-address-1/remediated-example/Cargo.toml"
+  unrestricted-transfer-from:
+    warning_message: "This argument comes from a user-supplied argument"
+    examples:
+      - vulnerable_path: "../../test-cases/unrestricted-transfer-from/unrestricted-transfer-from-1/escrow/vulnerable-example/Cargo.toml"
+        remediated_path: "../../test-cases/unrestricted-transfer-from/unrestricted-transfer-from-1/escrow/remediated-example/Cargo.toml"
