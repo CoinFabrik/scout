@@ -38,6 +38,8 @@ detectors:
         remediated_path: "../../test-cases/reentrancy/reentrancy-1/remediated-example/vault/Cargo.toml"
       - vulnerable_path: "../../test-cases/reentrancy/reentrancy-2/vulnerable-example/vault/Cargo.toml"
         remediated_path: "../../test-cases/reentrancy/reentrancy-2/remediated-example/vault/Cargo.toml"
+      - vulnerable_path: "../../test-cases/reentrancy/reentrancy-3/vulnerable-example/vault/Cargo.toml"
+        remediated_path: "../../test-cases/reentrancy/reentrancy-3/remediated-example/vault/Cargo.toml"
   divide-before-multiply:
     warning_message: "Division before multiplication might result in a loss of precision"
     examples:
