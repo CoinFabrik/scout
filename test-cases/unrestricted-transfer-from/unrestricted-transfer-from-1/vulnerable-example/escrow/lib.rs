@@ -74,11 +74,11 @@ mod unrestricted_transfer_from {
             amount: Balance,
         ) -> Self {
             Self {
-                buyer: buyer,
-                seller: seller,
-                arbiter: arbiter,
-                psp22_address: psp22_address,
-                amount: amount,
+                buyer,
+                seller,
+                arbiter,
+                psp22_address,
+                amount,
                 status: Status::Created,
             }
         }
@@ -86,7 +86,7 @@ mod unrestricted_transfer_from {
         #[ink(message)]
         pub fn deposit(&mut self, from: AccountId) -> Result<(), Error> {
             if self.env().caller() != self.buyer {
-                return Err(Error::CallerMustBeBuyer);
+                Err(Error::CallerMustBeBuyer)
             } else if self.status != Status::Created {
                 return Err(Error::StatusMustBeCreated);
             } else {
@@ -149,8 +149,8 @@ mod unrestricted_transfer_from {
                 let res = self
                     .env()
                     .invoke_contract(&call_params)
-                    .unwrap_or_else(|err| panic!("Err {:?}", err))
-                    .unwrap_or_else(|err| panic!("LangErr {:?}", err))
+                    .unwrap_or_else(|err| panic!("Err {err:?}"))
+                    .unwrap_or_else(|err| panic!("LangErr {err:?}"))
                     .map_err(Error::PSP22Error);
                 if res.is_ok() {
                     self.status = Status::Locked;
@@ -162,7 +162,7 @@ mod unrestricted_transfer_from {
         #[ink(message)]
         pub fn unlock(&mut self) -> Result<(), Error> {
             if self.env().caller() != self.arbiter {
-                return Err(Error::CallerMustBeArbiter);
+                Err(Error::CallerMustBeArbiter)
             } else if self.status != Status::Locked {
                 return Err(Error::StatusMustBeLocked);
             } else {
@@ -174,7 +174,7 @@ mod unrestricted_transfer_from {
         #[ink(message)]
         pub fn release(&mut self) -> Result<(), Error> {
             if self.env().caller() != self.seller {
-                return Err(Error::CallerMustBeSeller);
+                Err(Error::CallerMustBeSeller)
             } else if self.status != Status::Unlocked {
                 return Err(Error::StatusMustBeUnlocked);
             } else {
@@ -192,9 +192,9 @@ mod unrestricted_transfer_from {
                 let res = self
                     .env()
                     .invoke_contract(&call_params)
-                    .unwrap_or_else(|err| panic!("Err {:?}", err))
-                    .unwrap_or_else(|err| panic!("LangErr {:?}", err))
-                    .map_err(|err| Error::PSP22Error(err));
+                    .unwrap_or_else(|err| panic!("Err {err:?}"))
+                    .unwrap_or_else(|err| panic!("LangErr {err:?}"))
+                    .map_err(Error::PSP22Error);
                 if res.is_ok() {
                     self.status = Status::Released;
                 }
@@ -205,7 +205,7 @@ mod unrestricted_transfer_from {
         #[ink(message)]
         pub fn refund(&mut self) -> Result<(), Error> {
             if self.env().caller() != self.arbiter {
-                return Err(Error::CallerMustBeArbiter);
+                Err(Error::CallerMustBeArbiter)
             } else if self.status != Status::Locked {
                 return Err(Error::StatusMustBeLocked);
             } else {
@@ -225,9 +225,9 @@ mod unrestricted_transfer_from {
                 let res = self
                     .env()
                     .invoke_contract(&call_params)
-                    .unwrap_or_else(|err| panic!("Err {:?}", err))
-                    .unwrap_or_else(|err| panic!("LangErr {:?}", err))
-                    .map_err(|err| Error::PSP22Error(err));
+                    .unwrap_or_else(|err| panic!("Err {err:?}"))
+                    .unwrap_or_else(|err| panic!("LangErr {err:?}"))
+                    .map_err(Error::PSP22Error);
                 if res.is_ok() {
                     self.status = Status::Refunded;
                 }

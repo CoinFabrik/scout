@@ -104,8 +104,8 @@ mod unrestricted_transfer_from {
                 let res = self
                     .env()
                     .invoke_contract(&call_params)
-                    .unwrap_or_else(|err| panic!("Err {:?}", err))
-                    .unwrap_or_else(|err| panic!("LangErr {:?}", err))
+                    .unwrap_or_else(|err| panic!("Err {err:?}"))
+                    .unwrap_or_else(|err| panic!("LangErr {err:?}"))
                     .map_err(Error::PSP22Error);
                 if res.is_ok() {
                     self.status = Status::Locked;
@@ -147,8 +147,8 @@ mod unrestricted_transfer_from {
                 let res = self
                     .env()
                     .invoke_contract(&call_params)
-                    .unwrap_or_else(|err| panic!("Err {:?}", err))
-                    .unwrap_or_else(|err| panic!("LangErr {:?}", err))
+                    .unwrap_or_else(|err| panic!("Err {err:?}"))
+                    .unwrap_or_else(|err| panic!("LangErr {err:?}"))
                     .map_err(Error::PSP22Error);
                 if res.is_ok() {
                     self.status = Status::Released;
@@ -180,8 +180,8 @@ mod unrestricted_transfer_from {
                 let res = self
                     .env()
                     .invoke_contract(&call_params)
-                    .unwrap_or_else(|err| panic!("Err {:?}", err))
-                    .unwrap_or_else(|err| panic!("LangErr {:?}", err))
+                    .unwrap_or_else(|err| panic!("Err {err:?}"))
+                    .unwrap_or_else(|err| panic!("LangErr {err:?}"))
                     .map_err(Error::PSP22Error);
                 if res.is_ok() {
                     self.status = Status::Refunded;
