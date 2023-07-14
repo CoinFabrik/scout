@@ -176,7 +176,7 @@ impl<'tcx> LateLintPass<'tcx> for UnrestrictedTransferFrom {
                 cx,
                 UNRESTRICTED_TRANSFER_FROM,
                 utf_storage.span.unwrap(),
-                "this argument comes from a user-supplied argument",
+                "This argument comes from a user-supplied argument",
             );
         }
 
@@ -255,7 +255,7 @@ impl<'tcx> LateLintPass<'tcx> for UnrestrictedTransferFrom {
                                 if utf_storage.pusharg_def_id.is_some_and(|id|id==*def) {
                                     for arg in args {
                                         if arg.place().map_or(false, |place|tainted_locals.iter().any(|l|l == &place.local)) {
-                                            span_lint(cx, UNRESTRICTED_TRANSFER_FROM, *fn_span, "this argument comes from a user-supplied argument");
+                                            span_lint(cx, UNRESTRICTED_TRANSFER_FROM, *fn_span, "This argument comes from a user-supplied argument");
                                         }
                                     }
                                 }
