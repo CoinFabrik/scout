@@ -22,7 +22,7 @@ use rustc_span::Span;
 dylint_linting::impl_late_lint! {
     pub UNRESTRICTED_TRANSFER_FROM,
     Warn,
-    "description goes here",
+    "Don't use user-supplied arguments as 'from' field in transfer_from",
     UnrestrictedTransferFrom::default()
 }
 
@@ -235,9 +235,9 @@ impl<'tcx> LateLintPass<'tcx> for UnrestrictedTransferFrom {
                     let rustc_middle::ty::TyKind::FnDef(def, _) = val_type.kind() &&
                     utf_storage.def_id.is_some_and(|id|id==*def) &&
                     target.is_some() {
-                        //aca el terminator es la llamada a new, el destination tiene el place con el selector
-                        //a partir de aca lo que hago es buscar donde se usa el selector y donde se le pushean args dados por el usuario
-                        let mut tainted_selector_places: Vec<Local> = vec![destination.local];
+                    //here the terminator is the call to new, the destination has the place with the selector
+                    //from here on, what I do is look for where the selector is used and where user given args are pushed to it
+                    let mut tainted_selector_places: Vec<Local> = vec![destination.local];
                         fn navigate_trough_bbs(cx: &LateContext, bb: &BasicBlock, bbs: &BasicBlocks, tainted_locals: &Vec<Local>, _tainted_selector_places: &mut Vec<Local>, utf_storage: &UnrestrictedTransferFromFinder) {
                             if let TerminatorKind::Call {
                                     func,
