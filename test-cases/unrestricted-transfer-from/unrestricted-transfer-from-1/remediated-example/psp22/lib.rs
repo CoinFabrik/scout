@@ -4,7 +4,6 @@
 #[openbrush::contract]
 pub mod psp22 {
 
-    // imports from openbrush
     use openbrush::contracts::psp22::*;
     use openbrush::traits::Storage;
 
