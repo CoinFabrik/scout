@@ -5,7 +5,6 @@ authors = ["[your_name] <[your_email]>"]
 edition = "2021"
 
 [dependencies]
-# Import ink!
 ink = { version = "4.2.1", default-features = false }
 openbrush = { git = "https://github.com/727-Ventures/openbrush-contracts", version = "3.1.0", default-features = false, features = ["psp22"] }
 psp22 = { package = "psp22_base_contract", path = "../psp22", default-features = false, features = ["ink-as-dependency"] }
