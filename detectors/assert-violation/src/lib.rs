@@ -4,7 +4,7 @@ extern crate rustc_ast;
 extern crate rustc_hir;
 extern crate rustc_span;
 
-use clippy_utils::diagnostics::{span_lint, span_lint_and_help};
+use clippy_utils::diagnostics::span_lint;
 use if_chain::if_chain;
 use rustc_ast::ast::LitKind;
 use rustc_hir::intravisit::Visitor;
@@ -92,7 +92,6 @@ impl<'tcx> LateLintPass<'tcx> for AssertViolation {
                     if let ExprKind::Lit(lit) = &args3[0].kind;
                     if let LitKind::Str(_, _) = lit.node;
                     then {
-                        dbg!(expr.span);
                         self.span.push(Some(b.span));
                         self.uses_assert = true;
                     }
@@ -111,9 +110,11 @@ impl<'tcx> LateLintPass<'tcx> for AssertViolation {
         if av_storage.uses_assert {
             av_storage.span.iter().for_each(|span| {
                 if let Some(span) = span {
-                    dbg!(span);
-
-                    span_lint_and_help(cx, ASSERT_VIOLATION, *span, "warn", None, "help");
+                    let error_msg = "Assert causes panic. Instead, return a proper error";
+                    if let Some(span_outer) = span.ctxt().outer_expn().expansion_cause() {
+                        span_lint(cx, ASSERT_VIOLATION, *&span_outer, error_msg);
+                    }
+                    span_lint(cx, ASSERT_VIOLATION, *span, error_msg);
                 }
             });
         }
