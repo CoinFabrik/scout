@@ -2,24 +2,24 @@
 ## Description
 * Vulnerability Category: `Reentrancy`
 * Severity: `Critical`
-* Detectors: [`reentrancy`](https://github.com/CoinFabrik/scout/tree/main/detectors/reentrancy)
-* Test Cases: [`reentrancy-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy/reentrancy-1), [`reentrancy-2`](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy/reentrancy-2) 
+* Detectors: [`reentrancy-1`](https://github.com/CoinFabrik/scout/tree/main/detectors/reentrancy-1), [`reentrancy-2`](https://github.com/CoinFabrik/scout/tree/main/detectors/reentrancy-2)
+* Test Cases: [`reentrancy-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy/reentrancy-1), [`reentrancy-2`](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy/reentrancy-2), [`reentrancy-3`](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy/reentrancy-3)
 
-Smart contracts can call other contracts and send tokens to them. These 
+Smart contracts can call other contracts and send tokens to them. These
 operations imply external calls where control flow is passed to the called
-contract until the execution of the called code is over. Then the control 
+contract until the execution of the called code is over. Then the control
 is delivered back to the caller.
 
 External calls, therefore, could open the opportunity for a malicious contract
 to execute any arbitrary code. This includes calling back the caller contract,
-an attack known as reentrancy. This kind of attack was used in Ethereum for 
+an attack known as reentrancy. This kind of attack was used in Ethereum for
 the infamous [DAO Hack](https://blog.chain.link/reentrancy-attacks-and-the-dao-hack/).
 
 ## Exploit Scenario
-In order to exemplify this vulnerability we developed two contracts: 
+In order to exemplify this vulnerability we developed two contracts:
 a `Vault` contract and an `Exploit` contract.
 
-The `Vault` contract provides functions to deposit, withdraw, check balance, 
+The `Vault` contract provides functions to deposit, withdraw, check balance,
 and call a function on another contract with a specified value.
 
 ```rust
@@ -53,7 +53,7 @@ pub fn call_with_value(&mut self, address: AccountId, amount: Balance, selector:
 }
 ```
 
-Th function `call_with_value function()` allows the contract owner to call 
+Th function `call_with_value function()` allows the contract owner to call
 other contracts on the blockchain and transfer a specified amount of value in
 the process. The function takes three arguments:
 - *address*: The address of the contract to call.
@@ -62,19 +62,19 @@ the process. The function takes three arguments:
 
 The function first checks the balance of the caller to make sure that they have
 enough funds to perform the transfer. If the balance is sufficient, a new call
-is constructed using the `build_call()` function provided by the 
+is constructed using the `build_call()` function provided by the
 `env::call module`.
 
 The `build_call()` function constructs a new contract call with the specified
-arguments. In this case, the call method is used to specify the address of the 
-contract to call, the transferred_value method is used to specify the amount 
-of balance to transfer, and the exec_input method is used to specify the 
+arguments. In this case, the call method is used to specify the address of the
+contract to call, the transferred_value method is used to specify the amount
+of balance to transfer, and the exec_input method is used to specify the
 function selector and any arguments to pass to the called function.
 
 The `call_flags()` method is also used to set a flag that allows the called
 contract to re-enter the current contract if necessary. This possibility to
-re-enter the contract, together with an appropriate 32-bit function selector 
-will allow us to repeatedly withdraw balance from the contract, emptying the 
+re-enter the contract, together with an appropriate 32-bit function selector
+will allow us to repeatedly withdraw balance from the contract, emptying the
 Vault.
 
 In order to perform this attack, we will use the `exploit()` function of the
@@ -113,16 +113,16 @@ pub fn exploit(&mut self) {
 The vulnerable code example can be found [here](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy/reentrancy-1/vulnerable-example).
 
 ### Deployment
-Vault and Exploit files can be found under the directories 
-[vulnerable-example/exploit](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy/reentrancy-1/vulnerable-example/exploit) and 
-[vulnerable-example/vault](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy/reentrancy-1/vulnerable-example/vault). 
+Vault and Exploit files can be found under the directories
+[vulnerable-example/exploit](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy/reentrancy-1/vulnerable-example/exploit) and
+[vulnerable-example/vault](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy/reentrancy-1/vulnerable-example/vault).
 The whole exploit example can be run automatically using the `deploy.sh` file.
 
 ## Recommendation
-In general, risks associated to reentrancy can be addressed with the 
-Check-Effect-Interaction pattern, a best practice that indicates that external 
-calls should be the last thing to be executed in a function. In this example, 
-this can be done by inserting the balance before transferring the value (see 
+In general, risks associated to reentrancy can be addressed with the
+Check-Effect-Interaction pattern, a best practice that indicates that external
+calls should be the last thing to be executed in a function. In this example,
+this can be done by inserting the balance before transferring the value (see
 [remediated-example-1](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy/reentrancy-1/remediated-example)).
 
 
@@ -158,10 +158,10 @@ pub fn call_with_value(&mut self, address: AccountId, amount: Balance, selector:
 
 The remediated code example can be found [here](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy/reentrancy-1/remediated-example).
 
-Alternatively, if reentrancy by an external contract is not needed, the 
-`set_allow_reentry(true)` should be removed altogether (see 
-[remediated-example-2](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy/reentrancy-2/remediated-example)). This is equivalent in Substrate to using a 
-[reentrancy guard](https://github.com/Supercolony-net/openbrush-contracts/tree/main/contracts/src/security/reentrancy_guard) 
+Alternatively, if reentrancy by an external contract is not needed, the
+`set_allow_reentry(true)` should be removed altogether (see
+[remediated-example-2](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy/reentrancy-2/remediated-example)). This is equivalent in Substrate to using a
+[reentrancy guard](https://github.com/Supercolony-net/openbrush-contracts/tree/main/contracts/src/security/reentrancy_guard)
 like the one offered by [OpenBrush](https://github.com/Supercolony-net/openbrush-contracts).
 
 ```rust
