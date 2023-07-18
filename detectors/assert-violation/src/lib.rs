@@ -16,52 +16,38 @@ use rustc_span::Span;
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
-    /// Checks for delegated calls to contracts passed as arguments.
+    /// Checks for `assert!` usage.
     /// ### Why is this bad?
-    ///Delegated calls to contracts passed as arguments can be used to change the expected behavior of the contract. If you need to change the target of a delegated call, you should use a storage variable, and make a function with proper access control to change it.
-    /// ### Known problems
-    /// Remove if none.
-    ///
+    /// `assert!` causes a panic, and panicking it's not a good practice. Instead, use proper error handling.
     /// ### Example
     /// ```rust
-    ///pub fn delegateCall(&mut self, target: Hash, argument: Balance) {
-    ///    let selector_bytes = [0x0, 0x0, 0x0, 0x0];
-    ///    let result: T  = build_call::<DefaultEnvironment>()
-    ///        .delegate(target)
-    ///        .exec_input(
-    ///            ExecutionInput::new(Selector::new(selector_bytes))
-    ///                .push_arg(argument)
-    ///     )
-    ///        .returns::<T>()
-    ///     .invoke();
-    ///}
+    ///    #[ink(message)]
+    ///    pub fn assert_if_greater_than_10(&self, value: u128) -> bool {
+    ///        assert!(value <= 10, "value should be less than 10");
+    ///        true
+    ///    }
     ///     ```
     /// Use instead:
     ///```rust
-    ///pub fn delegate_call(&mut self, argument: Balance) {
-    ///    let selector_bytes = [0x0, 0x0, 0x0, 0x0];
-    ///    let result: T  = build_call::<DefaultEnvironment>()
-    ///        .delegate(self.target)
-    ///        .exec_input(
-    ///            ExecutionInput::new(Selector::new(selector_bytes))
-    ///                .push_arg(argument)
-    ///        )
-    ///        .returns::<T>()
-    ///        .invoke();
-    ///}
+    ///     #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
+    ///     #[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
+    ///     pub enum Error {
+    ///         GreaterThan10,
+    ///     }
     ///
-    ///pub fn set_target(&mut self, new_target: Hash) -> Result<(), &'static str> {
-    ///   if self.admin != self.env().caller() {
-    ///        Err("Only admin can set target")
-    ///    } else {
-    ///        self.target = new_target;
-    ///        Ok(())
-     ///   }
-    ///}
+    ///    #[ink(message)]
+    ///    pub fn revert_if_greater_than_10(&self, value: u128) -> Result<bool, Error> {
+    ///        if value <= 10 {
+    ///            return Ok(true)
+    ///        } else {
+    ///            return Err(Error::GreaterThan10)
+    ///        }
+    ///    }
+    ///```
 
     pub ASSERT_VIOLATION,
     Warn,
-    "warning"
+    "Assert causes panic. Instead, return a proper error."
 }
 impl<'tcx> LateLintPass<'tcx> for AssertViolation {
     fn check_fn(
@@ -113,8 +99,9 @@ impl<'tcx> LateLintPass<'tcx> for AssertViolation {
                     let error_msg = "Assert causes panic. Instead, return a proper error";
                     if let Some(span_outer) = span.ctxt().outer_expn().expansion_cause() {
                         span_lint(cx, ASSERT_VIOLATION, *&span_outer, error_msg);
+                    } else {
+                        span_lint(cx, ASSERT_VIOLATION, *span, error_msg);
                     }
-                    span_lint(cx, ASSERT_VIOLATION, *span, error_msg);
                 }
             });
         }
