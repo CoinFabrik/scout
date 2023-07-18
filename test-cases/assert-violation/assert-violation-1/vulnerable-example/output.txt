@@ -1,0 +1,16 @@
+[1mBuilding workspace metadata entry `assert-violation`[0m
+   Compiling assert-violation v0.1.0 (/home/flerena/coinfabrik/alephzero/scout/detectors/assert-violation)
+warning: unused import: `span_lint_and_help`
+ --> src/lib.rs:8:44
+  |
+8 | use clippy_utils::diagnostics::{span_lint, span_lint_and_help};
+  |                                            ^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: `assert-violation` (lib) generated 1 warning (run `cargo fix --lib -p assert-violation` to apply 1 suggestion)
+    Finished release [optimized] target(s) in 1.09s
+[1mChecking with toolchain `nightly-2023-01-27-x86_64-unknown-linux-gnu`[0m
+    Checking assert_violation v0.1.0 (/home/flerena/coinfabrik/alephzero/scout/test-cases/assert-violation/assert-violation-1/vulnerable-example)
+hola
+    Finished dev [unoptimized + debuginfo] target(s) in 0.33s
