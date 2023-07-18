@@ -271,3 +271,11 @@ This vulnerability falls under the [Validations and error handling](#vulnerabili
 and has a Critical severity.
 
 Check the following [documentation](14-unrestricted-transfer-from.md) for a more detailed explanation of this vulnerability class.
+
+### 15 - Assert violation
+
+The `assert!` macro is used in Rust to ensure that a certain condition holds true at a certain point in your code. If the condition does not hold, then the assert! macro will cause the program to panic. This is a problem, as seen in [panic-error](#4-panic-error)
+
+We classified this issue, a deviation from best practices which could have
+security implications, under the [Validations and error handling](#vulnerability-categories) category and assigned it an Enhancement severity.
+

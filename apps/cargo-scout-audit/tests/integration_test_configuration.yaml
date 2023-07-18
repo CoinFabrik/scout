@@ -70,3 +70,8 @@ detectors:
     examples:
       - vulnerable_path: "../../test-cases/unrestricted-transfer-from/unrestricted-transfer-from-1/escrow/vulnerable-example/Cargo.toml"
         remediated_path: "../../test-cases/unrestricted-transfer-from/unrestricted-transfer-from-1/escrow/remediated-example/Cargo.toml"
+  assert-violation:
+    warning_message: "Assert causes panic. Instead, return a proper error"
+    examples:
+      - vulnerable_path: "../../test-cases/assert-violation/assert-violation-1/vulnerable-example/Cargo.toml"
+        remediated_path: "../../test-cases/assert-violation/assert-violation-1/remediated-example/Cargo.toml"

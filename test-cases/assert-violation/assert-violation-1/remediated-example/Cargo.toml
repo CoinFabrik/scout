@@ -25,10 +25,3 @@ std = [
 ]
 ink-as-dependency = []
 e2e-tests = []
-
-
-[workspace.metadata.dylint]
-libraries = [
-    { path = "../../../../detectors/assert-violation" },
-]
-
