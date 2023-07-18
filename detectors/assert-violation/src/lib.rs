@@ -86,11 +86,11 @@ impl<'tcx> LateLintPass<'tcx> for AssertViolation {
                     if let Some(expr1) = block.expr;
                     if let ExprKind::Call(_, args) = expr1.kind;
                     if let ExprKind::Call(_, args2) = args[0].kind;
-//                    if args2.len() == 2;
-//                    if let ExprKind::AddrOf(_, _, expr2) = args2[0].kind;
-//                    if let ExprKind::Array(args3) = expr2.kind;
-//                    if let ExprKind::Lit(lit) = &args3[0].kind;
-//                    if let LitKind::Str(_, _) = lit.node;
+                    if args2.len() == 2;
+                    if let ExprKind::AddrOf(_, _, expr2) = args2[0].kind;
+                    if let ExprKind::Array(args3) = expr2.kind;
+                    if let ExprKind::Lit(lit) = &args3[0].kind;
+                    if let LitKind::Str(_, _) = lit.node;
                     then {
                         dbg!(expr.span);
                         self.span.push(Some(b.span));
@@ -111,7 +111,6 @@ impl<'tcx> LateLintPass<'tcx> for AssertViolation {
         if av_storage.uses_assert {
             av_storage.span.iter().for_each(|span| {
                 if let Some(span) = span {
-
                     dbg!(span);
 
                     span_lint_and_help(cx, ASSERT_VIOLATION, *span, "warn", None, "help");
