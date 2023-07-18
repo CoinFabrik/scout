@@ -262,3 +262,12 @@ This vulnerability again falls under the [Block attributes](#vulnerability-categ
 and has a Critical severity.
 
 Check the following [documentation](13-insufficiently-random-values.md) for a more detailed explanation of this vulnerability class.
+
+### 14 - Unrestricted transfer from
+
+In an ink! Substrate smart contract, allowing unrestricted `transfer_from` operations poses a significant vulnerability. When `from` arguments for that function is provided directly by the user, this might enable the withdrawal of funds from any actor with token approval on the contract. This could result in unauthorized transfers and loss of funds. To mitigate this vulnerability, instead of allowing an arbitrary `from` address, the `from` address should be restricted, ideally to the address of the caller (`self.env().caller()`), ensuring that the sender can initiate a transfer only with their own tokens.
+
+This vulnerability falls under the [Validations and error handling](#vulnerability-categories) category
+and has a Critical severity.
+
+Check the following [documentation](14-unrestricted-transfer-from.md) for a more detailed explanation of this vulnerability class.
