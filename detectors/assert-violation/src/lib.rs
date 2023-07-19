@@ -60,8 +60,7 @@ impl<'tcx> LateLintPass<'tcx> for AssertViolation {
         _: HirId,
     ) {
         struct AssertViolationStorage {
-            span: Vec<Option<Span>>,
-            uses_assert: bool,
+            span: Vec<Span>,
         }
 
         impl<'tcx> Visitor<'tcx> for AssertViolationStorage {
@@ -78,32 +77,24 @@ impl<'tcx> LateLintPass<'tcx> for AssertViolation {
                     if let ExprKind::Lit(lit) = &args3[0].kind;
                     if let LitKind::Str(_, _) = lit.node;
                     then {
-                        self.span.push(Some(b.span));
-                        self.uses_assert = true;
+                        self.span.push(b.span);
                     }
                 }
 
                 walk_expr(self, expr);
             }
         }
-        let mut av_storage = AssertViolationStorage {
-            span: Vec::new(),
-            uses_assert: false,
-        };
+        let mut av_storage = AssertViolationStorage { span: Vec::new() };
 
         walk_expr(&mut av_storage, body.value);
 
-        if av_storage.uses_assert {
-            av_storage.span.iter().for_each(|span| {
-                if let Some(span) = span {
-                    let error_msg = "Assert causes panic. Instead, return a proper error";
-                    if let Some(span_outer) = span.ctxt().outer_expn().expansion_cause() {
-                        span_lint(cx, ASSERT_VIOLATION, span_outer, error_msg);
-                    } else {
-                        span_lint(cx, ASSERT_VIOLATION, *span, error_msg);
-                    }
-                }
-            });
-        }
+        av_storage.span.iter().for_each(|span| {
+            let error_msg = "Assert causes panic. Instead, return a proper error";
+            if let Some(span_outer) = span.ctxt().outer_expn().expansion_cause() {
+                span_lint(cx, ASSERT_VIOLATION, span_outer, error_msg);
+            } else {
+                span_lint(cx, ASSERT_VIOLATION, *span, error_msg);
+            }
+        });
     }
 }
