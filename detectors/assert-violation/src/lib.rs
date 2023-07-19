@@ -98,7 +98,7 @@ impl<'tcx> LateLintPass<'tcx> for AssertViolation {
                 if let Some(span) = span {
                     let error_msg = "Assert causes panic. Instead, return a proper error";
                     if let Some(span_outer) = span.ctxt().outer_expn().expansion_cause() {
-                        span_lint(cx, ASSERT_VIOLATION, *&span_outer, error_msg);
+                        span_lint(cx, ASSERT_VIOLATION, span_outer, error_msg);
                     } else {
                         span_lint(cx, ASSERT_VIOLATION, *span, error_msg);
                     }
