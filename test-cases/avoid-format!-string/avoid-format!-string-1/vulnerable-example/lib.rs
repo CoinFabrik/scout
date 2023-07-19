@@ -3,7 +3,6 @@
 #[ink::contract]
 mod avoid_format {
 
-
     #[ink(storage)]
     pub struct AvoidFormat {
         value: bool,
@@ -15,19 +14,18 @@ mod avoid_format {
         FormatError { msg: String },
     }
 
-
     impl AvoidFormat {
         #[ink(constructor)]
         pub fn new(init_value: bool) -> Self {
             Self { value: init_value }
         }
 
-
         #[ink(message)]
         pub fn crash(&self) -> Result<(), Error> {
-            Err(Error::FormatError { msg: (format!("{}", self.value)) })
+            Err(Error::FormatError {
+                msg: (format!("{}", self.value)),
+            })
         }
-
     }
 
     #[cfg(test)]
@@ -37,8 +35,12 @@ mod avoid_format {
         #[test]
         fn crash_works() {
             let avoid_format = AvoidFormat::new(false);
-            assert_eq!(avoid_format.crash(), Err(Error::FormatError { msg: "false".to_string() }));
+            assert_eq!(
+                avoid_format.crash(),
+                Err(Error::FormatError {
+                    msg: "false".to_string()
+                })
+            );
         }
     }
-
 }
