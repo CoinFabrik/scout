@@ -14,33 +14,32 @@ use rustc_span::sym;
 
 dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does
-    /// The panic! macro is used to stop execution when a condition is not met.
-    /// This is useful for testing and prototyping, but should be avoided in production code
+    /// Detects the usage of `format!` macro.
     ///
     /// ### Why is this bad?
-    /// The usage of panic! is not recommended because it will stop the execution of the caller contract.
-    ///
-    /// ### Known problems
-    /// While this linter detects explicit calls to panic!, there are some ways to raise a panic such as unwrap() or expect().
-    ///
+    /// The usage of format! is not recommended because it can panic the execution.
     /// ### Example
     /// ```rust
-    /// pub fn add(&mut self, value: u32)   {
-    ///    match self.value.checked_add(value) {
-    ///        Some(v) => self.value = v,
-    ///        None => panic!("Overflow error"),
-    ///    };
-    /// }
+    ///    #[ink(message)]
+    ///    pub fn crash(&self) -> Result<(), Error> {
+    ///        Err(Error::FormatError {
+    ///            msg: (format!("{}", self.value)),
+    ///        })
+    ///    }
+    ///
     /// ```
     /// Use instead:
     /// ```rust
-    /// pub fn add(&mut self, value: u32) -> Result<(), Error>  {
-    ///     match self.value.checked_add(value) {
-    ///         Some(v) => self.value = v,
-    ///         None => return Err(Error::OverflowError),
-    ///     };
-    ///     Ok(())
-    /// }
+    ///    pub enum Error {
+    ///        FormatError { msg: String },
+    ///        CrashError
+    ///    }
+    /// 
+    ///    #[ink(message)]
+    ///    pub fn crash(&self) -> Result<(), Error> {
+    ///        Err(Error::FormatError { msg: self.value.to_string() })
+    ///    }
+    ///
     /// ```
     pub AVOID_FORMAT_STRING,
     Warn,
