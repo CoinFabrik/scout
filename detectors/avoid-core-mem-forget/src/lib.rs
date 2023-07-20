@@ -11,7 +11,7 @@ use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::sym;
 
 dylint_linting::impl_pre_expansion_lint! {
-        /// ### What it does
+    /// ### What it does
     /// Checks for `core::mem::forget` usage.
     /// ### Why is this bad?
     /// This is a bad practice because it can lead to memory leaks, resource leaks and logic errors.

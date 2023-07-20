@@ -1,5 +1,5 @@
 [package]
-name = "avoid_std_and_core_mem_forget"
+name = "avoid_core_mem_forget"
 version = "0.1.0"
 edition = "2021"
 
