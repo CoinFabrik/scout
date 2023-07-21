@@ -8,7 +8,7 @@
 - Test Cases: [`unrestricted-transfer-from-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/unrestricted-transfer-from/unrestricted-transfer-from-1)
 
 Using an user-defined argument as a `transfer_from`'s `from` parameter could lead to transfer funds from a third party account without proper authorization.
- 
+
 ## Exploit Scenario
 
 Consider the following `ink!` contract:
@@ -42,15 +42,15 @@ Consider the following `ink!` contract:
     }
 ```
 
-The vulnerability in this `deposit` function arises from the use of `from`, an user-defined parameter as an argument in the `from` field of the `transfer_from` function. Alice can approve a contract to spend their tokens, then Bob can call that contract, use that allowance to send as themselves Alice's tokens. 
- 
+The vulnerability in this `deposit` function arises from the use of `from`, an user-defined parameter as an argument in the `from` field of the `transfer_from` function. Alice can approve a contract to spend their tokens, then Bob can call that contract, use that allowance to send as themselves Alice's tokens.
 
 The vulnerable code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/unrestricted-transfer-from/unrestricted-transfer-from-1/vulnerable-example).
 
 ## Remediation
 
-Avoid using user-defined arguments as `from` parameter in `transfer_from`. Instead, use `self.env().caller()`
+Avoid using user-defined arguments as `from` parameter in `transfer_from`. Instead, use `self.env().caller()`.
 
+The remediated code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/unrestricted-transfer-from/unrestricted-transfer-from-1/remediated-example).
 
 ## References
 
