@@ -282,6 +282,20 @@ The `assert!` macro is used in Rust to ensure that a certain condition holds tru
 We classified this issue, a deviation from best practices which could have
 security implications, under the [Validations and error handling](#vulnerability-categories) category and assigned it an Enhancement severity.
 
+### 16 - Avoid core::mem::forget
+
+The `core::mem::forget` function is used to forget about a value without running its destructor. This could lead to memory leaks and logic errors.
+
+We classified this issue, a deviation from best practices which could have
+security implications, under the [Best practices](#vulnerability-categories) category and assigned it an Enhancement severity.
+
+### 17 - Avoid format! macro
+
+The `format!` macro is used to create a String from a given set of arguments. This macro is not recommended, it is better to use a custom error type enum.
+
+We classified this issue, a deviation from best practices which could have
+security implications, under the [Validations and error handling](#vulnerability-categories) category and assigned it an Enhancement severity.
+
 ### 19 - Iterators over indexing
 
 The use of iterators over indexing is a best practice that should be followed in Rust. This is because accessing a vector by index is slower than using an iterator. Also, if the index is out of bounds, it will panic.
