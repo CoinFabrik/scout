@@ -1,4 +1,4 @@
-# Unrestricted Transfer From
+# Assert violation
 
 ## Description
 
@@ -8,7 +8,7 @@
 - Test Cases: [`assert-violation-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/assert-violation/assert-violation-1)
 
 The `assert!` macro can cause the contract to panic. This is not a good practice.
- 
+
 ## Exploit Scenario
 
 Consider the following `ink!` contract:
@@ -21,7 +21,7 @@ Consider the following `ink!` contract:
     }
 ```
 
-The problem arises from the use of the `assert!` macro, if the condition is not met, the contract panics. 
+The problem arises from the use of the `assert!` macro, if the condition is not met, the contract panics.
 
 The vulnerable code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/assert-violation/assert-violation-1/vulnerable-example).
 
@@ -29,6 +29,7 @@ The vulnerable code example can be found [`here`](https://github.com/CoinFabrik/
 
 Avoid the use of `assert!` macro. Instead, use a proper error and return it.
 
+The remediated code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/assert-violation/assert-violation-1/remediated-example).
 
 ## References
 
