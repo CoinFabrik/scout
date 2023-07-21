@@ -7,7 +7,7 @@
 - Detectors: [`iterators-over-indexing`](https://github.com/CoinFabrik/scout/tree/main/detectors/iterators-over-indexing)
 - Test Cases: [`iterators-over-indexing-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/iterators-over-indexing/iterators-over-indexing-1)
 
-Iterating with hardoded indexes is slower than using an iterator. Also, if the index is out of bounds, it will panic.
+Iterating with hardcoded indexes is slower than using an iterator. Also, if the index is out of bounds, it will panic.
 
 ## Exploit Scenario
 

@@ -7,7 +7,7 @@
 - Detectors: [`avoid-format!-string`](https://github.com/CoinFabrik/scout/tree/main/detectors/avoid-format!-string)
 - Test Cases: [`avoid-format!-string-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/avoid-format!-string/avoid-format!-string-1)
 
-The `format!` macro usage can panic, so it's not recommended to use it.
+The `format!` macro is not recommended. A custom error is recommended instead.
 
 ## Exploit Scenario
 
