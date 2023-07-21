@@ -6,7 +6,7 @@ Checks for `assert!` macro usage.
 
 ### Why is this bad?
 
-The `assert!` macro can cause the contract to panic. 
+The `assert!` macro can cause the contract to panic.
 
 ### Example
 
@@ -19,6 +19,7 @@ The `assert!` macro can cause the contract to panic.
 ```
 
 Use instead:
+
 ```rust
     #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
     #[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
@@ -29,9 +30,9 @@ Use instead:
     #[ink(message)]
     pub fn revert_if_greater_than_10(&self, value: u128) -> Result<bool, Error> {
         if value <= 10 {
-            return Ok(true)
+            Ok(true)
         } else {
-            return Err(Error::GreaterThan10)
+            Err(Error::GreaterThan10)
         }
     }
 ```
