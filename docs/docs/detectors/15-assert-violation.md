@@ -1,4 +1,4 @@
-# Unrestricted Transfer From
+# Assert violation
 
 ### What it does
 
@@ -6,7 +6,7 @@ Checks for `assert!` macro usage.
 
 ### Why is this bad?
 
-The `assert!` macro can cause the contract to panic. 
+The `assert!` macro can cause the contract to panic.
 
 ### Example
 
@@ -19,6 +19,7 @@ The `assert!` macro can cause the contract to panic.
 ```
 
 Use instead:
+
 ```rust
     #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
     #[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
