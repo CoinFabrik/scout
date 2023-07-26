@@ -28,7 +28,7 @@ The vulnerable code example can be found [`here`](https://github.com/CoinFabrik/
 
 ## Remediation
 
-Use the pattern `let _ = forgotten_value;` or the `.drop` method instead of `core::mem::forget(forgotten_value);`.
+Use the pattern `let _ = forgotten_value;` or the `.drop()` method instead of `core::mem::forget(forgotten_value);`.
 
 ## References
 

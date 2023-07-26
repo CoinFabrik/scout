@@ -28,7 +28,7 @@ mod avoid_std_and_core_mem {
         pub fn drop_value(&mut self) {
             let forgotten_value = self.value;
             self.value = false;
-            forget_value.drop;
+            forget_value.drop();
         }
 
         #[ink(message)]

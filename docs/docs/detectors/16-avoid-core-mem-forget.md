@@ -35,7 +35,7 @@ Use instead:
     pub fn drop_value(&mut self) {
         let forgotten_value = self.value;
         self.value = false;
-        forget_value.drop;
+        forget_value.drop();
     }
 ```
 
