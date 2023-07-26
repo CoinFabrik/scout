@@ -30,9 +30,9 @@ Use instead:
     #[ink(message)]
     pub fn revert_if_greater_than_10(&self, value: u128) -> Result<bool, Error> {
         if value <= 10 {
-            return Ok(true)
+            Ok(true)
         } else {
-            return Err(Error::GreaterThan10)
+            Err(Error::GreaterThan10)
         }
     }
 ```
