@@ -28,6 +28,15 @@ Use instead:
        self.value = false;
        let _ = forgotten_value;
    }
+
+// or if droppable
+
+    #[ink(message)]
+    pub fn drop_value(&mut self) {
+        let forgotten_value = self.value;
+        self.value = false;
+        forget_value.drop;
+    }
 ```
 
 ### Implementation

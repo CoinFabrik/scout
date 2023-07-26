@@ -33,7 +33,16 @@ dylint_linting::impl_pre_expansion_lint! {
     ///        self.value = false;
     ///        let _ = forgotten_value;
     ///    }
+    ///
+    /// // or use drop if droppable
+    ///
+    ///    pub fn drop_value(&mut self) {
+    ///        let forgotten_value = self.value;
+    ///        self.value = false;
+    ///        forget_value.drop;
+    ///    }
     ///```
+
     pub AVOID_STD_CORE_MEM_FORGET,
     Warn,
     "Using `core::mem::forget` is not recommended.",
@@ -69,7 +78,7 @@ impl EarlyLintPass for AvoidStdCoreMemForget {
                     expr.span,
                     "Using `core::mem::forget` is not recommended.",
                     None,
-                    &format!("Instead, use the `let _ = ...` pattern to forget the value."),
+                    &format!("Instead, use the `let _ = ...` pattern or `.drop` method to forget the value."),
                 );
             }
         }
