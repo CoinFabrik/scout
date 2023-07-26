@@ -27,5 +27,4 @@ mod ink_version {
             self.value
         }
     }
-
 }

@@ -24,7 +24,7 @@ The vulnerable code example can be found [`here`](https://github.com/CoinFabrik/
 
 ## Remediation
 
-Avoid the use of hardcoded indexes. Instead, use `iter()`, `to_iter()`, `for ... in ...` or range over `0..value.len()`
+Use the latest stable version available.
 
 The remediated code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/ink-version/ink-version-1/remediated-example).
 

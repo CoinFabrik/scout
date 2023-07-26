@@ -9,8 +9,8 @@ use std::fs;
 use clippy_utils::diagnostics::span_lint_and_help;
 use reqwest::{Client, Error};
 use rustc_lint::{LateContext, LateLintPass};
-use serde::Deserialize;
 use semver::*;
+use serde::Deserialize;
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -60,7 +60,6 @@ impl<'tcx> LateLintPass<'tcx> for CheckInkVersion {
             None => return,
         };
 
-
         let req = Version::parse(&latest_version.replace("\"", "")).unwrap();
         let ink_version = VersionReq::parse(&ink_version.replace("\"", "")).unwrap();
 
@@ -74,7 +73,10 @@ impl<'tcx> LateLintPass<'tcx> for CheckInkVersion {
                     latest_version, ink_version
                 ),
                 None,
-                &format!("Please, use version {} of ink! in your Cargo.toml", latest_version),
+                &format!(
+                    "Please, use version {} of ink! in your Cargo.toml",
+                    latest_version
+                ),
             );
         }
     }
