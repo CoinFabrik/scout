@@ -44,7 +44,11 @@ impl<'tcx> LateLintPass<'tcx> for CheckInkVersion {
             Err(_) => return,
         };
 
-        let cargo_toml = fs::read_to_string("Cargo.toml").expect("Unable to read Cargo.toml");
+        let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
+
+        let cargo_toml_path = std::path::Path::new(&manifest_dir).join("Cargo.toml");
+
+        let cargo_toml = fs::read_to_string(cargo_toml_path).expect("Unable to read Cargo.toml");
 
         let toml: toml::Value = toml::from_str(&cargo_toml).unwrap();
 
@@ -59,7 +63,6 @@ impl<'tcx> LateLintPass<'tcx> for CheckInkVersion {
 
         let req = Version::parse(&latest_version.replace("\"", "")).unwrap();
         let ink_version = VersionReq::parse(&ink_version.replace("\"", "")).unwrap();
-
 
         if !ink_version.matches(&req) {
             span_lint_and_help(
