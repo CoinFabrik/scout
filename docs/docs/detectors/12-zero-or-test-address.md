@@ -4,7 +4,7 @@
 Checks whether the zero address is being inputed to a function without validation.
 
 ### Why is this bad?
-Because if the zero address is assigned ownership of a contract, the control of the contract can be lost and not recovered.
+Because the private key for the zero address is known, anyone could take ownership of the contract.
 
 ### Example
 
