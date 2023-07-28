@@ -24,13 +24,13 @@ Consider the following `ink!` contract:
 
 The problem arises from the use of hardcoded indexes. If `self.value` has less than 4 elements, the contract will panic.
 
-The vulnerable code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/assert-violation/iterators-over-indexing-1/vulnerable-example).
+The vulnerable code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/iterators-over-indexing/iterators-over-indexing-1/vulnerable-example).
 
 ## Remediation
 
 Avoid the use of hardcoded indexes. Instead, use `iter()`, `to_iter()`, `for ... in ...` or range over `0..value.len()`
 
-The remediated code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/assert-violation/iterators-over-indexing-1/remediated-example).
+The remediated code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/iterators-over-indexing/iterators-over-indexing-1/remediated-example).
 
 ## References
 
