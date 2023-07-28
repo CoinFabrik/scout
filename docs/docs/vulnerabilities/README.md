@@ -3,19 +3,23 @@ sidebar_position: 2
 ---
 
 # Vulnerabilities
+
 This section lists relevant security-related issues typically introduced during the development of smart contracts in Substrate Ink!. While many of these issues can be generalized to Substrate-based networks, that is not always the case. The list, though non-exhaustive, features highly relevant items. Each issue is assigned a severity label based on the taxonomy presented below.
 
 ## Vulnerability Severity
+
 This severity classification, although arbitrary, has been used in hundreds
 of security audits and helps to understand the vulnerabilities we introduce
 and measure the utility of this proof of concept.
-* __Critical__: These issues seriously compromise the system and must be addressed immediately.
-* __Medium__: These are potentially exploitable issues which might represent
-a security risk in the near future. We suggest fixing them as soon as possible.
-* __Minor__: These issues represent problems that are relatively small or difficult to exploit, but might be exploited in combination with other issues. These kinds of issues do not block deployments in production environments. They should be taken into account and fixed when possible.
-* __Enhancement__: This class relates to issues stemming from deviations from best practices or stylistic conventions, which could escalate into higher-priority issues due to other changes. For instance, these issues may lead to development errors in future updates.
+
+- **Critical**: These issues seriously compromise the system and must be addressed immediately.
+- **Medium**: These are potentially exploitable issues which might represent
+  a security risk in the near future. We suggest fixing them as soon as possible.
+- **Minor**: These issues represent problems that are relatively small or difficult to exploit, but might be exploited in combination with other issues. These kinds of issues do not block deployments in production environments. They should be taken into account and fixed when possible.
+- **Enhancement**: This class relates to issues stemming from deviations from best practices or stylistic conventions, which could escalate into higher-priority issues due to other changes. For instance, these issues may lead to development errors in future updates.
 
 ## Vulnerability Categories
+
 We follow with a taxonomy of Vulnerabilities. Many "top vulnerability" lists
 can be found covering Ethereum/Solidity smart contracts. This list below is
 used by the Coinfabrik Audit Team, when source code (security) audits in
@@ -23,22 +27,22 @@ Ethereum/Solidity, Stacks/Clarity, Algorand/PyTEAL /TEAL, Solana/RUST, etc.
 The team discusses the creation of the list in this
 [blogpost](https://blog.coinfabrik.com/analysis-categories/).
 
-| Category                  | Description                                                                                                      |
-| -------------------------| -----------------------------------------------------------------------------------------------------------------|
-| Arithmetic                | Proper usage of arithmetic and number representation.                                                              |
-| Assembly Usage            | Detailed analysis of implementations using assembly.                                                             |
-| Authorization             | Vulnerabilities related to insufficient access control or incorrect authorization implementation.                |
-| Best practices            | Conventions and best practices for improved code quality and vulnerability prevention.                           |
-| Block attributes          | Appropriate usage of block attributes, especially when used as a source of randomness.                      |
-| Centralization            | Analysis of centralization and single points of failure.                                                         |
-| Denial of Service                       | Denial of service. attacks.                                                                                        |
-| Gas Usage                 | Performance issues, enhancements and vulnerabilities related to use of gas.                                      |
-| MEV                       | Patterns that could lead to the exploitation of Maximal Extractable Value.                                        |
-| Privacy                   | Patterns revealing sensible user or state data.                                                                   |
-| Reentrancy                | Consistency of contract state under recursive calls.                                                              |
-| Unexpected transfers      | Contract behavior under unexpected or forced transfers of tokens.                                               |
-| Upgradability             | Proxy patterns and upgradable smart contracts.                                                                   |
-| Validations and error handling | Handling of errors, exceptions and parameters.                                                               |
+| Category                       | Description                                                                                       |
+| ------------------------------ | ------------------------------------------------------------------------------------------------- |
+| Arithmetic                     | Proper usage of arithmetic and number representation.                                             |
+| Assembly Usage                 | Detailed analysis of implementations using assembly.                                              |
+| Authorization                  | Vulnerabilities related to insufficient access control or incorrect authorization implementation. |
+| Best practices                 | Conventions and best practices for improved code quality and vulnerability prevention.            |
+| Block attributes               | Appropriate usage of block attributes, especially when used as a source of randomness.            |
+| Centralization                 | Analysis of centralization and single points of failure.                                          |
+| Denial of Service              | Denial of service. attacks.                                                                       |
+| Gas Usage                      | Performance issues, enhancements and vulnerabilities related to use of gas.                       |
+| MEV                            | Patterns that could lead to the exploitation of Maximal Extractable Value.                        |
+| Privacy                        | Patterns revealing sensible user or state data.                                                   |
+| Reentrancy                     | Consistency of contract state under recursive calls.                                              |
+| Unexpected transfers           | Contract behavior under unexpected or forced transfers of tokens.                                 |
+| Upgradability                  | Proxy patterns and upgradable smart contracts.                                                    |
+| Validations and error handling | Handling of errors, exceptions and parameters.                                                    |
 
 We used the above Vulnerability Categories, along with common examples of vulnerabilities detected within each category in other blockchains, as a guideline for finding and developing vulnerable examples of Substrate Ink! smart contracts.
 
@@ -53,9 +57,10 @@ Check our
 for code examples of these vulnerabilities and their respective remediations.
 
 ### 1 - Integer overflow or underflow
+
 This type of vulnerability occurs when an arithmetic operation attempts to
 create a numeric value that is outside the valid range in substrate, e.g,
-a `u8` unsigned integer can be at most *M:=2^8-1=255*, hence the sum `M+1`
+a `u8` unsigned integer can be at most _M:=2^8-1=255_, hence the sum `M+1`
 produces an overflow.
 
 An overflow/underflow is typically caught and generates an error. When it
@@ -75,6 +80,7 @@ list.
 Check the following [documentation](1-integer-overflow-or-underflow.md) for a more detailed explanation of this vulnerability class.
 
 ### 2 - Set contract storage
+
 Smart contracts can store important information in memory which changes through the contract's lifecycle. Changes happen via user interaction with the smart contract. An _unauthorized_ set contract storage vulnerability happens when a smart contract call allows a user to set or modify contract memory when they were not supposed to be authorized.
 
 Common practice is to have functions with the ability to change
@@ -222,7 +228,6 @@ In our example, we consider an contract that utilizes the `unwrap` method to ret
 
 Check the following [documentation](9-unsafe-unwrap.md) for a more detailed explanation of this vulnerability class.
 
-
 ### 10 - Divide before multiply
 
 This vulnerability class relates to the order of operations in Rust, specifically in integer arithmetic. Performing a division operation before a multiplication can lead to a loss of precision. This issue becomes significant in programs like smart contracts where numerical precision is crucial.
@@ -232,7 +237,6 @@ and has a Medium Severity.
 
 Check the following [documentation](10-divide-before-multiply.md) for a more detailed explanation of this vulnerability class.
 
-
 ### 11 - Delegate call
 
 Delegate calls can introduce security vulnerabilities if not handled carefully. The main idea is that delegate calls to contracts passed as arguments can be used to change the expected behavior of the contract, leading to potential attacks. It is important to validate and restrict delegate calls to trusted contracts, implement proper access control mechanisms, and carefully review external contracts to prevent unauthorized modifications, unexpected behavior, and potential exploits. By following these best practices, developers can enhance the security of their smart contracts and mitigate the risks associated with delegate calls.
@@ -241,7 +245,6 @@ This vulnerability falls under the [Authorization](#vulnerability-categories) ca
 and has a Critical severity.
 
 Check the following [documentation](11-delegate-call.md) for a more detailed explanation of this vulnerability class.
-
 
 ### 12 - Zero or test address
 
@@ -272,6 +275,27 @@ and has a Critical severity.
 
 Check the following [documentation](14-unrestricted-transfer-from.md) for a more detailed explanation of this vulnerability class.
 
+### 15 - Assert violation
+
+The `assert!` macro is used in Rust to ensure that a certain condition holds true at a certain point in your code. If the condition does not hold, then the assert! macro will cause the program to panic. This is a problem, as seen in [panic-error](#4-panic-error)
+
+We classified this issue, a deviation from best practices which could have
+security implications, under the [Validations and error handling](#vulnerability-categories) category and assigned it an Enhancement severity.
+
+### 16 - Avoid core::mem::forget
+
+The `core::mem::forget` function is used to forget about a value without running its destructor. This could lead to memory leaks and logic errors.
+
+We classified this issue, a deviation from best practices which could have
+security implications, under the [Best practices](#vulnerability-categories) category and assigned it an Enhancement severity.
+
+### 17 - Avoid format! macro
+
+The `format!` macro is used to create a String from a given set of arguments. This macro is not recommended, it is better to use a custom error type enum.
+
+We classified this issue, a deviation from best practices which could have
+security implications, under the [Validations and error handling](#vulnerability-categories) category and assigned it an Enhancement severity.
+
 ### 18 - Unprotected seld destruct
 
 If users are allowed to call `terminate_contract`, they can intentionally or accidentally destroy the contract, leading to the loss of all associated data and functionalities given by this contract or by others that depend on it. To prevent this, the function should be restricted to administrators or authorized users only.
@@ -280,3 +304,10 @@ This vulnerability falls under the [Authorization](#vulnerability-categories) ca
 and has a Critical severity.
 
 Check the following [documentation](18-unprotected-self-destruct.md) for a more detailed explanation of this vulnerability class.
+
+### 19 - Iterators over indexing
+
+The use of iterators over indexing is a best practice that should be followed in Rust. This is because accessing a vector by index is slower than using an iterator. Also, if the index is out of bounds, it will panic.
+
+We classified this issue, a deviation from best practices which could have
+security implications, under the [Best practices](#vulnerability-categories) category and assigned it an Enhancement severity.

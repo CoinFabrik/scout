@@ -1,23 +1,25 @@
-# DoS unexpected revert With vector
+# DoS unexpected revert with vector
+
 ## Description
+
 - Vulnerability Category: `DoS`
 - Severity: `Critical`
 - Detectors: [`dos-unexpected-revert-with-vector`](https://github.com/CoinFabrik/scout/tree/main/detectors/dos-unexpected-revert-with-vector)
 - Test Cases: [`dos-unexpected-revert-with-vector-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/dos-unexpected-revert-with-vector/dos-unexpected-revert-with-vector-1)
 
-
-This vulnerability of DoS through unexpected revert arises when a smart 
+This vulnerability of DoS through unexpected revert arises when a smart
 contract does not handle storage size errors correctly, and a user can add an
 excessive number of entries, leading to an unexpected revert of transactions
 by other users and a Denial of Service. This vulnerability can be exploited by
-an attacker to perform a DoS attack on the network and can result in lost 
+an attacker to perform a DoS attack on the network and can result in lost
 funds, poor user experience, and even harm the network's overall security.
 
 ## Exploit Scenario
+
 The vulnerable smart contract we developed for his example allows users to
-vote for one of different candidates. 
+vote for one of different candidates.
 The smart contract contains a struct named `UnexpectedRevert` that stores the
-total number of votes, a list of candidates, their votes, and whether an 
+total number of votes, a list of candidates, their votes, and whether an
 account has voted. It also stores information about the most voted candidate
 and when the vote will end.
 
@@ -258,50 +260,52 @@ mod unexpected_revert {
 ```
 
 The smart contract has several functions that allow adding a candidate, getting
-votes for a specific candidate, getting the account ID of the most voted 
+votes for a specific candidate, getting the account ID of the most voted
 candidate, getting the total votes, getting the total number of candidates,
 getting a candidate by index, checking if an account has voted, and voting for
 a candidate.
 
 The #[cfg(test)] block contains a single test that adds 512 candidates to the
-smart contract. It initializes the contract with the current timestamp + 10 
-minutes and then uses a loop to add each candidate. The test verifies that 
+smart contract. It initializes the contract with the current timestamp + 10
+minutes and then uses a loop to add each candidate. The test verifies that
 the function to add a candidate fails with an error indicating that the vote
-has ended. The purpose of this test is to trigger an unexpected revert due 
+has ended. The purpose of this test is to trigger an unexpected revert due
 to the contract's storage size, but this does not occur since the deployment
 is mocked and does not check the size of storage cells.
 
-On the other hand, the end to end test instantiates the contract using 
-`ink_e2e::alice()` as the deployer account and an `UnexpectedRevertRef` 
+On the other hand, the end to end test instantiates the contract using
+`ink_e2e::alice()` as the deployer account and an `UnexpectedRevertRef`
 instance with a specified now value. It then uses a loop to add 512 candidates
-to the contract by calling the add_candidate function for each candidate 
+to the contract by calling the add_candidate function for each candidate
 account.
 
-The loop generates a unique `AccountId` for each candidate by creating a 
+The loop generates a unique `AccountId` for each candidate by creating a
 vector of 28 zeroes, appending the current index as a big-endian byte array,
 and converting the resulting vector to a fixed-length array of 32 bytes.
 
 The test expects the `add_candidate()` function to fail with a `CallDryRun` error,
-which indicates that the transaction execution failed during a dry run. This 
-is indicated by the `#[should_panic(expected = "add_candidate failed: CallDryRun")]` 
-attribute on the test function. This test _does_ trigger an unexpected revert 
+which indicates that the transaction execution failed during a dry run. This
+is indicated by the `#[should_panic(expected = "add_candidate failed: CallDryRun")]`
+attribute on the test function. This test _does_ trigger an unexpected revert
 due to the contract's storage size.
 
 The vulnerable code example can be found [here](https://github.com/CoinFabrik/scout/blob/main/test-cases/dos-unexpected-revert-with-vector/dos-unexpected-revert-with-vector-1/vulnerable-example/lib.rs).
 
 ### Deployment (of the vulnerable contract)
-In order to run the tests associated to this contract and view this 
+
+In order to run the tests associated to this contract and view this
 vulnerability in action:
+
 1. Save the `vulnerable-example` directory.
 2. Run a substrate node and save its `FULL_PATH`.
-3. Open a new terminal at the `vulnerable-example` directory and set the 
-contract node environmental variable by running:
-    `export CONTRACTS_NODE=[FULL_PATH]`
+3. Open a new terminal at the `vulnerable-example` directory and set the
+   contract node environmental variable by running:
+   `export CONTRACTS_NODE=[FULL_PATH]`
 4. Finally, run the test with:
-    `cargo test --features e2e-tests`
+   `cargo test --features e2e-tests`
 
 You should see that the vulnerability is not realized for the integration test
-since the deployment is mocked and does not check the size of storage cells, 
+since the deployment is mocked and does not check the size of storage cells,
 but it is for the e2e-test.
 
 ```bash
@@ -334,7 +338,8 @@ test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 ```
 
 ## Remediation
-In order to prevent this vulnerability we discourage the use of `Vec` and 
+
+In order to prevent this vulnerability we discourage the use of `Vec` and
 propose the use of `Mapping` in order to avoid storage limits in the list of candidates.
 
 ```rust
@@ -583,13 +588,15 @@ mod unexpected_revert {
 The remediated code example can be found [here](https://github.com/CoinFabrik/scout/blob/main/test-cases/dos-unexpected-revert-with-vector/dos-unexpected-revert-with-vector-1/remediated-example/lib.rs).
 
 ### Deployment (of the remediated contract)
+
 In order to run the tests associated to this remediated contract in action:
+
 1. Save the `remediated-example` directory.
 2. Run a substrate node and save its `FULL_PATH`.
 3. Open a new terminal at the `vulnerable-example` directory and set the contract node environmental variable by running:
-    `export CONTRACTS_NODE=[FULL_PATH]`
+   `export CONTRACTS_NODE=[FULL_PATH]`
 4. Finally, run the test with:
-    `cargo test --features e2e-tests`
+   `cargo test --features e2e-tests`
 
 You should see that the vulnerability is not realized for any of the tests.
 
@@ -620,6 +627,7 @@ test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 ```
 
 ## References
+
 - [SWC-113](https://swcregistry.io/docs/SWC-113)
 - https://consensys.github.io/smart-contract-best-practices/attacks/denial-of-service/#dos-with-unexpected-revert
 - [Ethernaut: King](https://ethernaut.openzeppelin.com/level/0x43BA674B4fbb8B157b7441C2187bCdD2cdF84FD5)
