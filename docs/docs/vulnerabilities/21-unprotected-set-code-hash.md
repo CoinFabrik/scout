@@ -5,7 +5,7 @@
 - Vulnerability Category: `Authorization`
 - Vulnerability Severity: `Critical`
 - Detectors: [`unprotected-set-code-hash`](https://github.com/CoinFabrik/scout/tree/main/detectors/set-code-hash)
-- Test Cases: [`unprotected-self-destruct-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/set-code-hash/set-code-hash-1)
+- Test Cases: [`unprotected-set-code-hash-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/set-code-hash/set-code-hash-1)
 
 Allowing users to call `set_code_hash` can be a significant vulnerability due to the following reasons:
 
