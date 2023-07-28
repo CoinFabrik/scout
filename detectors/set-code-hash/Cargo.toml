@@ -1,5 +1,5 @@
 [package]
-name = "unprotected-self-destruct"
+name = "unprotected-set-code-hash"
 version = "0.1.0"
 authors = ["authors go here"]
 description = "description goes here"

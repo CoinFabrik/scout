@@ -23,21 +23,21 @@ use rustc_span::def_id::DefId;
 use rustc_span::Span;
 
 dylint_linting::impl_late_lint! {
-    pub UNPROTECTED_SELF_DESTRUCT,
+    pub UNPROTECTED_SET_CODE_HASH,
     Warn,
     "Don't call terminate_contract without checking the caller authority",
-    UnprotectedSelfDestruct::default()
+    UnprotectedSetCodeHash::default()
 }
 
 #[derive(Default)]
-pub struct UnprotectedSelfDestruct {}
-impl UnprotectedSelfDestruct {
+pub struct UnprotectedSetCodeHash {}
+impl UnprotectedSetCodeHash {
     pub fn new() -> Self {
         Self {}
     }
 }
 
-impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
+impl<'tcx> LateLintPass<'tcx> for UnprotectedSetCodeHash {
     fn check_fn(
         &mut self,
         cx: &LateContext<'tcx>,
@@ -47,14 +47,14 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
         _: Span,
         localdef: rustc_span::def_id::LocalDefId,
     ) {
-        struct UnprotectedSelfDestructFinder<'tcx, 'tcx_ref> {
+        struct UnprotectedSetCodeHashFinder<'tcx, 'tcx_ref> {
             cx: &'tcx_ref LateContext<'tcx>,
             terminate_contract_span: Option<Span>,
             terminate_contract_def_id: Option<DefId>,
             caller_def_id: Option<DefId>,
         }
 
-        impl<'tcx> Visitor<'tcx> for UnprotectedSelfDestructFinder<'tcx, '_> {
+        impl<'tcx> Visitor<'tcx> for UnprotectedSetCodeHashFinder<'tcx, '_> {
             fn visit_expr(&mut self, expr: &'tcx Expr<'_>) {
                 if let ExprKind::MethodCall(path, receiver, ..) = expr.kind &&
                     let ExprKind::MethodCall(rec_path, reciever2, ..) = receiver.kind &&
@@ -85,7 +85,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
             }
         }
 
-        let mut utf_storage = UnprotectedSelfDestructFinder {
+        let mut utf_storage = UnprotectedSetCodeHashFinder {
             cx: cx,
             terminate_contract_def_id: None,
             terminate_contract_span: None,
@@ -142,9 +142,9 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
                     if let TerminatorKind::Call { fn_span, .. } = terminate.0.terminator().kind {
                         span_lint(
                             cx,
-                            UNPROTECTED_SELF_DESTRUCT,
+                            UNPROTECTED_SET_CODE_HASH,
                             fn_span,
-                            "This terminate_contract is called without access control",
+                            "This set_code_hash is called without access control",
                         );
                     }
                 }
@@ -159,9 +159,9 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
                 for place in unchecked_places {
                     span_lint(
                         cx,
-                        UNPROTECTED_SELF_DESTRUCT,
+                        UNPROTECTED_SET_CODE_HASH,
                         place.1,
-                        "This terminate_contract is called without access control",
+                        "This set_code_hash is called without access control",
                     );
                 }
             }
@@ -175,7 +175,6 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
             tainted_places: &mut Vec<Place<'tcx>>,
         ) -> Vec<(Place<'tcx>, Span)> {
             let mut ret_vec = Vec::<(Place, Span)>::new();
-            //dbg!(after_comparison, &tainted_places, &bbs[bb]);
             if bbs[bb].terminator.is_none() {
                 return ret_vec;
             }
