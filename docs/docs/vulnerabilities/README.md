@@ -271,3 +271,12 @@ This vulnerability falls under the [Validations and error handling](#vulnerabili
 and has a Critical severity.
 
 Check the following [documentation](14-unrestricted-transfer-from.md) for a more detailed explanation of this vulnerability class.
+
+### 18 - Unprotected seld destruct
+
+If users are allowed to call `terminate_contract`, they can intentionally or accidentally destroy the contract, leading to the loss of all associated data and functionalities given by this contract or by others that depend on it. To prevent this, the function should be restricted to administrators or authorized users only.
+
+This vulnerability falls under the [Authorization](#vulnerability-categories) category
+and has a Critical severity.
+
+Check the following [documentation](18-unprotected-self-destruct.md) for a more detailed explanation of this vulnerability class.
