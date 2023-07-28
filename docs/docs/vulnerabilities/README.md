@@ -296,9 +296,25 @@ The `format!` macro is used to create a String from a given set of arguments. Th
 We classified this issue, a deviation from best practices which could have
 security implications, under the [Validations and error handling](#vulnerability-categories) category and assigned it an Enhancement severity.
 
+### 18 - Unprotected seld destruct
+
+If users are allowed to call `terminate_contract`, they can intentionally or accidentally destroy the contract, leading to the loss of all associated data and functionalities given by this contract or by others that depend on it. To prevent this, the function should be restricted to administrators or authorized users only.
+
+This vulnerability falls under the [Authorization](#vulnerability-categories) category
+and has a Critical severity.
+
+Check the following [documentation](18-unprotected-self-destruct.md) for a more detailed explanation of this vulnerability class.
+
 ### 19 - Iterators over indexing
 
 The use of iterators over indexing is a best practice that should be followed in Rust. This is because accessing a vector by index is slower than using an iterator. Also, if the index is out of bounds, it will panic.
+
+We classified this issue, a deviation from best practices which could have
+security implications, under the [Best practices](#vulnerability-categories) category and assigned it an Enhancement severity.
+
+### 20 - Ink version
+
+Using a pinned version of ink! can be dangerous, as it may have bugs or security issues. Use the latest version available.
 
 We classified this issue, a deviation from best practices which could have
 security implications, under the [Best practices](#vulnerability-categories) category and assigned it an Enhancement severity.

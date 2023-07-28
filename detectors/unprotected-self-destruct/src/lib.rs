@@ -7,16 +7,19 @@ extern crate rustc_middle;
 extern crate rustc_span;
 
 use clippy_utils::diagnostics::span_lint;
+use rustc_hir::QPath;
 use rustc_hir::{
     intravisit::{walk_expr, Visitor},
     Expr, ExprKind,
 };
-use rustc_hir::{QPath};
 use rustc_lint::{LateContext, LateLintPass};
-use rustc_middle::mir::{BasicBlock, BasicBlocks, Operand, TerminatorKind, ConstantKind, Place, BasicBlockData, StatementKind};
-use rustc_middle::ty::{ TyKind};
-use rustc_span::Span;
+use rustc_middle::mir::{
+    BasicBlock, BasicBlockData, BasicBlocks, ConstantKind, Operand, Place, StatementKind,
+    TerminatorKind,
+};
+use rustc_middle::ty::TyKind;
 use rustc_span::def_id::DefId;
+use rustc_span::Span;
 
 dylint_linting::impl_late_lint! {
     pub UNPROTECTED_SELF_DESTRUCT,
@@ -55,7 +58,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
                 if let ExprKind::MethodCall(path, receiver, ..) = expr.kind &&
                     let ExprKind::MethodCall(rec_path, reciever2, ..) = receiver.kind &&
                     rec_path.ident.name.to_string() == "env" &&
-                    let ExprKind::Path(rec2_qpath) = &reciever2.kind && 
+                    let ExprKind::Path(rec2_qpath) = &reciever2.kind &&
                     let QPath::Resolved(qualifier, rec2_path) = rec2_qpath &&
                     rec2_path.segments.first().map_or_else(||false, |seg|seg.ident.to_string() == "self" &&
                     qualifier.is_none()) {
@@ -66,28 +69,32 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
                     } else if path.ident.name.to_string() == "caller" {
                         self.caller_def_id = self.cx.typeck_results().type_dependent_def_id(expr.hir_id);
                     }
-                }    
+                }
 
                 walk_expr(self, expr);
             }
         }
 
-        let mut utf_storage = UnprotectedSelfDestructFinder {
+        let mut usd_storage = UnprotectedSelfDestructFinder {
             cx: cx,
             terminate_contract_def_id: None,
             terminate_contract_span: None,
             caller_def_id: None,
         };
 
-        walk_expr(&mut utf_storage, body.value);
+        walk_expr(&mut usd_storage, body.value);
         let mir_body = cx.tcx.optimized_mir(localdef);
 
-        struct CallersAndTerminates<'tcx>{
+        struct CallersAndTerminates<'tcx> {
             callers: Vec<(&'tcx BasicBlockData<'tcx>, BasicBlock)>,
             terminates: Vec<(&'tcx BasicBlockData<'tcx>, BasicBlock)>,
         }
 
-        fn find_caller_and_terminate_in_mir<'tcx>(bbs: &'tcx BasicBlocks<'tcx>, caller_def_id: Option<DefId>, terminate_def_id: Option<DefId>) -> CallersAndTerminates {
+        fn find_caller_and_terminate_in_mir<'tcx>(
+            bbs: &'tcx BasicBlocks<'tcx>,
+            caller_def_id: Option<DefId>,
+            terminate_def_id: Option<DefId>,
+        ) -> CallersAndTerminates {
             let mut callers_vec = CallersAndTerminates {
                 callers: vec![],
                 terminates: vec![],
@@ -97,14 +104,10 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
                     continue;
                 }
                 let terminator = bb_data.terminator.clone().unwrap();
-                if let TerminatorKind::Call {
-                    func,
-                    ..
-                } = terminator.kind {
+                if let TerminatorKind::Call { func, .. } = terminator.kind {
                     if let Operand::Constant(fn_const) = func &&
                         let ConstantKind::Val(_const_val, ty) = fn_const.literal &&
-                        let TyKind::FnDef(def, _subs) = ty.kind() 
-                        {   
+                        let TyKind::FnDef(def, _subs) = ty.kind() {
                             if caller_def_id.is_some_and(|d|d==*def) {
                                 callers_vec.callers.push((bb_data, BasicBlock::from_usize(bb)));
                             } else if terminate_def_id.is_some_and(|d|d==*def) {
@@ -113,21 +116,19 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
                     }
                 }
             }
-            return callers_vec
+            return callers_vec;
         }
 
         let caller_and_terminate = find_caller_and_terminate_in_mir(
             &mir_body.basic_blocks,
-            utf_storage.caller_def_id,
-            utf_storage.terminate_contract_def_id
+            usd_storage.caller_def_id,
+            usd_storage.terminate_contract_def_id,
         );
 
         if caller_and_terminate.terminates.len() > 0 {
             if caller_and_terminate.callers.len() == 0 {
                 for terminate in caller_and_terminate.terminates {
-                    if let TerminatorKind::Call {
-                        fn_span, ..
-                    } = terminate.0.terminator().kind {
+                    if let TerminatorKind::Call { fn_span, .. } = terminate.0.terminator().kind {
                         span_lint(
                             cx,
                             UNPROTECTED_SELF_DESTRUCT,
@@ -142,7 +143,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
                     BasicBlock::from_u32(0),
                     &caller_and_terminate,
                     false,
-                    &mut vec![]
+                    &mut vec![],
                 );
                 for place in unchecked_places {
                     span_lint(
@@ -202,34 +203,37 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
                 TerminatorKind::SwitchInt { discr, targets } => {
                     let comparison_with_caller: bool;
                     match discr {
-                        Operand::Copy(place) |
-                        Operand::Move(place) => {
-                            comparison_with_caller = tainted_places.iter().any(
-                                |tainted_place| tainted_place == place
-                            ) || after_comparison
-                        },
+                        Operand::Copy(place) | Operand::Move(place) => {
+                            comparison_with_caller = tainted_places
+                                .iter()
+                                .any(|tainted_place| tainted_place == place)
+                                || after_comparison
+                        }
                         Operand::Constant(_cons) => {
                             comparison_with_caller = after_comparison;
                         }
                     }
                     for target in targets.all_targets() {
-                        ret_vec.append(
-                            &mut navigate_trough_basicblocks(
-                                bbs,
-                                *target,
-                                caller_and_terminate,
-                                comparison_with_caller,
-                                tainted_places
-                            )
-                        );
+                        ret_vec.append(&mut navigate_trough_basicblocks(
+                            bbs,
+                            *target,
+                            caller_and_terminate,
+                            comparison_with_caller,
+                            tainted_places,
+                        ));
                     }
                     return ret_vec;
-                },
-                TerminatorKind::Call { destination, args, target, fn_span, .. } => {
+                }
+                TerminatorKind::Call {
+                    destination,
+                    args,
+                    target,
+                    fn_span,
+                    ..
+                } => {
                     for arg in args {
                         match arg {
-                            Operand::Copy(origplace) |
-                            Operand::Move(origplace) => {
+                            Operand::Copy(origplace) | Operand::Move(origplace) => {
                                 if tainted_places
                                     .clone()
                                     .into_iter()
@@ -238,7 +242,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
                                     tainted_places.push(*destination);
                                 }
                             }
-                            Operand::Constant(_) => {},
+                            Operand::Constant(_) => {}
                         }
                     }
                     for caller in &caller_and_terminate.callers {
@@ -252,84 +256,71 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
                         }
                     }
                     if target.is_some() {
-                        ret_vec.append(
-                            &mut navigate_trough_basicblocks(
-                                bbs,
-                                target.unwrap(),
-                                caller_and_terminate,
-                                after_comparison,
-                                tainted_places
-                            )
-                        );
+                        ret_vec.append(&mut navigate_trough_basicblocks(
+                            bbs,
+                            target.unwrap(),
+                            caller_and_terminate,
+                            after_comparison,
+                            tainted_places,
+                        ));
                     }
-                },
-                TerminatorKind::Assert { target, .. } |
-                TerminatorKind::Goto { target, .. } |
-                TerminatorKind::Drop { target, .. } => {
-                    ret_vec.append(
-                        &mut navigate_trough_basicblocks(
-                            bbs,
-                            *target,
-                            caller_and_terminate,
-                            after_comparison,
-                            tainted_places
-                        )
-                    );
-                },
+                }
+                TerminatorKind::Assert { target, .. }
+                | TerminatorKind::Goto { target, .. }
+                | TerminatorKind::Drop { target, .. } => {
+                    ret_vec.append(&mut navigate_trough_basicblocks(
+                        bbs,
+                        *target,
+                        caller_and_terminate,
+                        after_comparison,
+                        tainted_places,
+                    ));
+                }
                 TerminatorKind::Yield { resume, .. } => {
-                    ret_vec.append(
-                        &mut navigate_trough_basicblocks(
-                            bbs,
-                            *resume,
-                            caller_and_terminate,
-                            after_comparison,
-                            tainted_places
-                        )
-                    );
-                },
+                    ret_vec.append(&mut navigate_trough_basicblocks(
+                        bbs,
+                        *resume,
+                        caller_and_terminate,
+                        after_comparison,
+                        tainted_places,
+                    ));
+                }
                 TerminatorKind::FalseEdge { real_target, .. } => {
-                    ret_vec.append(
-                        &mut navigate_trough_basicblocks(
-                            bbs,
-                            *real_target,
-                            caller_and_terminate,
-                            after_comparison,
-                            tainted_places
-                        )
-                    );
-                },
+                    ret_vec.append(&mut navigate_trough_basicblocks(
+                        bbs,
+                        *real_target,
+                        caller_and_terminate,
+                        after_comparison,
+                        tainted_places,
+                    ));
+                }
                 TerminatorKind::FalseUnwind { real_target, .. } => {
-                    ret_vec.append(
-                        &mut navigate_trough_basicblocks(
-                            bbs,
-                            *real_target,
-                            caller_and_terminate,
-                            after_comparison,
-                            tainted_places
-                        )
-                    );
-                },
+                    ret_vec.append(&mut navigate_trough_basicblocks(
+                        bbs,
+                        *real_target,
+                        caller_and_terminate,
+                        after_comparison,
+                        tainted_places,
+                    ));
+                }
                 TerminatorKind::InlineAsm { destination, .. } => {
                     if destination.is_some() {
-                        ret_vec.append(
-                            &mut navigate_trough_basicblocks(
-                                bbs,
-                                destination.unwrap(),
-                                caller_and_terminate,
-                                after_comparison,
-                                tainted_places
-                            )
-                        );
+                        ret_vec.append(&mut navigate_trough_basicblocks(
+                            bbs,
+                            destination.unwrap(),
+                            caller_and_terminate,
+                            after_comparison,
+                            tainted_places,
+                        ));
                     }
-                },
-                TerminatorKind::Resume |
-                TerminatorKind::Terminate |
-                TerminatorKind::Return |
-                TerminatorKind::Unreachable |
-                TerminatorKind::GeneratorDrop => {},
+                }
+                TerminatorKind::Resume
+                | TerminatorKind::Terminate
+                | TerminatorKind::Return
+                | TerminatorKind::Unreachable
+                | TerminatorKind::GeneratorDrop => {}
             }
             return ret_vec;
         }
-        
     }
 }
