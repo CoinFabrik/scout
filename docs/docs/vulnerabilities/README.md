@@ -311,3 +311,10 @@ The use of iterators over indexing is a best practice that should be followed in
 
 We classified this issue, a deviation from best practices which could have
 security implications, under the [Best practices](#vulnerability-categories) category and assigned it an Enhancement severity.
+
+### 20 - Ink version
+
+Using a pinned version of ink! can be dangerous, as it may have bugs or security issues. Use the latest version available.
+
+We classified this issue, a deviation from best practices which could have
+security implications, under the [Best practices](#vulnerability-categories) category and assigned it an Enhancement severity.
