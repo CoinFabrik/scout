@@ -296,7 +296,7 @@ The `format!` macro is used to create a String from a given set of arguments. Th
 We classified this issue, a deviation from best practices which could have
 security implications, under the [Validations and error handling](#vulnerability-categories) category and assigned it an Enhancement severity.
 
-### 18 - Unprotected seld destruct
+### 18 - Unprotected self destruct
 
 If users are allowed to call `terminate_contract`, they can intentionally or accidentally destroy the contract, leading to the loss of all associated data and functionalities given by this contract or by others that depend on it. To prevent this, the function should be restricted to administrators or authorized users only.
 
