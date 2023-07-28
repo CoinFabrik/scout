@@ -271,3 +271,12 @@ This vulnerability falls under the [Validations and error handling](#vulnerabili
 and has a Critical severity.
 
 Check the following [documentation](14-unrestricted-transfer-from.md) for a more detailed explanation of this vulnerability class.
+
+### xx - Unprotected mapping operation
+
+Modifying mappings with an arbitrary key given by the user could lead to unintented modifications of critical data, modifying data belonging to other users, causing denial of service, unathorized access, and other potential issues.
+
+This vulnerability falls under the [Authorization](#vulnerability-categories) category
+and has a Critical severity.
+
+Check the following [documentation](xx-unprotected-mapping-operation.md) for a more detailed explanation of this vulnerability class.
