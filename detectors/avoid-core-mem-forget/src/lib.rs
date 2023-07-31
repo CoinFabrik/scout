@@ -78,7 +78,7 @@ impl EarlyLintPass for AvoidStdCoreMemForget {
                     expr.span,
                     "Using `core::mem::forget` is not recommended.",
                     None,
-                    &format!("Instead, use the `let _ = ...` pattern or `.drop` method to forget the value."),
+                    "Instead, use the `let _ = ...` pattern or `.drop` method to forget the value."
                 );
             }
         }

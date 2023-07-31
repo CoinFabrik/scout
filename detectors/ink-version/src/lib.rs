@@ -60,8 +60,8 @@ impl<'tcx> LateLintPass<'tcx> for CheckInkVersion {
             None => return,
         };
 
-        let req = Version::parse(&latest_version.replace("\"", "")).unwrap();
-        let ink_version = VersionReq::parse(&ink_version.replace("\"", "")).unwrap();
+        let req = Version::parse(&latest_version.replace('\"', "")).unwrap();
+        let ink_version = VersionReq::parse(&ink_version.replace('\"', "")).unwrap();
 
         if !ink_version.matches(&req) {
             span_lint_and_help(
@@ -69,14 +69,10 @@ impl<'tcx> LateLintPass<'tcx> for CheckInkVersion {
                 CHECK_INK_VERSION,
                 rustc_span::DUMMY_SP,
                 &format!(
-                    "The latest ink! version is {}, and your version is {}",
-                    latest_version, ink_version
+                    "The latest ink! version is {latest_version}, and your version is {ink_version}"
                 ),
                 None,
-                &format!(
-                    "Please, use version {} of ink! in your Cargo.toml",
-                    latest_version
-                ),
+                &format!("Please, use version {latest_version} of ink! in your Cargo.toml"),
             );
         }
     }

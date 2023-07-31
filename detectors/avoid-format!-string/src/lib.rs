@@ -70,7 +70,7 @@ impl EarlyLintPass for AvoidFormatString {
                     expr.span,
                     "The format! macro should not be used, it can panic at runtime.",
                     None,
-                    &format!("Instead, if this is returning an error, define a new error type"),
+                    "Instead, if this is returning an error, define a new error type",
                 );
             }
         }

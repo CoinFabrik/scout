@@ -18,7 +18,7 @@ mod set_code_hash {
 
     impl SetCodeHash {
         #[ink(constructor)]
-        pub fn new() -> Self {
+        pub fn constr() -> Self {
             Self {
                 admin: Self::env().caller(),
             }

@@ -60,20 +60,16 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSetCodeHash {
                     let ExprKind::MethodCall(rec_path, reciever2, ..) = receiver.kind &&
                     rec_path.ident.name.to_string() == "env" &&
                     let ExprKind::Path(rec2_qpath) = &reciever2.kind &&
-                    let QPath::Resolved(qualifier, rec2_path) = rec2_qpath &&
-                    rec2_path.segments.first().map_or_else(||false, |seg|seg.ident.to_string() == "self" &&
-                    qualifier.is_none()) {
-
-                        if path.ident.name.to_string() == "caller" {
-                            self.caller_def_id =
-                                self.cx.typeck_results().type_dependent_def_id(expr.hir_id);
-                        }
+                    let QPath::Resolved(qualifier, rec2_path) = rec2_qpath && rec2_path.segments.first().map_or_else(||false, |seg|seg.ident.to_string() == "self" &&
+                    qualifier.is_none()) && path.ident.name.to_string() == "caller" {
+                    self.caller_def_id =
+                        self.cx.typeck_results().type_dependent_def_id(expr.hir_id);
                 }
 
                 if let ExprKind::Call(path, _) = expr.kind &&
                     let ExprKind::Path(pth) = &path.kind &&
                     let QPath::Resolved(_, path) = pth &&
-                    path.segments.into_iter().any(|seg|seg.ident.to_string() == "set_code_hash"){
+                    path.segments.iter().any(|seg|seg.ident.to_string() == "set_code_hash"){
                         self.terminate_contract_span = Some(expr.span);
 
                         if let def::Res::Def(_, id) = path.res {
@@ -86,7 +82,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSetCodeHash {
         }
 
         let mut utf_storage = UnprotectedSetCodeHashFinder {
-            cx: cx,
+            cx,
             terminate_contract_def_id: None,
             terminate_contract_span: None,
             caller_def_id: None,
@@ -127,7 +123,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSetCodeHash {
                     }
                 }
             }
-            return callers_vec;
+            callers_vec
         }
 
         let caller_and_terminate = find_caller_and_terminate_in_mir(
@@ -136,8 +132,8 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSetCodeHash {
             utf_storage.terminate_contract_def_id,
         );
 
-        if caller_and_terminate.terminates.len() > 0 {
-            if caller_and_terminate.callers.len() == 0 {
+        if !caller_and_terminate.terminates.is_empty() {
+            if caller_and_terminate.callers.is_empty() {
                 for terminate in caller_and_terminate.terminates {
                     if let TerminatorKind::Call { fn_span, .. } = terminate.0.terminator().kind {
                         span_lint(
@@ -211,18 +207,15 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSetCodeHash {
             }
             match &bbs[bb].terminator().kind {
                 TerminatorKind::SwitchInt { discr, targets } => {
-                    let comparison_with_caller: bool;
-                    match discr {
+                    let comparison_with_caller: bool = match discr {
                         Operand::Copy(place) | Operand::Move(place) => {
-                            comparison_with_caller = tainted_places
+                            tainted_places
                                 .iter()
                                 .any(|tainted_place| tainted_place == place)
                                 || after_comparison
                         }
-                        Operand::Constant(_cons) => {
-                            comparison_with_caller = after_comparison;
-                        }
-                    }
+                        Operand::Constant(_cons) => after_comparison,
+                    };
                     for target in targets.all_targets() {
                         ret_vec.append(&mut navigate_trough_basicblocks(
                             bbs,
@@ -261,7 +254,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSetCodeHash {
                         }
                     }
                     for terminate in &caller_and_terminate.terminates {
-                        if terminate.1 == bb && after_comparison == false {
+                        if terminate.1 == bb && !after_comparison {
                             ret_vec.push((*destination, *fn_span))
                         }
                     }
@@ -330,7 +323,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSetCodeHash {
                 | TerminatorKind::Unreachable
                 | TerminatorKind::GeneratorDrop => {}
             }
-            return ret_vec;
+            ret_vec
         }
     }
 }
