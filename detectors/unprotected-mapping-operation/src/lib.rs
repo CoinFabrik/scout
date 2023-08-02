@@ -7,6 +7,7 @@ extern crate rustc_middle;
 extern crate rustc_span;
 
 use clippy_utils::diagnostics::span_lint;
+use std::collections::HashSet;
 use rustc_hir::QPath;
 use rustc_hir::{
     intravisit::{walk_expr, Visitor},
@@ -147,6 +148,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
                 &caller_and_map_ops,
                 false,
                 &mut vec![],
+                &mut HashSet::<BasicBlock>::default()
             );
             for place in unchecked_places {
                 span_lint(
@@ -164,8 +166,14 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
             caller_and_map_ops: &CallersAndMapOps<'tcx>,
             after_comparison: bool,
             tainted_places: &mut Vec<Place<'tcx>>,
+            visited_bbs: &mut HashSet<BasicBlock>,
         ) -> Vec<(Place<'tcx>, Span)> {
             let mut ret_vec = Vec::<(Place, Span)>::new();
+            if visited_bbs.contains(&bb) {
+                return ret_vec;
+            } else {
+                visited_bbs.insert(bb);
+            }
             if bbs[bb].terminator.is_none() {
                 return ret_vec;
             }
@@ -221,6 +229,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
                             caller_and_map_ops,
                             comparison_with_caller,
                             tainted_places,
+                            visited_bbs
                         ));
                     }
                     return ret_vec;
@@ -268,6 +277,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
                             caller_and_map_ops,
                             after_comparison,
                             tainted_places,
+                            visited_bbs
                         ));
                     }
                 }
@@ -280,6 +290,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
                         caller_and_map_ops,
                         after_comparison,
                         tainted_places,
+                        visited_bbs
                     ));
                 }
                 TerminatorKind::Yield { resume, .. } => {
@@ -289,6 +300,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
                         caller_and_map_ops,
                         after_comparison,
                         tainted_places,
+                        visited_bbs
                     ));
                 }
                 TerminatorKind::FalseEdge { real_target, .. }
@@ -299,6 +311,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
                         caller_and_map_ops,
                         after_comparison,
                         tainted_places,
+                        visited_bbs
                     ));
                 }
                 TerminatorKind::InlineAsm { destination, .. } => {
@@ -309,6 +322,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
                             caller_and_map_ops,
                             after_comparison,
                             tainted_places,
+                            visited_bbs
                         ));
                     }
                 }
