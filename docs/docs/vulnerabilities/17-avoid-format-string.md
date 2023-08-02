@@ -22,7 +22,8 @@ Consider the following `ink!` contract:
     }
 ```
 
-The problem arises from the use of the `format!` macro. This is used to format a string with the given arguments. This is a bad practice because it can panic the execution.
+The problem arises from the use of the `format!` macro. This is used to format a string with the given arguments. Returning a custom error is desirable.
+
 
 The vulnerable code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/avoid-format!-string/avoid-format!-string-1/vulnerable-example).
 

@@ -15,7 +15,7 @@ dylint_linting::impl_pre_expansion_lint! {
     /// Detects the usage of `format!` macro.
     ///
     /// ### Why is this bad?
-    /// The usage of format! is not recommended because it can panic the execution.
+    /// The usage of format! is not recommended.
     /// ### Example
     /// ```rust
     ///    #[ink(message)]
@@ -41,7 +41,7 @@ dylint_linting::impl_pre_expansion_lint! {
     /// ```
     pub AVOID_FORMAT_STRING,
     Warn,
-    "`format!` can panic in runtime, and this should be avoided in production code",
+    "`format!` should be avoided in production code",
     AvoidFormatString::default()
 }
 
@@ -68,7 +68,7 @@ impl EarlyLintPass for AvoidFormatString {
                     cx,
                     AVOID_FORMAT_STRING,
                     expr.span,
-                    "The format! macro should not be used, it can panic at runtime.",
+                    "The format! macro should not be used.",
                     None,
                     &format!("Instead, if this is returning an error, define a new error type"),
                 );
