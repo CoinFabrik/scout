@@ -321,7 +321,7 @@ security implications, under the [Best practices](#vulnerability-categories) cat
 
 ### 21 - Unprotected set code hash
 
-If users are allowed to call `terminate_contract`, they can intentionally modify the contract behaviour, leading to the loss of all associated data/tokens and functionalities given by this contract or by others that depend on it. To prevent this, the function should be restricted to administrators or authorized users only.
+If users are allowed to call `set_code_hash`, they can intentionally modify the contract behaviour, leading to the loss of all associated data/tokens and functionalities given by this contract or by others that depend on it. To prevent this, the function should be restricted to administrators or authorized users only.
 
 This vulnerability falls under the [Authorization](#vulnerability-categories) category
 and has a Critical severity.

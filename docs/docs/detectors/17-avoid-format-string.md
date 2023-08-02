@@ -6,7 +6,7 @@ Checks for `format!` macro usage.
 
 ### Why is this bad?
 
-The usage of format! is not recommended because it can panic the execution.
+The usage of format! is not recommended.
 
 ### Example
 
