@@ -17,9 +17,11 @@ use rustc_hir::{ArrayLen, Expr, HirId, QPath, TyKind};
 use rustc_hir::{BinOpKind, ExprKind};
 use rustc_hir::{Body, FnDecl, Param, PatKind};
 use rustc_lint::{LateContext, LateLintPass};
+use rustc_middle::mir::{BasicBlock, BasicBlocks, Place, Local, StatementKind, Operand, TerminatorKind, ConstantKind};
 use rustc_middle::ty::TyCtxt;
 use rustc_span::def_id::LocalDefId;
 use rustc_span::Span;
+use rustc_span::def_id::DefId;
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -82,8 +84,9 @@ impl<'tcx> LateLintPass<'tcx> for ZeroOrTestAddress {
 
         struct ZeroCheckStorage<'tcx, 'tcx_ref> {
             cx: &'tcx_ref LateContext<'tcx>,
-            acc_id_params: Vec<&'tcx Param<'tcx>>,
+            acc_id_params: Vec<(&'tcx Param<'tcx>, Local)>,
             checked_params: HashSet<HirId>,
+            whitelisted_funcs: Vec<DefId>
         }
 
         fn get_param_hir_id(param: &Param) -> Option<HirId> {
@@ -133,27 +136,46 @@ impl<'tcx> LateLintPass<'tcx> for ZeroOrTestAddress {
 
         impl<'tcx> Visitor<'tcx> for ZeroCheckStorage<'tcx, '_> {
             fn visit_expr(&mut self, expr: &'tcx Expr<'_>) {
-                //Look if those params are compared with zero address
-                if let ExprKind::If(mut cond, _, _) = &expr.kind {
-                    if let ExprKind::DropTemps(drop) = cond.kind {
-                        cond = drop;
-                    }
-                    if_chain! {
-                        if let ExprKind::Binary(op, lexpr, rexpr) = cond.kind;
-                        if BinOpKind::Eq == op.node;
-                        then {
-                            for param in &self.acc_id_params {
-                                let param_hir_id = get_param_hir_id(param);
-                                if (param_hir_id == get_path_local_hir_id(lexpr)
-                                    && expr_is_zero_addr(rexpr, self.cx.tcx)) ||
-                                    (param_hir_id == get_path_local_hir_id(rexpr)
-                                    && expr_is_zero_addr(lexpr, self.cx.tcx)) {
-                                    self.checked_params.insert(param.hir_id);
+                match &expr.kind {
+                    //Look if those params are compared with zero address
+                    ExprKind::If(mut cond, _, _) => {
+                        if let ExprKind::DropTemps(drop) = cond.kind {
+                            cond = drop;
+                        }
+                        if_chain! {
+                            if let ExprKind::Binary(op, lexpr, rexpr) = cond.kind;
+                            if BinOpKind::Eq == op.node;
+                            then {
+                                for param in &self.acc_id_params {
+                                    let param_hir_id = get_param_hir_id(param.0);
+                                    if (param_hir_id == get_path_local_hir_id(lexpr)
+                                        && expr_is_zero_addr(rexpr, self.cx.tcx)) ||
+                                        (param_hir_id == get_path_local_hir_id(rexpr)
+                                        && expr_is_zero_addr(lexpr, self.cx.tcx)) {
+                                        self.checked_params.insert(param.0.hir_id);
+                                    }
                                 }
                             }
                         }
-                    }
+                    },
+                    ExprKind::MethodCall(path, receiver, ..) => {
+                        let defid = self.cx.typeck_results().type_dependent_def_id(expr.hir_id);
+                        let ty = self.cx.tcx.mk_foreign(defid.unwrap());
+                        if ty.to_string().contains("ink::storage::Mapping") && defid.is_some(){
+                            if path.ident.name.to_string() == "get" {
+                                self.whitelisted_funcs.push(defid.unwrap());
+                            }
+                        } else if ty.to_string().contains("AccountId") && defid.is_some(){
+                            if path.ident.name.to_string() == "eq" {
+                                self.whitelisted_funcs.push(defid.unwrap());
+                            } else if path.ident.name.to_string() == "ne" {
+                                self.whitelisted_funcs.push(defid.unwrap());
+                            } 
+                        }
+                    },
+                    _ => {}
                 }
+
                 walk_expr(self, expr);
             }
         }
@@ -162,13 +184,15 @@ impl<'tcx> LateLintPass<'tcx> for ZeroOrTestAddress {
             cx,
             acc_id_params: Vec::default(),
             checked_params: HashSet::default(),
+            whitelisted_funcs: Vec::default(),
         };
 
         // Look for function params with AccountId type
         let mir_body = cx.tcx.optimized_mir(id);
+
         for (arg, hir_param) in mir_body.args_iter().zip(body.params.iter()) {
             if mir_body.local_decls[arg].ty.to_string() == "ink::ink_primitives::AccountId" {
-                zerocheck_storage.acc_id_params.push(hir_param);
+                zerocheck_storage.acc_id_params.push((hir_param,arg));
             }
         }
 
@@ -179,17 +203,175 @@ impl<'tcx> LateLintPass<'tcx> for ZeroOrTestAddress {
 
         walk_expr(&mut zerocheck_storage, body.value);
 
-        for param in zerocheck_storage.acc_id_params {
-            if !zerocheck_storage.checked_params.contains(&param.hir_id) {
-                span_lint_and_help(
-                    cx,
-                    ZERO_OR_TEST_ADDRESS,
-                    param.span,
-                    "Not checking for a zero-address could lead to a locked contract",
-                    None,
-                    "This function should check if the AccountId passed is zero and revert if it is",
-                );
+        let mut args = zerocheck_storage.acc_id_params.iter().map(|f|f.1).collect();
+        let fn_using_nonsanitized_add = navigate_trough_basicblocks(
+            &mir_body.basic_blocks,
+            BasicBlock::from_u32(0),
+            &mut args,
+            &zerocheck_storage.whitelisted_funcs,
+            &mut HashSet::default()
+        );
+        fn navigate_trough_basicblocks<'tcx>(
+            bbs: &'tcx BasicBlocks<'tcx>,
+            bb: BasicBlock,
+            tainted_locals: &mut Vec<Local>,
+            whitelisted_funcs: &Vec<DefId>,
+            visited_bbs: &mut HashSet<BasicBlock>,
+        ) -> Vec::<Span>{
+            let mut ret_vec = Vec::<Span>::new();
+            if visited_bbs.contains(&bb) {
+                return ret_vec;
+            } else {
+                visited_bbs.insert(bb);
             }
+            if bbs[bb].terminator.is_none() {
+                return ret_vec;
+            }
+            for statement in &bbs[bb].statements {
+                if let StatementKind::Assign(assign) = &statement.kind {
+                    match &assign.1 {
+                        rustc_middle::mir::Rvalue::Ref(_, _, origplace)
+                        | rustc_middle::mir::Rvalue::AddressOf(_, origplace)
+                        | rustc_middle::mir::Rvalue::Len(origplace)
+                        | rustc_middle::mir::Rvalue::CopyForDeref(origplace) => {
+                            if tainted_locals
+                                .clone()
+                                .into_iter()
+                                .any(|local| local == origplace.local)
+                            {
+                                tainted_locals.push(assign.0.local);
+                            }
+                        }
+                        rustc_middle::mir::Rvalue::Use(operand) => match &operand {
+                            Operand::Copy(origplace) | Operand::Move(origplace) => {
+                                if tainted_locals
+                                    .clone()
+                                    .into_iter()
+                                    .any(|local| local == origplace.local)
+                                {
+                                    tainted_locals.push(assign.0.local);
+                                }
+                            }
+                            _ => {}
+                        },
+                        _ => {}
+                    }
+                }
+            }
+            match &bbs[bb].terminator().kind {
+                TerminatorKind::SwitchInt { discr, targets } => {
+                    for target in targets.all_targets() {
+                        ret_vec.append(&mut navigate_trough_basicblocks(
+                            bbs,
+                            *target,
+                            tainted_locals,
+                            whitelisted_funcs,
+                            visited_bbs
+                        ));
+                    }
+                }
+                TerminatorKind::Call {
+                    func,
+                    destination,
+                    args,
+                    target,
+                    fn_span,
+                    ..
+                } => {
+                    
+                    if_chain! {
+                        if let Operand::Constant(fn_const) = func;
+                        if let ConstantKind::Val(_const_val, ty) = fn_const.literal;
+                        if let rustc_middle::ty::TyKind::FnDef(def, _subs) = ty.kind();
+                        if whitelisted_funcs.contains(def);
+                        then {
+                            
+                        } else {
+                            for arg in args {
+                                match arg {
+                                    Operand::Copy(origplace) | Operand::Move(origplace) => {
+                                        if tainted_locals.clone()
+                                            .into_iter()
+                                            .any(|local| local == origplace.local)
+                                        {
+                                            ret_vec.push(*fn_span);
+                                            tainted_locals.push(destination.local);
+                                        }
+                                    }
+                                    Operand::Constant(_) => {}
+                                }
+                            }
+                        }
+                    }
+                    if target.is_some() {
+                        ret_vec.append(&mut navigate_trough_basicblocks(
+                            bbs,
+                            target.unwrap(),
+                            tainted_locals,
+                            whitelisted_funcs,
+                            visited_bbs
+                        ));
+                    }
+                }
+                TerminatorKind::Assert { target, .. }
+                | TerminatorKind::Goto { target, .. }
+                | TerminatorKind::Drop { target, .. } => {
+                    ret_vec.append(&mut navigate_trough_basicblocks(
+                        bbs,
+                        *target,
+                        tainted_locals,
+                        whitelisted_funcs,
+                        visited_bbs
+                    ));
+                }
+                TerminatorKind::Yield { resume, .. } => {
+                    ret_vec.append(&mut navigate_trough_basicblocks(
+                        bbs,
+                        *resume,
+                        tainted_locals,
+                        whitelisted_funcs,
+                        visited_bbs
+                    ));
+                }
+                TerminatorKind::FalseEdge { real_target, .. }
+                | TerminatorKind::FalseUnwind { real_target, .. } => {
+                    ret_vec.append(&mut navigate_trough_basicblocks(
+                        bbs,
+                        *real_target,
+                        tainted_locals,
+                        whitelisted_funcs,
+                        visited_bbs
+                    ));
+                }
+                TerminatorKind::InlineAsm { destination, .. } => {
+                    if destination.is_some() {
+                        ret_vec.append(&mut navigate_trough_basicblocks(
+                            bbs,
+                            destination.unwrap(),
+                            tainted_locals,
+                            whitelisted_funcs,
+                            visited_bbs
+                        ));
+                    }
+                }
+                TerminatorKind::Resume
+                | TerminatorKind::Terminate
+                | TerminatorKind::Return
+                | TerminatorKind::Unreachable
+                | TerminatorKind::GeneratorDrop => {}
+            }
+            return ret_vec;
+        }
+
+        for func in fn_using_nonsanitized_add {
+            span_lint_and_help(
+                cx,
+                ZERO_OR_TEST_ADDRESS,
+                func,
+                "Not checking for a zero-address could lead to a locked contract",
+                None,
+                "This function should check if the AccountId passed is zero and revert if it is",
+            );
         }
     }
 }
