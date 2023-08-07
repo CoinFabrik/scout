@@ -9,10 +9,10 @@ use if_chain::if_chain;
 use rustc_ast::{
     token::{LitKind, TokenKind},
     tokenstream::TokenTree,
-    Expr, ExprKind, Item, NodeId,
+    Expr, ExprKind, Item, NodeId, visit::FnKind, StmtKind, MacCall, ptr::P,
 };
 use rustc_lint::{EarlyContext, EarlyLintPass};
-use rustc_span::sym;
+use rustc_span::{sym, Span};
 
 dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does
@@ -61,31 +61,47 @@ impl EarlyLintPass for PanicError {
             self.stack.push(item.id);
         }
     }
-
+    fn check_stmt(&mut self, cx: &EarlyContext<'_>,stmt: &rustc_ast::Stmt) {
+        if_chain! {
+            if !self.in_test_item();
+            if let StmtKind::MacCall(mac) = &stmt.kind;
+            then {
+                check_macro_call(cx, stmt.span, &mac.mac)
+            }
+        }
+    }
     fn check_expr(&mut self, cx: &EarlyContext, expr: &Expr) {
         if_chain! {
             if !self.in_test_item();
             if let ExprKind::MacCall(mac) = &expr.kind;
-            if mac.path == sym!(panic);
-            if let [TokenTree::Token(token, _)] = mac
-                .args
-                .tokens
-                .clone()
-                .into_trees()
-                .collect::<Vec<_>>()
-                .as_slice();
-            if let TokenKind::Literal(lit) = token.kind;
-            if lit.kind == LitKind::Str;
             then {
-                span_lint_and_help(
-                    cx,
-                    PANIC_ERROR,
-                    expr.span,
-                    "The panic! macro is used to stop execution when a condition is not met. This is useful for testing and prototyping, but should be avoided in production code",
-                    None,
-                    &format!("You could use instead an Error enum and then 'return Err(Error::{})'", capitalize_err_msg(lit.symbol.as_str()).replace(' ', "")),
-                );
+                check_macro_call(cx, expr.span, mac)
             }
+        }
+    }
+}
+
+fn check_macro_call(cx: &EarlyContext, span: Span, mac: &P<MacCall>) {
+    if_chain! {
+        if mac.path == sym!(panic);
+        if let [TokenTree::Token(token, _)] = mac
+            .args
+            .tokens
+            .clone()
+            .into_trees()
+            .collect::<Vec<_>>()
+            .as_slice();
+        if let TokenKind::Literal(lit) = token.kind;
+        if lit.kind == LitKind::Str;
+        then {
+            span_lint_and_help(
+                cx,
+                PANIC_ERROR,
+                span,
+                "The panic! macro is used to stop execution when a condition is not met. This is useful for testing and prototyping, but should be avoided in production code",
+                None,
+                &format!("You could use instead an Error enum and then 'return Err(Error::{})'", capitalize_err_msg(lit.symbol.as_str()).replace(' ', "")),
+            );
         }
     }
 }
