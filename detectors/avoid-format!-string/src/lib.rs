@@ -6,9 +6,12 @@ extern crate rustc_span;
 
 use clippy_utils::{diagnostics::span_lint_and_help, sym};
 use if_chain::if_chain;
-use rustc_ast::{Expr, ExprKind, Item, NodeId};
+use rustc_ast::{
+    tokenstream::{TokenStream, TokenTree},
+    AttrArgs, AttrKind, Expr, ExprKind, Item,
+};
 use rustc_lint::{EarlyContext, EarlyLintPass};
-use rustc_span::sym;
+use rustc_span::{sym, Span};
 
 dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does
@@ -47,14 +50,31 @@ dylint_linting::impl_pre_expansion_lint! {
 
 #[derive(Default)]
 pub struct AvoidFormatString {
-    stack: Vec<NodeId>,
+    in_test_span: Option<Span>,
+}
+
+impl AvoidFormatString {
+    fn in_test_item(&self) -> bool {
+        self.in_test_span.is_some()
+    }
 }
 
 impl EarlyLintPass for AvoidFormatString {
     fn check_item(&mut self, _cx: &EarlyContext, item: &Item) {
-        if self.in_test_item() || is_test_item(item) {
-            self.stack.push(item.id);
-        }
+        match (is_test_item(item), self.in_test_span) {
+            (true, None) => self.in_test_span = Some(item.span),
+            (true, Some(test_span)) => {
+                if !test_span.contains(item.span) {
+                    self.in_test_span = Some(item.span);
+                }
+            }
+            (false, None) => {}
+            (false, Some(test_span)) => {
+                if !test_span.contains(item.span) {
+                    self.in_test_span = None;
+                }
+            }
+        };
     }
 
     fn check_expr(&mut self, cx: &EarlyContext, expr: &Expr) {
@@ -79,27 +99,39 @@ impl EarlyLintPass for AvoidFormatString {
 
 fn is_test_item(item: &Item) -> bool {
     item.attrs.iter().any(|attr| {
+        // Find #[cfg(all(test, feature = "e2e-tests"))]
+        if_chain!(
+            if let AttrKind::Normal(normal) = &attr.kind;
+            if let AttrArgs::Delimited(delim_args) = &normal.item.args;
+            if is_test_token_present(&delim_args.tokens);
+            then {
+                return true;
+            }
+        );
+
+        // Find unit or integration tests
         if attr.has_name(sym::test) {
-            true
-        } else {
-            if_chain! {
-                if attr.has_name(sym::cfg);
-                if let Some(items) = attr.meta_item_list();
-                if let [item] = items.as_slice();
-                if let Some(feature_item) = item.meta_item();
-                if feature_item.has_name(sym::test);
-                then {
-                    true
-                } else {
-                    false
-                }
+            return true;
+        }
+
+        if_chain! {
+            if attr.has_name(sym::cfg);
+            if let Some(items) = attr.meta_item_list();
+            if let [item] = items.as_slice();
+            if let Some(feature_item) = item.meta_item();
+            if feature_item.has_name(sym::test);
+            then {
+                return true;
             }
         }
+
+        return false;
     })
 }
 
-impl AvoidFormatString {
-    fn in_test_item(&self) -> bool {
-        !self.stack.is_empty()
-    }
+fn is_test_token_present(token_stream: &TokenStream) -> bool {
+    token_stream.trees().any(|tree| match tree {
+        TokenTree::Token(token, _) => token.is_ident_named(sym::test),
+        TokenTree::Delimited(_, _, token_stream) => is_test_token_present(token_stream),
+    })
 }
