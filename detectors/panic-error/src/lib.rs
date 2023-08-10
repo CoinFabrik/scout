@@ -7,9 +7,10 @@ extern crate rustc_span;
 use clippy_utils::{diagnostics::span_lint_and_help, sym};
 use if_chain::if_chain;
 use rustc_ast::{
+    ptr::P,
     token::{LitKind, TokenKind},
-    tokenstream::TokenTree,
-    Expr, ExprKind, Item, NodeId, visit::FnKind, StmtKind, MacCall, ptr::P,
+    tokenstream::{TokenStream, TokenTree},
+    AttrArgs, AttrKind, Expr, ExprKind, Item, MacCall, StmtKind,
 };
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::{sym, Span};
@@ -52,16 +53,28 @@ dylint_linting::impl_pre_expansion_lint! {
 
 #[derive(Default)]
 pub struct PanicError {
-    stack: Vec<NodeId>,
+    in_test_span: Option<Span>,
 }
 
 impl EarlyLintPass for PanicError {
     fn check_item(&mut self, _cx: &EarlyContext, item: &Item) {
-        if self.in_test_item() || is_test_item(item) {
-            self.stack.push(item.id);
-        }
+        match (is_test_item(item), self.in_test_span) {
+            (true, None) => self.in_test_span = Some(item.span),
+            (true, Some(test_span)) => {
+                if !test_span.contains(item.span) {
+                    self.in_test_span = Some(item.span);
+                }
+            }
+            (false, None) => {}
+            (false, Some(test_span)) => {
+                if !test_span.contains(item.span) {
+                    self.in_test_span = None;
+                }
+            }
+        };
     }
-    fn check_stmt(&mut self, cx: &EarlyContext<'_>,stmt: &rustc_ast::Stmt) {
+
+    fn check_stmt(&mut self, cx: &EarlyContext<'_>, stmt: &rustc_ast::Stmt) {
         if_chain! {
             if !self.in_test_item();
             if let StmtKind::MacCall(mac) = &stmt.kind;
@@ -70,6 +83,7 @@ impl EarlyLintPass for PanicError {
             }
         }
     }
+
     fn check_expr(&mut self, cx: &EarlyContext, expr: &Expr) {
         if_chain! {
             if !self.in_test_item();
@@ -108,28 +122,39 @@ fn check_macro_call(cx: &EarlyContext, span: Span, mac: &P<MacCall>) {
 
 fn is_test_item(item: &Item) -> bool {
     item.attrs.iter().any(|attr| {
+        // Find #[cfg(all(test, feature = "e2e-tests"))]
+        if_chain!(
+            if let AttrKind::Normal(normal) = &attr.kind;
+            if let AttrArgs::Delimited(delim_args) = &normal.item.args;
+            if is_test_token_present(&delim_args.tokens);
+            then {
+                return true;
+            }
+        );
+
+        // Find unit or integration tests
         if attr.has_name(sym::test) {
-            true
-        } else {
-            if_chain! {
-                if attr.has_name(sym::cfg);
-                if let Some(items) = attr.meta_item_list();
-                if let [item] = items.as_slice();
-                if let Some(feature_item) = item.meta_item();
-                if feature_item.has_name(sym::test);
-                then {
-                    true
-                } else {
-                    false
-                }
+            return true;
+        }
+
+        if_chain! {
+            if attr.has_name(sym::cfg);
+            if let Some(items) = attr.meta_item_list();
+            if let [item] = items.as_slice();
+            if let Some(feature_item) = item.meta_item();
+            if feature_item.has_name(sym::test);
+            then {
+                return true;
             }
         }
+
+        return false;
     })
 }
 
 impl PanicError {
     fn in_test_item(&self) -> bool {
-        !self.stack.is_empty()
+        self.in_test_span.is_some()
     }
 }
 
@@ -144,4 +169,11 @@ fn capitalize_err_msg(s: &str) -> String {
         })
         .collect::<Vec<String>>()
         .join(" ")
+}
+
+fn is_test_token_present(token_stream: &TokenStream) -> bool {
+    token_stream.trees().any(|tree| match tree {
+        TokenTree::Token(token, _) => token.is_ident_named(sym::test),
+        TokenTree::Delimited(_, _, token_stream) => is_test_token_present(token_stream),
+    })
 }
