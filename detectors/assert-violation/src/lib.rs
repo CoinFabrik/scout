@@ -1,20 +1,19 @@
 #![feature(rustc_private)]
 
 extern crate rustc_ast;
-extern crate rustc_hir;
 extern crate rustc_span;
 
-use clippy_utils::diagnostics::span_lint;
+use clippy_utils::{diagnostics::span_lint_and_help, sym};
 use if_chain::if_chain;
-use rustc_ast::ast::LitKind;
-use rustc_hir::intravisit::Visitor;
-use rustc_hir::intravisit::{walk_expr, FnKind};
-use rustc_hir::{Body, FnDecl, HirId};
-use rustc_hir::{Expr, ExprKind};
-use rustc_lint::{LateContext, LateLintPass};
-use rustc_span::Span;
+use rustc_ast::{
+    ptr::P,
+    tokenstream::{TokenStream, TokenTree},
+    AttrArgs, AttrKind, Expr, ExprKind, Item, MacCall, Stmt, StmtKind,
+};
+use rustc_lint::{EarlyContext, EarlyLintPass};
+use rustc_span::{sym, Span};
 
-dylint_linting::declare_late_lint! {
+dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does
     /// Checks for `assert!` usage.
     /// ### Why is this bad?
@@ -47,54 +46,117 @@ dylint_linting::declare_late_lint! {
 
     pub ASSERT_VIOLATION,
     Warn,
-    "Assert causes panic. Instead, return a proper error."
+    "Assert causes panic. Instead, return a proper error.",
+    AssertViolation::default()
 }
-impl<'tcx> LateLintPass<'tcx> for AssertViolation {
-    fn check_fn(
-        &mut self,
-        cx: &LateContext<'tcx>,
-        _: FnKind<'tcx>,
-        _: &'tcx FnDecl<'_>,
-        body: &'tcx Body<'_>,
-        _: Span,
-        _: HirId,
-    ) {
-        struct AssertViolationStorage {
-            span: Vec<Span>,
-        }
 
-        impl<'tcx> Visitor<'tcx> for AssertViolationStorage {
-            fn visit_expr(&mut self, expr: &'tcx Expr<'_>) {
-                if_chain! {
-                    if let ExprKind::If(_, b, _) = expr.kind;
-                    if let ExprKind::Block(block, _) = b.kind;
-                    if let Some(expr1) = block.expr;
-                    if let ExprKind::Call(_, args) = expr1.kind;
-                    if let ExprKind::Call(_, args2) = args[0].kind;
-                    if args2.len() == 2;
-                    if let ExprKind::AddrOf(_, _, expr2) = args2[0].kind;
-                    if let ExprKind::Array(args3) = expr2.kind;
-                    if let ExprKind::Lit(lit) = &args3[0].kind;
-                    if let LitKind::Str(_, _) = lit.node;
-                    then {
-                        self.span.push(b.span);
-                    }
-                }
+#[derive(Default)]
+pub struct AssertViolation {
+    in_test_span: Option<Span>,
+}
 
-                walk_expr(self, expr);
-            }
-        }
-        let mut av_storage = AssertViolationStorage { span: Vec::new() };
-
-        walk_expr(&mut av_storage, body.value);
-
-        av_storage.span.iter().for_each(|span| {
-            let error_msg = "Assert causes panic. Instead, return a proper error";
-            if let Some(span_outer) = span.ctxt().outer_expn().expansion_cause() {
-                span_lint(cx, ASSERT_VIOLATION, span_outer, error_msg);
-            } else {
-                span_lint(cx, ASSERT_VIOLATION, *span, error_msg);
-            }
-        });
+impl AssertViolation {
+    fn in_test_item(&self) -> bool {
+        self.in_test_span.is_some()
     }
+}
+
+impl EarlyLintPass for AssertViolation {
+    fn check_item(&mut self, _cx: &EarlyContext, item: &Item) {
+        match (is_test_item(item), self.in_test_span) {
+            (true, None) => self.in_test_span = Some(item.span),
+            (true, Some(test_span)) => {
+                if !test_span.contains(item.span) {
+                    self.in_test_span = Some(item.span);
+                }
+            }
+            (false, None) => {}
+            (false, Some(test_span)) => {
+                if !test_span.contains(item.span) {
+                    self.in_test_span = None;
+                }
+            }
+        };
+    }
+
+    fn check_stmt(&mut self, cx: &EarlyContext, stmt: &Stmt) {
+        if self.in_test_item() {
+            return;
+        }
+
+        if let StmtKind::MacCall(mac) = &stmt.kind {
+            check_macro_call(cx, stmt.span, &mac.mac)
+        }
+    }
+    fn check_expr(&mut self, cx: &EarlyContext, expr: &Expr) {
+        if self.in_test_item() {
+            return;
+        }
+
+        if let ExprKind::MacCall(mac) = &expr.kind {
+            check_macro_call(cx, expr.span, mac)
+        }
+    }
+}
+
+fn check_macro_call(cx: &EarlyContext, span: Span, mac: &P<MacCall>) {
+    if vec![
+        sym!(assert),
+        sym!(assert_eq),
+        sym!(assert_ne),
+        sym!(debug_assert),
+        sym!(debug_assert_eq),
+        sym!(debug_assert_ne),
+    ]
+    .iter()
+    .any(|sym| &mac.path == sym)
+    {
+        span_lint_and_help(
+            cx,
+            ASSERT_VIOLATION,
+            span,
+            "Assert causes panic. Instead, return a proper error.",
+            None,
+            "You could use instead an Error enum.",
+        );
+    }
+}
+
+fn is_test_item(item: &Item) -> bool {
+    item.attrs.iter().any(|attr| {
+        // Find #[cfg(all(test, feature = "e2e-tests"))]
+        if_chain!(
+            if let AttrKind::Normal(normal) = &attr.kind;
+            if let AttrArgs::Delimited(delim_args) = &normal.item.args;
+            if is_test_token_present(&delim_args.tokens);
+            then {
+                return true;
+            }
+        );
+
+        // Find unit or integration tests
+        if attr.has_name(sym::test) {
+            return true;
+        }
+
+        if_chain! {
+            if attr.has_name(sym::cfg);
+            if let Some(items) = attr.meta_item_list();
+            if let [item] = items.as_slice();
+            if let Some(feature_item) = item.meta_item();
+            if feature_item.has_name(sym::test);
+            then {
+                return true;
+            }
+        }
+
+        return false;
+    })
+}
+
+fn is_test_token_present(token_stream: &TokenStream) -> bool {
+    token_stream.trees().any(|tree| match tree {
+        TokenTree::Token(token, _) => token.is_ident_named(sym::test),
+        TokenTree::Delimited(_, _, token_stream) => is_test_token_present(token_stream),
+    })
 }
