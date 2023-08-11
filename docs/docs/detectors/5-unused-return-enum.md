@@ -14,26 +14,7 @@ If definitions of Err() and/or Ok() are in the code but do not flow to the retur
 
 ### Example
 
-```rust
-// example code where a warning is issued
-    #![cfg_attr(not(feature = "std"), no_std)]
-    pub enum TradingPairErrors {
-        Overflow,
-    }
-    (...)
-    #[ink(message)]
-    pub fn get_percentage_difference(&mut self, value1: Balance, value2: Balance) -> Result<Balance, TradingPairErrors>  {
-        let absolute_difference = value1.abs_diff(value2);
-        let sum = value1 + value2;
-        let percentage_difference =
-        match 100u128.checked_mul(absolute_difference / sum) {
-           Some(result) => result,
-           None => Err(TradingPairErrors::Overflow),
-        }
-    }
-```
-
-Use instead:
+Instead of using:
 
 ```rust
 // example code that does not raise a warning
@@ -41,7 +22,7 @@ Use instead:
     pub enum TradingPairErrors {
         Overflow,
     }
-    (...)
+
     #[ink(message)]
     pub fn get_percentage_difference(&mut self, value1: Balance, value2: Balance) -> Result<Balance, TradingPairErrors>  {
         let absolute_difference = value1.abs_diff(value2);
@@ -52,6 +33,26 @@ Use instead:
            None => panic!("overflow!"),
         };
         return Err(TradingPairErrors::Overflow);
+    }
+```
+
+Use this:
+
+```rust
+    #![cfg_attr(not(feature = "std"), no_std)]
+    pub enum TradingPairErrors {
+        Overflow,
+    }
+
+    #[ink(message)]
+    pub fn get_percentage_difference(&mut self, value1: Balance, value2: Balance) -> Result<Balance, TradingPairErrors>  {
+        let absolute_difference = value1.abs_diff(value2);
+        let sum = value1 + value2;
+        let percentage_difference =
+        match 100u128.checked_mul(absolute_difference / sum) {
+           Some(result) => result,
+           None => Err(TradingPairErrors::Overflow),
+        }
     }
 ```
 
