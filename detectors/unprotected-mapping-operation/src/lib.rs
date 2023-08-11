@@ -64,7 +64,8 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
                     let mapping_type = self.cx.typeck_results().expr_ty_adjusted(receiver);
 
                     if /* ty.to_string().contains("ink::storage::Mapping") && */
-                    mapping_type.to_string().contains("ink::storage::Mapping<ink::ink_primitives::AccountId"){
+                    mapping_type.to_string().contains("ink::storage::Mapping<ink::ink_primitives::AccountId") ||
+                    mapping_type.to_string().contains("ink::storage::Mapping<OpenBrush::AccountIdExt") {
 
                         if path.ident.name.to_string() == "insert" {
                             self.insert_def_id = defid;
