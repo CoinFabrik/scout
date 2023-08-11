@@ -2,7 +2,7 @@
 
 ### What it does
 
-It warns you if a mapping operation (`insert`, `take`, `remove`) function is called with a user-given `key` field.
+It warns you if a mapping operation (`insert`, `take`, `remove`) function is called with a user-given `key` field of the type `AccountId`.
 
 ### Why is this bad?
 
@@ -17,7 +17,6 @@ Modifying mappings with an arbitrary key given by users can be a significant vul
 ### Known problems
 
 ### Example
-
 
 ```rust
     #[ink(message)]
