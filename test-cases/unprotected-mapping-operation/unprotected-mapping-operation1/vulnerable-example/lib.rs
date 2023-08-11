@@ -7,6 +7,7 @@ mod unprotected_mapping_operation {
     #[ink(storage)]
     pub struct UnprotectedMappingOperation {
         balances: Mapping<AccountId, Balance>,
+        random: Mapping<u128, AccountId>,
     }
 
     #[derive(Debug, PartialEq, Eq, Clone, scale::Encode, scale::Decode)]
@@ -21,12 +22,18 @@ mod unprotected_mapping_operation {
         pub fn new() -> Self {
             Self {
                 balances: Mapping::new(),
+                random: Mapping::new(),
             }
+        }
+
+        #[ink(message)]
+        pub fn set_random(&mut self, key: u128, value: AccountId) {
+            self.random.insert(key, &value);
         }
 
         #[ink(message, payable)]
         pub fn deposit(&mut self, dest: AccountId) {
-            let amount = self.env().transferred_value();
+            let amount: Balance = self.env().transferred_value();
             if let Some(current_bal) = self.balances.get(dest) {
                 self.balances.insert(dest, &(current_bal + amount));
             } else {
