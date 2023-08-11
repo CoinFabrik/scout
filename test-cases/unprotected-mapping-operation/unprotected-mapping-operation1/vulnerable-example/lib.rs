@@ -22,13 +22,13 @@ mod unprotected_mapping_operation {
         pub fn new() -> Self {
             Self {
                 balances: Mapping::new(),
-                random: Mapping::new(),
+                another_mapping: Mapping::new(),
             }
         }
 
         #[ink(message)]
-        pub fn set_random(&mut self, key: u128, value: AccountId) {
-            self.random.insert(key, &value);
+        pub fn this_should_not_trigger(&mut self, key: u128, value: AccountId) {
+            self.another_mapping.insert(key, &value);
         }
 
         #[ink(message, payable)]
