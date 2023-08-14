@@ -4,6 +4,7 @@ extern crate rustc_ast;
 extern crate rustc_span;
 
 use clippy_utils::diagnostics::span_lint_and_help;
+use if_chain::if_chain;
 use rustc_ast::visit::{self, FnKind, Visitor};
 use rustc_ast::{Expr, ExprKind, FnRetTy};
 use rustc_lint::{EarlyContext, EarlyLintPass};
@@ -120,16 +121,21 @@ impl EarlyLintPass for UnusedReturnEnum {
             _ => return,
         };
 
-        // If the return type of the function is not a "Result" enum, we don't want to lint it
-        if let FnRetTy::Ty(t) = &fn_sig.decl.output {
-            if let rustc_ast::TyKind::Path(_, path) = &t.kind {
-                if let Some(segment) = path.segments.last() {
-                    if segment.ident.to_string() != "Result" {
-                        return;
-                    }
-                }
-            }
+        // If code comes from macro expansion, return
+        if fn_sig.span.from_expansion() {
+            return;
         }
+
+        // If the return type of the function is not a "Result" enum, we don't want to lint it
+        if_chain!(
+            if let FnRetTy::Ty(t) = &fn_sig.decl.output;
+            if let rustc_ast::TyKind::Path(_, path) = &t.kind;
+            if let Some(segment) = path.segments.last();
+            if segment.ident.to_string() != "Result";
+            then {
+                return;
+            }
+        );
 
         let mut visitor = CounterVisitor {
             count_ok: 0,
@@ -154,10 +160,7 @@ impl EarlyLintPass for UnusedReturnEnum {
             }
         });
 
-        if !visitor.found_try
-            && (visitor.count_err < 1 || visitor.count_ok < 1)
-            && (visitor.count_err != visitor.count_ok)
-        {
+        if !visitor.found_try && (visitor.count_err == 0 || visitor.count_ok == 0) {
             visitor.span.iter().for_each(|span| {
                 if let Some(span) = span {
                     span_lint_and_help(
