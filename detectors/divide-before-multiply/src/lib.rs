@@ -66,11 +66,7 @@ fn get_divisions_inside_expr<'tcx>(expr: &'tcx Expr<'_>) -> Vec<Span> {
 }
 
 impl<'tcx> LateLintPass<'tcx> for DivideBeforeMultiply {
-    fn check_expr(
-        &mut self,
-        cx: &LateContext<'tcx>,
-        expr: &'tcx rustc_hir::Expr<'tcx>
-    ) {
+    fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx rustc_hir::Expr<'tcx>) {
         if_chain! {
             if let ExprKind::Binary(op, _lexpr, _rexpr) = expr.kind;
             if BinOpKind::Mul == op.node;
