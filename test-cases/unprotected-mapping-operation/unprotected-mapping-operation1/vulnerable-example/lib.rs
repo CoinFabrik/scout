@@ -7,7 +7,7 @@ mod unprotected_mapping_operation {
     #[ink(storage)]
     pub struct UnprotectedMappingOperation {
         balances: Mapping<AccountId, Balance>,
-        random: Mapping<u128, AccountId>,
+        another_mapping: Mapping<u128, AccountId>,
     }
 
     #[derive(Debug, PartialEq, Eq, Clone, scale::Encode, scale::Decode)]

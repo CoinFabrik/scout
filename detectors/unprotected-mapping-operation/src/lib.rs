@@ -59,13 +59,10 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
             fn visit_expr(&mut self, expr: &'tcx Expr<'_>) {
                 if let ExprKind::MethodCall(path, receiver, ..) = expr.kind {
                     let defid = self.cx.typeck_results().type_dependent_def_id(expr.hir_id);
-                    /* let ty = self.cx.tcx.mk_foreign(defid.unwrap()); */
 
                     let mapping_type = self.cx.typeck_results().expr_ty_adjusted(receiver);
 
-                    if /* ty.to_string().contains("ink::storage::Mapping") && */
-                    mapping_type.to_string().contains("ink::storage::Mapping<ink::ink_primitives::AccountId") ||
-                    mapping_type.to_string().contains("ink::storage::Mapping<OpenBrush::AccountIdExt") {
+                    if mapping_type.to_string().contains("ink::storage::Mapping<ink::ink_primitives::AccountId") {
 
                         if path.ident.name.to_string() == "insert" {
                             self.insert_def_id = defid;
@@ -121,7 +118,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
                 if let TerminatorKind::Call { func, .. } = terminator.kind {
                     if let Operand::Constant(fn_const) = func &&
                         let ConstantKind::Val(_const_val, ty) = fn_const.literal &&
-                        let TyKind::FnDef(def, subs) = ty.kind() {
+                        let TyKind::FnDef(def, _subs) = ty.kind() {
 
 
                             if caller_def_id.is_some_and(|d: DefId|d==*def) {
