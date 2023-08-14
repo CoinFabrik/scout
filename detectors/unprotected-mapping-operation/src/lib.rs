@@ -59,8 +59,11 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
             fn visit_expr(&mut self, expr: &'tcx Expr<'_>) {
                 if let ExprKind::MethodCall(path, receiver, ..) = expr.kind {
                     let defid = self.cx.typeck_results().type_dependent_def_id(expr.hir_id);
-                    let ty = self.cx.tcx.mk_foreign(defid.unwrap());
-                    if ty.to_string().contains("ink::storage::Mapping"){
+
+                    let mapping_type = self.cx.typeck_results().expr_ty_adjusted(receiver);
+
+                    if mapping_type.to_string().contains("ink::storage::Mapping<ink::ink_primitives::AccountId") {
+
                         if path.ident.name.to_string() == "insert" {
                             self.insert_def_id = defid;
                         } else if path.ident.name.to_string() == "remove" {
@@ -75,7 +78,6 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
                         rec2_path.segments.first().map_or(false, |seg|seg.ident.to_string() == "self" &&
                         qualifier.is_none()) &&
                         path.ident.name.to_string() == "caller" {
-
                         self.caller_def_id = self.cx.typeck_results().type_dependent_def_id(expr.hir_id);
                     }
                 }
@@ -117,6 +119,8 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
                     if let Operand::Constant(fn_const) = func &&
                         let ConstantKind::Val(_const_val, ty) = fn_const.literal &&
                         let TyKind::FnDef(def, _subs) = ty.kind() {
+
+
                             if caller_def_id.is_some_and(|d: DefId|d==*def) {
                                 callers_vec.callers.push((bb_data, BasicBlock::from_usize(bb)));
                             } else {
