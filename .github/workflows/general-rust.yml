@@ -21,9 +21,44 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  build-cargo-scout-audit:
+    name: Build Scout Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Cache cargo-scout dependencies
+        id: cache-cargo-scout-dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo
+          key: ${{ runner.os }}-cargo-scout-dependencies-${{ github.run_id	}}
+
+      - name: Install Rust nightly-2023-01-27
+        run: rustup install nightly-2023-01-27 --profile minimal
+
+      - name: Install Rust nightly-2023-04-23
+        run: rustup install nightly-2023-04-23 --profile minimal
+
+      - name: Install dylint-link
+        run: cargo install dylint-link
+
+      - name: Install cargo-scout-audit
+        run: cargo install --path apps/cargo-scout-audit
+
+      - name: Build detectors
+        working-directory: ${{ runner.temp }}
+        run: |
+          cargo new test-run
+          cd test-run
+          cargo scout-audit
+
   scout-audit-test:
     name: Test Scout Audit
     runs-on: ubuntu-latest
+    needs: build-cargo-scout-audit
     strategy:
       matrix:
         test: ["panic-error"]
@@ -35,36 +70,13 @@ jobs:
         id: cache-cargo-scout-dependencies
         uses: actions/cache@v3
         with:
-          path: ./apps/cargo-scout-audit/target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('apps/cargo-scout-audit/Cargo.lock') }}
-
-      - name: Cache other dependencies
-        id: cache-other-dependencies
-        uses: actions/cache@v3
-        with:
           path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-          key: ${{ runner.os }}-other-dependencies
-
-      - name: Update Rust
-        run: rustup update
-
-      - name: Install Rust nightly-2023-01-27
-        run: rustup install nightly-2023-01-27 --profile minimal
-
-      - name: Install Rust nightly-2023-04-23
-        run: rustup install nightly-2023-04-23 --profile minimal
-
-      - name: Install dylint-link
-        run: cargo install dylint-link
-
-      - name: Install cargo-scout
-        run: cargo install --path apps/cargo-scout-audit
+            ~/.cargo
+          key: ${{ runner.os }}-cargo-scout-dependencies-${{ github.run_id	}}
 
       - name: Run tests
-        run: INTEGRATION_TESTS_TO_RUN=${{ matrix.test }} cargo test -- --nocapture
         working-directory: apps/cargo-scout-audit
+        run: INTEGRATION_TESTS_TO_RUN=${{ matrix.test }} cargo test -- --nocapture
 
   fmt:
     name: Rustfmt
