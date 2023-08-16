@@ -3,10 +3,24 @@
 #[ink::contract]
 mod delegate_call {
 
-    use ink::env::{
-        call::{build_call, ExecutionInput, Selector},
-        DefaultEnvironment,
+    use ink::storage::Lazy;
+    use ink::{
+        env::{
+            call::{build_call, ExecutionInput, Selector},
+            DefaultEnvironment,
+        },
+        storage::traits::ManualKey,
     };
+
+    #[ink(event)]
+    pub struct Payouts {
+        #[ink(topic)]
+        pub amount1: u128,
+        #[ink(topic)]
+        pub amount2: u128,
+        #[ink(topic)]
+        pub amount3: u128,
+    }
 
     #[ink(storage)]
     pub struct DelegateCall {
@@ -15,6 +29,8 @@ mod delegate_call {
         percent1: u128,
         percent2: u128,
         percent3: u128,
+        _lazy_value: Lazy<u128>,
+        _lazy_value_manual_key: Lazy<u128, ManualKey<12345>>,
     }
 
     #[derive(Debug, PartialEq, Eq, Clone, scale::Encode, scale::Decode)]
@@ -42,13 +58,15 @@ mod delegate_call {
                 percent1,
                 percent2,
                 percent3,
+                _lazy_value: Lazy::new(),
+                _lazy_value_manual_key: Lazy::new(),
             }
         }
 
         /// Returns the addresses of the payees
         #[ink(message)]
-        pub fn get_addresses(&self) -> [AccountId; 3] {
-            self.addresses
+        pub fn get_addresses(&self) -> Vec<AccountId> {
+            return vec![self.addresses[0], self.addresses[1], self.addresses[2]];
         }
 
         /// Returns the percentages of the payees
