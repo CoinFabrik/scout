@@ -64,6 +64,7 @@ jobs:
 
       - name: Run tests
         run: INTEGRATION_TESTS_TO_RUN=${{ matrix.test }} cargo test -- --nocapture
+        working-directory: apps/cargo-scout-audit
 
   fmt:
     name: Rustfmt
