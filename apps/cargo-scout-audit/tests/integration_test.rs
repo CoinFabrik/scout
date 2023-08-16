@@ -39,11 +39,22 @@ fn test() {
         print_cargo_scout_not_found()
     );
 
+    // Get environment variable to determine integration tests to run
+    let integration_tests_to_run = std::env::var("INTEGRATION_TESTS_TO_RUN")
+        .ok()
+        .map(|e| e.split(',').map(|s| s.to_string()).collect::<Vec<String>>());
+
     // Get the configuration
     let configuration = get_configuration()
         .unwrap_or_else(|_| panic!("{}", "Failed to get the configuration".red().to_string()));
 
     for (detector_name, detector_config) in configuration.detectors.iter() {
+        if let Some(integration_tests_to_run) = &integration_tests_to_run {
+            if !integration_tests_to_run.contains(&detector_name) {
+                continue;
+            }
+        }
+
         println!("\n{} {}", "Running detector:".bright_cyan(), detector_name);
         for example in detector_config.examples.iter() {
             execute_and_validate_example(
