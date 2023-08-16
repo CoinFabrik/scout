@@ -14,58 +14,6 @@ use rustc_ast::{
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::Span;
 
-/*
-dylint_linting::impl_late_lint! {
-    /// ### What it does
-    /// Checks for delegated calls to contracts passed as arguments.
-    /// ### Why is this bad?
-    ///Delegated calls to contracts passed as arguments can be used to change the expected behavior of the contract. If you need to change the target of a delegated call, you should use a storage variable, and make a function with proper access control to change it.
-    /// ### Known problems
-    /// Remove if none.
-    ///
-    /// ### Example
-    /// ```rust
-    ///pub fn delegateCall(&mut self, target: Hash, argument: Balance) {
-    ///    let selector_bytes = [0x0, 0x0, 0x0, 0x0];
-    ///    let result: T  = build_call::<DefaultEnvironment>()
-    ///        .delegate(target)
-    ///        .exec_input(
-    ///            ExecutionInput::new(Selector::new(selector_bytes))
-    ///                .push_arg(argument)
-    ///     )
-    ///        .returns::<T>()
-    ///     .invoke();
-    ///}
-    ///     ```
-    /// Use instead:
-    ///```rust
-    ///pub fn delegate_call(&mut self, argument: Balance) {
-    ///    let selector_bytes = [0x0, 0x0, 0x0, 0x0];
-    ///    let result: T  = build_call::<DefaultEnvironment>()
-    ///        .delegate(self.target)
-    ///        .exec_input(
-    ///            ExecutionInput::new(Selector::new(selector_bytes))
-    ///                .push_arg(argument)
-    ///        )
-    ///        .returns::<T>()
-    ///        .invoke();
-    ///}
-    ///
-    ///pub fn set_target(&mut self, new_target: Hash) -> Result<(), &'static str> {
-    ///   if self.admin != self.env().caller() {
-    ///        Err("Only admin can set target")
-    ///    } else {
-    ///        self.target = new_target;
-    ///        Ok(())
-     ///   }
-    ///}
-
-    pub DELEGATE_CALL,
-    Warn,
-    "Passing arguments to the target of a delegate call is not safe, as it allows the caller to set a malicious hash as the target.",
-    DelegateCall::default()
-}
- */
 dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does
     /// Checks for non-lazy storage when using delegate calls.
