@@ -24,7 +24,6 @@ mod delegate_call {
     }
 
     impl DelegateCall {
-        /// Creates a new instance of the contract
         #[ink(constructor)]
         pub fn new() -> Self {
             let mut instance = Self::default();
@@ -33,13 +32,11 @@ mod delegate_call {
             instance
         }
 
-        /// Returns the addresses of the payees
         #[ink(message)]
         pub fn get_admin(&self) -> AccountId {
             self.admin.get().unwrap()
         }
 
-        /// Delegates the fee calculation and pays the results to the corresponding addresses
         #[ink(message, payable)]
         pub fn change_admin(
             &mut self,
