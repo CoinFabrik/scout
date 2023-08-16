@@ -34,6 +34,7 @@ jobs:
         with:
           path: |
             ~/.cargo
+            apps/cargo-scout-audit/target
           key: ${{ runner.os }}-cargo-scout-dependencies-${{ github.run_id	}}
 
       - name: Install Rust nightly-2023-01-27
@@ -55,13 +56,17 @@ jobs:
           cd test-run
           cargo scout-audit
 
+      - name: Compile cargo-scout-audit tests
+        working-directory: apps/cargo-scout-audit
+        run: cargo test --no-run
+
   scout-audit-test:
     name: Test Scout Audit
     runs-on: ubuntu-latest
     needs: build-cargo-scout-audit
     strategy:
       matrix:
-        test: ["panic-error"]
+        test: ["assert-violation", "avoid-core-mem-forget", "avoid-format!-string"]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
