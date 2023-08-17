@@ -18,7 +18,7 @@ fn cargo(subcommand: &str, verb: &str, description: &str, quiet: bool) -> Comman
         std::io::stderr()
             .write_fmt(format_args!(
                 "{}\n",
-                if std::io::stderr().is_terminal() {
+                if std::io::stdout().is_terminal() {
                     Style::new().bold()
                 } else {
                     Style::new()
