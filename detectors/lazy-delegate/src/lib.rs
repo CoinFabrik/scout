@@ -56,7 +56,6 @@ impl EarlyLintPass for DelegateCall {
         && let ItemKind::Struct(strt, _) = &item.kind
         {
             for field in strt.fields() {
-                dbg!(field);
                 if let Some(_) = field.ident
                 && let TyKind::Path(_, path) = &field.ty.kind
                 && path.segments.len() == 1
