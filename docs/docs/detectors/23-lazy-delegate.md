@@ -26,7 +26,7 @@ Use instead:
 
 ```rust
     #[ink(storage)]
-    pub struct DelegateCall {
+    pub struct Contract {
         admin: Lazy<AccountId, ManualKey<12345>>,
     }
 ```
