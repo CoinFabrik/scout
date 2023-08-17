@@ -2,12 +2,11 @@
 
 ## Description
 
-- Vulnerability Category: `Best practices`
-- Vulnerability Severity: `Critical`
+- Vulnerability Severity: `High`
 - Detectors: [`lazy-delegate`](https://github.com/CoinFabrik/scout/tree/main/detectors/lazy-delegate)
 - Test Cases: [`lazy-delegate`](https://github.com/CoinFabrik/scout/tree/main/test-cases/lazy-delegate/lazy-delegate-1)
 
-ink! has a bug that makes delegated calls not modify the storage of the caller.
+ink! has a bug that makes delegated calls not modify the storage of the caller, unless it's using `Lazy` with `ManualKey` or `Mapping`.
 
 ## Exploit Scenario
 
@@ -47,7 +46,7 @@ Consider the following `ink!` contract:
 }
 ```
 
-In this example, the function `change_admin` takes `new_admin` and sets it as the new admin. If this function is called, `self.admin` will be the same as before, even if it's setted to a new AccountId.
+In this example, the function `change_admin` takes `new_admin` and sets it as the new admin. If this function is called, `self.admin` will be the same as before, even if it's setted to a new `AccountId`.
 
 The vulnerable code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/lazy-delegate/lazy-delegate-1/vulnerable-example).
 
@@ -87,7 +86,7 @@ To remediate this, we can use `Lazy` to store things.
     }
 ```
 
-The remediated code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/delegate-call/delegate-call-1/remediated-example).
+The remediated code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/lazy-delegate/lazy-delegate-1/remediated-example).
 
 ## References
 
