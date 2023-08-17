@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Check test matrix
-        run: python scripts/check-ci-detectors.py .github/workflows/test-detectors-yml .github/workflows/test-detectors.yml
+        run: python scripts/check-ci-detectors.py .github/workflows/test-detectors.yml detectors
 
   build:
     name: Build
