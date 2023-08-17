@@ -43,6 +43,8 @@ fn test() {
     let integration_tests_to_run = std::env::var("INTEGRATION_TESTS_TO_RUN")
         .ok()
         .map(|e| e.split(',').map(|s| s.to_string()).collect::<Vec<String>>());
+    let mut ran_integration_tests =
+        vec![false; integration_tests_to_run.as_ref().map_or(0, |v| v.len())];
 
     // Get the configuration
     let configuration = get_configuration()
@@ -50,9 +52,13 @@ fn test() {
 
     for (detector_name, detector_config) in configuration.detectors.iter() {
         if let Some(integration_tests_to_run) = &integration_tests_to_run {
-            if !integration_tests_to_run.contains(&detector_name) {
-                continue;
-            }
+            let integration_tests_to_run_i = integration_tests_to_run
+                .iter()
+                .position(|t| t == detector_name);
+            match integration_tests_to_run_i {
+                Some(i) => ran_integration_tests[i] = true,
+                None => continue,
+            };
         }
 
         println!("\n{} {}", "Running detector:".bright_cyan(), detector_name);
@@ -67,6 +73,22 @@ fn test() {
                 &example.remediated_path,
                 false,
             );
+        }
+    }
+
+    if let Some(integration_tests_to_run) = &integration_tests_to_run {
+        let panic_exit = ran_integration_tests.iter().any(|t| !t);
+        for (i, ran_integration_test) in ran_integration_tests.iter().enumerate() {
+            if !ran_integration_test {
+                println!(
+                    "{} {}",
+                    "Error: integration test not found:".bright_red(),
+                    integration_tests_to_run[i]
+                );
+            }
+        }
+        if panic_exit {
+            panic!();
         }
     }
 }
