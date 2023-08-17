@@ -77,6 +77,7 @@ jobs:
         with:
           path: |
             ~/.cargo
+            apps/cargo-scout-audit/target
           key: ${{ runner.os }}-cargo-scout-dependencies-${{ github.run_id	}}
 
       - name: Run tests
