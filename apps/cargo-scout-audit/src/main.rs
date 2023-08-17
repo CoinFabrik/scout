@@ -1,5 +1,3 @@
-#![feature(is_terminal)]
-
 use std::{fs, path::PathBuf};
 
 use cargo::Config;
