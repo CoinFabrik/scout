@@ -59,13 +59,16 @@ detectors:
     examples:
       - vulnerable_path: "../../test-cases/panic-error/panic-error-1/vulnerable-example/Cargo.toml"
         remediated_path: "../../test-cases/panic-error/panic-error-1/remediated-example/Cargo.toml"
-  reentrancy:
+  reentrancy-1:
     warning_message: "External calls could open the opportunity for a malicious contract to execute any arbitrary code"
     examples:
       - vulnerable_path: "../../test-cases/reentrancy/reentrancy-1/vulnerable-example/vault/Cargo.toml"
         remediated_path: "../../test-cases/reentrancy/reentrancy-1/remediated-example/vault/Cargo.toml"
       - vulnerable_path: "../../test-cases/reentrancy/reentrancy-2/vulnerable-example/vault/Cargo.toml"
         remediated_path: "../../test-cases/reentrancy/reentrancy-2/remediated-example/vault/Cargo.toml"
+  reentrancy-2:
+    warning_message: "External calls could open the opportunity for a malicious contract to execute any arbitrary code"
+    examples:
       - vulnerable_path: "../../test-cases/reentrancy/reentrancy-3/vulnerable-example/vault/Cargo.toml"
         remediated_path: "../../test-cases/reentrancy/reentrancy-3/remediated-example/vault/Cargo.toml"
   set-code-hash:
