@@ -31,3 +31,8 @@ overflow-checks = false
 
 [profile.release]
 overflow-checks = false
+
+[workspace.metadata.dylint]
+libraries = [
+    { path = "../../../../detectors/lazy-delegate" },
+]

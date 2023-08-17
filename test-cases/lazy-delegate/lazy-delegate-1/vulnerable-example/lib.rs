@@ -2,15 +2,16 @@
 
 #[ink::contract]
 mod delegate_call {
-
     use ink::env::{
         call::{build_call, ExecutionInput, Selector},
         DefaultEnvironment,
     };
+    use ink::storage::Mapping;
 
     #[ink(storage)]
     pub struct DelegateCall {
         admin: AccountId,
+        balances: Mapping<AccountId, Balance>,
     }
 
     #[derive(Debug, PartialEq, Eq, Clone, scale::Encode, scale::Decode)]
@@ -25,6 +26,7 @@ mod delegate_call {
         pub fn new() -> Self {
             Self {
                 admin: Self::env().caller(),
+                balances: Mapping::new(),
             }
         }
 

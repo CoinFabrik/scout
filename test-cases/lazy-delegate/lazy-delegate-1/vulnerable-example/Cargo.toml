@@ -31,3 +31,4 @@ overflow-checks = false
 
 [profile.release]
 overflow-checks = false
+

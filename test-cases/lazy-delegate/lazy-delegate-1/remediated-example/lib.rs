@@ -9,11 +9,13 @@ mod delegate_call {
     };
     use ink::storage::traits::ManualKey;
     use ink::storage::Lazy;
+    use ink::storage::Mapping;
 
     #[ink(storage)]
     #[derive(Default)]
     pub struct DelegateCall {
         admin: Lazy<AccountId, ManualKey<123456>>,
+        balances: Mapping<AccountId, Balance>,
     }
 
     #[derive(Debug, PartialEq, Eq, Clone, scale::Encode, scale::Decode)]
@@ -29,6 +31,7 @@ mod delegate_call {
             let mut instance = Self::default();
             let caller = Self::env().caller();
             instance.admin.set(&caller);
+            instance.balances = Mapping::new();
             instance
         }
 

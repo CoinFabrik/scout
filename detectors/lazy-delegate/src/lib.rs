@@ -56,10 +56,11 @@ impl EarlyLintPass for DelegateCall {
         && let ItemKind::Struct(strt, _) = &item.kind
         {
             for field in strt.fields() {
+                dbg!(field);
                 if let Some(_) = field.ident
                 && let TyKind::Path(_, path) = &field.ty.kind
                 && path.segments.len() == 1
-                && path.segments[0].ident.name.to_string() == "Lazy".to_string()
+                && (path.segments[0].ident.name.to_string() == "Lazy".to_string() || path.segments[0].ident.name.to_string() == "Mapping".to_string())
                 && let Some(arg) = &path.segments[0].args
                 && let GenericArgs::AngleBracketed(AngleBracketedArgs { args, .. }) = arg.clone().into_inner()
                 && args.len() > 1 {} else {
@@ -77,7 +78,7 @@ impl EarlyLintPass for DelegateCall {
             self.delegate_uses.push(id.span);
         }
 
-        if !self.delegate_uses.is_empty() {
+        if !self.delegate_uses.is_empty() && !self.non_lazy_manual_storage_spans.is_empty() {
             span_lint_and_help(
                 cx,
                 DELEGATE_CALL,
