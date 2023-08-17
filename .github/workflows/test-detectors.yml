@@ -1,0 +1,121 @@
+name: General Rust
+
+on:
+  push:
+    branches:
+      - "main"
+    paths:
+      - "apps/cargo-scout-audit/**"
+      - "detectors/**"
+      - "test-cases/**"
+      - "Makefile"
+  pull_request:
+    paths:
+      - "apps/cargo-scout-audit/**"
+      - "detectors/**"
+      - "test-cases/**"
+      - "Makefile"
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  check-config:
+    name: Check config
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Check test matrix
+        run: python scripts/check_test_matrix.py .github/workflows/test-detectors-yml .github/workflows/test-detectors.yml
+
+  build:
+    name: Build
+    needs: check-config
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Cache cargo-scout dependencies
+        id: cache-cargo-scout-dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo
+            apps/cargo-scout-audit/target
+          key: ${{ runner.os }}-cargo-scout-dependencies-${{ github.run_id }}
+
+      - name: Install Rust nightly-2023-01-27
+        run: rustup install nightly-2023-01-27 --profile minimal
+
+      - name: Install Rust nightly-2023-04-23
+        run: rustup install nightly-2023-04-23 --profile minimal
+
+      - name: Install dylint-link
+        run: cargo install dylint-link
+
+      - name: Install cargo-scout-audit
+        run: cargo install --path apps/cargo-scout-audit
+
+      - name: Build detectors
+        working-directory: ${{ runner.temp }}
+        run: |
+          cargo new test-run
+          cd test-run
+          cargo scout-audit
+
+      - name: Compile cargo-scout-audit tests
+        working-directory: apps/cargo-scout-audit
+        run: cargo test --no-run
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: build
+    strategy:
+      matrix:
+        test:
+          [
+            "assert-violation",
+            "avoid-core-mem-forget",
+            "avoid-format!-string",
+            "delegate-call",
+            "divide-before-multiply",
+            "dos-unbounded-operation",
+            "dos-unexpected-revert-with-vector",
+            "ink-version",
+            "insufficiently-random-values",
+            "integer-overflow-or-underflow",
+            "iterators-over-indexing",
+            "panic-error",
+            "reentrancy-1",
+            "reentrancy-2",
+            "set-code-hash",
+            "set-contract-storage",
+            "unprotected-mapping-operation",
+            "unprotected-self-destruct",
+            "unrestricted-transfer-from",
+            "unsafe-expect",
+            "unsafe-unwrap",
+            "unused-return-enum",
+            "zero-or-test-address",
+          ]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Cache cargo-scout dependencies
+        id: cache-cargo-scout-dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo
+            apps/cargo-scout-audit/target
+          key: ${{ runner.os }}-cargo-scout-dependencies-${{ github.run_id  }}
+
+      - name: Run tests
+        working-directory: apps/cargo-scout-audit
+        run: INTEGRATION_TESTS_TO_RUN=${{ matrix.test }} cargo test -- --nocapture
