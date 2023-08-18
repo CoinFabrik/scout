@@ -1,4 +1,7 @@
-use std::{io::Write, process::Stdio};
+use std::{
+    io::{IsTerminal, Write},
+    process::Stdio,
+};
 
 use ansi_term::Style;
 
@@ -15,7 +18,7 @@ fn cargo(subcommand: &str, verb: &str, description: &str, quiet: bool) -> Comman
         std::io::stderr()
             .write_fmt(format_args!(
                 "{}\n",
-                if atty::is(atty::Stream::Stdout) {
+                if std::io::stdout().is_terminal() {
                     Style::new().bold()
                 } else {
                     Style::new()
