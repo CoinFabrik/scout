@@ -94,8 +94,8 @@ detectors:
   unrestricted-transfer-from:
     warning_message: "This argument comes from a user-supplied argument"
     examples:
-      - vulnerable_path: "../../test-cases/unrestricted-transfer-from/unrestricted-transfer-from-1/escrow/vulnerable-example/Cargo.toml"
-        remediated_path: "../../test-cases/unrestricted-transfer-from/unrestricted-transfer-from-1/escrow/remediated-example/Cargo.toml"
+      - vulnerable_path: "../../test-cases/unrestricted-transfer-from/unrestricted-transfer-from-1/vulnerable-example/escrow/Cargo.toml"
+        remediated_path: "../../test-cases/unrestricted-transfer-from/unrestricted-transfer-from-1/remediated-example/escrow/Cargo.toml"
   unsafe-expect:
     warning_message: "Unsafe usage of `expect`"
     examples:
