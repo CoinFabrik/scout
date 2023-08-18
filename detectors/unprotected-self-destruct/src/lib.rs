@@ -76,7 +76,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
         }
 
         let mut usd_storage = UnprotectedSelfDestructFinder {
-            cx: cx,
+            cx,
             terminate_contract_def_id: None,
             terminate_contract_span: None,
             caller_def_id: None,
@@ -116,7 +116,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
                     }
                 }
             }
-            return callers_vec;
+            callers_vec
         }
 
         let caller_and_terminate = find_caller_and_terminate_in_mir(
@@ -125,8 +125,8 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
             usd_storage.terminate_contract_def_id,
         );
 
-        if caller_and_terminate.terminates.len() > 0 {
-            if caller_and_terminate.callers.len() == 0 {
+        if !caller_and_terminate.terminates.is_empty() {
+            if caller_and_terminate.callers.is_empty() {
                 for terminate in caller_and_terminate.terminates {
                     if let TerminatorKind::Call { fn_span, .. } = terminate.0.terminator().kind {
                         span_lint(
@@ -201,18 +201,15 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
             }
             match &bbs[bb].terminator().kind {
                 TerminatorKind::SwitchInt { discr, targets } => {
-                    let comparison_with_caller: bool;
-                    match discr {
+                    let comparison_with_caller = match discr {
                         Operand::Copy(place) | Operand::Move(place) => {
-                            comparison_with_caller = tainted_places
+                            tainted_places
                                 .iter()
                                 .any(|tainted_place| tainted_place == place)
                                 || after_comparison
                         }
-                        Operand::Constant(_cons) => {
-                            comparison_with_caller = after_comparison;
-                        }
-                    }
+                        Operand::Constant(_cons) => after_comparison,
+                    };
                     for target in targets.all_targets() {
                         ret_vec.append(&mut navigate_trough_basicblocks(
                             bbs,
@@ -251,7 +248,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
                         }
                     }
                     for terminate in &caller_and_terminate.terminates {
-                        if terminate.1 == bb && after_comparison == false {
+                        if terminate.1 == bb && !after_comparison {
                             ret_vec.push((*destination, *fn_span))
                         }
                     }
@@ -320,7 +317,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
                 | TerminatorKind::Unreachable
                 | TerminatorKind::GeneratorDrop => {}
             }
-            return ret_vec;
+            ret_vec
         }
     }
 }

@@ -38,13 +38,13 @@ dylint_linting::declare_late_lint! {
     "Division should be performed after multiplication"
 }
 
-fn get_divisions_inside_expr<'tcx>(expr: &'tcx Expr<'_>) -> Vec<Span> {
+fn get_divisions_inside_expr(expr: &Expr<'_>) -> Vec<Span> {
     struct DivisionsInsideExpr {
         divisions: Vec<Span>,
     }
 
-    impl<'tcx> Visitor<'tcx> for DivisionsInsideExpr {
-        fn visit_expr(&mut self, expr: &'tcx Expr<'_>) {
+    impl Visitor<'_> for DivisionsInsideExpr {
+        fn visit_expr(&mut self, expr: &Expr<'_>) {
             if_chain! {
                 if let ExprKind::Binary(op, _lexpr, _rexpr) = expr.kind;
                 if BinOpKind::Div == op.node;
@@ -62,7 +62,7 @@ fn get_divisions_inside_expr<'tcx>(expr: &'tcx Expr<'_>) -> Vec<Span> {
 
     walk_expr(&mut visitor, expr);
 
-    return visitor.divisions;
+    visitor.divisions
 }
 
 impl<'tcx> LateLintPass<'tcx> for DivideBeforeMultiply {
