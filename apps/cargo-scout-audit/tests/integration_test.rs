@@ -125,6 +125,8 @@ fn execute_and_validate_example(warning_message: &str, path: &str, is_vulnerable
             )
             .red()
         );
+        println!("stdout:\n{}", String::from_utf8(output.stdout).unwrap());
+        println!("stderr:\n{}", String::from_utf8(output.stderr).unwrap());
         panic!();
     }
 
