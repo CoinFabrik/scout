@@ -90,6 +90,7 @@ jobs:
             "insufficiently-random-values",
             "integer-overflow-or-underflow",
             "iterators-over-indexing",
+            "lazy-delegate",
             "panic-error",
             "reentrancy-1",
             "reentrancy-2",
