@@ -1,7 +1,6 @@
 #![feature(rustc_private)]
 #![warn(unused_extern_crates)]
 #![feature(let_chains)]
-#![feature(is_some_and)]
 
 extern crate rustc_hir;
 extern crate rustc_middle;
@@ -10,9 +9,9 @@ extern crate rustc_span;
 use std::collections::HashSet;
 
 use clippy_utils::diagnostics::span_lint;
+use rustc_hir::intravisit::walk_expr;
 use rustc_hir::intravisit::Visitor;
-use rustc_hir::intravisit::{walk_expr, FnKind};
-use rustc_hir::{Body, FnDecl, HirId, QPath};
+use rustc_hir::QPath;
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_middle::mir::{
@@ -105,12 +104,8 @@ impl<'tcx> LateLintPass<'tcx> for UnexpectedRevertWarn {
                         let QPath::TypeRelative(ty2, rec2_path) = rec2_qpath &&
                         rec2_path.ident.name.to_string() == "env" &&
                         let rustc_hir::TyKind::Path(rec3_qpath) = &ty2.kind &&
-                        let QPath::Resolved(_, rec3_path) = rec3_qpath &&
-                        rec3_path.segments[0].ident.to_string() == "Self" {
-
-                            if self.cx.typeck_results().type_dependent_def_id(expr.hir_id).is_some() {
-                                self.callers_def_id.insert(self.cx.typeck_results().type_dependent_def_id(expr.hir_id).unwrap());
-                            }
+                        let QPath::Resolved(_, rec3_path) = rec3_qpath && rec3_path.segments[0].ident.to_string() == "Self" && self.cx.typeck_results().type_dependent_def_id(expr.hir_id).is_some() {
+                        self.callers_def_id.insert(self.cx.typeck_results().type_dependent_def_id(expr.hir_id).unwrap());
                     }
                 }
                 walk_expr(self, expr);
@@ -118,7 +113,7 @@ impl<'tcx> LateLintPass<'tcx> for UnexpectedRevertWarn {
         }
 
         let mut uvf_storage = UnprotectedVectorFinder {
-            cx: cx,
+            cx,
             callers_def_id: HashSet::default(),
             push_def_id: None,
         };
@@ -150,9 +145,7 @@ impl<'tcx> LateLintPass<'tcx> for UnexpectedRevertWarn {
                     if let Operand::Constant(fn_const) = func &&
                         let ConstantKind::Val(_const_val, ty) = fn_const.literal &&
                         let TyKind::FnDef(def, _subs) = ty.kind() {
-
-
-                            if callers_def_id.len() > 0 {
+                            if !callers_def_id.is_empty() {
                                 for caller in &callers_def_id{
                                     if caller == def {
                                         callers_vec.callers.push((bb_data, BasicBlock::from_usize(bb)));
@@ -168,7 +161,7 @@ impl<'tcx> LateLintPass<'tcx> for UnexpectedRevertWarn {
                     }
                 }
             }
-            return callers_vec;
+            callers_vec
         }
 
         let caller_and_vec_ops = find_caller_and_vec_ops_in_mir(
@@ -177,7 +170,7 @@ impl<'tcx> LateLintPass<'tcx> for UnexpectedRevertWarn {
             uvf_storage.push_def_id,
         );
 
-        if caller_and_vec_ops.vec_ops.len() > 0 {
+        if !caller_and_vec_ops.vec_ops.is_empty() {
             let unchecked_places = navigate_trough_basicblocks(
                 &mir_body.basic_blocks,
                 BasicBlock::from_u32(0),
@@ -246,18 +239,15 @@ impl<'tcx> LateLintPass<'tcx> for UnexpectedRevertWarn {
             }
             match &bbs[bb].terminator().kind {
                 TerminatorKind::SwitchInt { discr, targets } => {
-                    let comparison_with_caller: bool;
-                    match discr {
+                    let comparison_with_caller = match discr {
                         Operand::Copy(place) | Operand::Move(place) => {
-                            comparison_with_caller = tainted_places
+                            tainted_places
                                 .iter()
                                 .any(|tainted_place| tainted_place == place)
                                 || after_comparison
                         }
-                        Operand::Constant(_cons) => {
-                            comparison_with_caller = after_comparison;
-                        }
-                    }
+                        Operand::Constant(_cons) => after_comparison,
+                    };
                     for target in targets.all_targets() {
                         ret_vec.append(&mut navigate_trough_basicblocks(
                             bbs,
@@ -298,7 +288,7 @@ impl<'tcx> LateLintPass<'tcx> for UnexpectedRevertWarn {
                     }
                     for map_op in &caller_and_vec_ops.vec_ops {
                         if map_op.1 == bb
-                            && after_comparison == false
+                            && !after_comparison
                             && args.get(1).map_or(true, |f| {
                                 f.place().is_some_and(|f| !tainted_places.contains(&f))
                             })
@@ -368,7 +358,7 @@ impl<'tcx> LateLintPass<'tcx> for UnexpectedRevertWarn {
                 | TerminatorKind::Unreachable
                 | TerminatorKind::GeneratorDrop => {}
             }
-            return ret_vec;
+            ret_vec
         }
     }
 }
