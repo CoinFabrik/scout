@@ -23,13 +23,13 @@ categories = ["development-tools", "command-line-utilities"]
 ansi_term = "0.12.1"
 anyhow = "1"
 atty = "0.2.14"
-cargo = "0.70"
-cargo_metadata = "0.15"
+cargo = "0.72.2"
+cargo_metadata = "0.17"
 clap = { version = "4.3.0", features = ["derive"] }
 dylint = "2.1.9"
 env_logger = "0.10"
 glob = { version = "0.3" }
-itertools = "0.10.5"
+itertools = "0.11"
 log = "0.4"
 
 [dev-dependencies]
