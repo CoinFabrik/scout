@@ -11,13 +11,13 @@ const CONFIG_FILENAME: &str = "integration_test_configuration.yaml";
 #[derive(Debug, Serialize, Deserialize)]
 struct DetectorConfig {
     warning_message: String,
-    examples: Vec<Example>,
+    testcases: Vec<Testcase>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Example {
-    vulnerable_path: String,
-    remediated_path: String,
+struct Testcase {
+    vulnerable_path: Option<String>,
+    remediated_path: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -61,18 +61,22 @@ fn test() {
             };
         }
 
-        println!("\n{} {}", "Running detector:".bright_cyan(), detector_name);
-        for example in detector_config.examples.iter() {
-            execute_and_validate_example(
-                &detector_config.warning_message,
-                &example.vulnerable_path,
-                true,
-            );
-            execute_and_validate_example(
-                &detector_config.warning_message,
-                &example.remediated_path,
-                false,
-            );
+        println!("\n{} {}", "Testing detector:".bright_cyan(), detector_name);
+        for example in detector_config.testcases.iter() {
+            if let Some(vulnerable_path) = &example.vulnerable_path {
+                execute_and_validate_testcase(
+                    &detector_config.warning_message,
+                    &vulnerable_path,
+                    true,
+                );
+            }
+            if let Some(remediated_path) = &example.remediated_path {
+                execute_and_validate_testcase(
+                    &detector_config.warning_message,
+                    &remediated_path,
+                    false,
+                );
+            }
         }
     }
 
@@ -104,9 +108,9 @@ pub fn get_configuration() -> Result<Detectors, config::ConfigError> {
         .try_deserialize()
 }
 
-fn execute_and_validate_example(warning_message: &str, path: &str, is_vulnerable: bool) {
+fn execute_and_validate_testcase(warning_message: &str, path: &str, is_vulnerable: bool) {
     let start_time = std::time::Instant::now();
-    print!("{} {}", "Running example:".green(), path);
+    print!("{} {}", "Running testcase:".green(), path);
     io::stdout().flush().unwrap();
     let output = execute_command(path);
     let end_time = std::time::Instant::now();
