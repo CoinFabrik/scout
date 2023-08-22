@@ -7,12 +7,10 @@ extern crate rustc_span;
 use std::fs;
 
 use clippy_utils::diagnostics::span_lint_and_help;
-use reqwest::{Client, Error};
-use rustc_lint::{LateContext, LateLintPass};
+use rustc_lint::EarlyLintPass;
 use semver::*;
-use serde::Deserialize;
 
-dylint_linting::declare_late_lint! {
+dylint_linting::declare_early_lint! {
     /// ### What it does
     /// Checks the ink! version of the contract
     /// ### Why is this bad?
@@ -24,25 +22,10 @@ dylint_linting::declare_late_lint! {
     "Use the latest version of ink!"
 }
 
-#[derive(Deserialize)]
-struct CrateResponse {
-    #[serde(rename = "crate")]
-    krate: Crate,
-}
-
-#[derive(Deserialize)]
-struct Crate {
-    max_version: String,
-}
-
-impl<'tcx> LateLintPass<'tcx> for CheckInkVersion {
-    fn check_crate(&mut self, cx: &LateContext<'_>) {
-        let latest_version = get_version();
-
-        let latest_version = match latest_version {
-            Ok(version) => version,
-            Err(_) => return,
-        };
+impl EarlyLintPass for CheckInkVersion {
+    fn check_crate(&mut self, cx: &rustc_lint::EarlyContext<'_>, _: &rustc_ast::Crate) {
+        let latest_version =
+            get_version().expect("Failed to get latest version of ink! from crates.io");
 
         let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
 
@@ -76,13 +59,19 @@ impl<'tcx> LateLintPass<'tcx> for CheckInkVersion {
     }
 }
 
-#[tokio::main]
-async fn get_version() -> Result<String, Error> {
-    let url = "https://crates.io/api/v1/crates/ink";
-
-    let client = Client::builder().user_agent("Scout/1.0").build()?;
-
-    let resp: CrateResponse = client.get(url).send().await?.json().await?;
-
-    Ok(resp.krate.max_version)
+fn get_version() -> Result<String, reqwest::Error> {
+    let client = reqwest::blocking::Client::builder()
+        .user_agent("Scout/1.0")
+        .build()?;
+    let resp: serde_json::Value = client
+        .get("https://crates.io/api/v1/crates/ink")
+        .send()?
+        .json()?;
+    let version = resp
+        .get("crate")
+        .unwrap()
+        .get("max_version")
+        .unwrap()
+        .to_string();
+    Ok(version)
 }
