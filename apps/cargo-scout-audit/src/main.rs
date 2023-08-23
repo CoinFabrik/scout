@@ -1,3 +1,4 @@
+use core::panic;
 use std::{fs, path::PathBuf};
 
 use cargo::Config;
@@ -53,6 +54,9 @@ struct Scout {
 
     #[clap(last = true, help = "Arguments for `cargo check`")]
     args: Vec<String>,
+
+    #[clap(short, long, value_name = "Type", help = "Sets the output type")]
+    output: Option<String>,
 }
 
 fn main() {
@@ -84,6 +88,7 @@ fn run_scout(opts: Scout) {
     let detectors_names = detectors
         .get_detector_names()
         .expect("Failed to build detectors");
+
     if opts.list_detectors {
         list_detectors(detectors_names).expect("Failed to list detectors");
         return;
@@ -101,7 +106,25 @@ fn run_scout(opts: Scout) {
         .build(used_detectors)
         .expect("Failed to build detectors");
 
-    run_dylint(detectors_paths, opts).expect("Failed to run dylint");
+    if opts.output.is_some() {
+        let valid_formats = ["json", "html"];
+        let format = opts.output.clone().unwrap();
+
+        if valid_formats.contains(&format.as_str()) {
+            run_dylint_with_output(detectors_paths, opts, format).expect("Failed to run dylint")
+        }
+    } else {
+        run_dylint(detectors_paths, opts).expect("Failed to run dylint");
+    }
+}
+
+fn run_dylint_with_output(
+    detectors_paths: Vec<PathBuf>,
+    opts: Scout,
+    format: String,
+) -> anyhow::Result<()> {
+    //implement this
+    Ok(())
 }
 
 fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> {
