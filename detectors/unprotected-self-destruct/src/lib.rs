@@ -164,7 +164,6 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
             tainted_places: &mut Vec<Place<'tcx>>,
         ) -> Vec<(Place<'tcx>, Span)> {
             let mut ret_vec = Vec::<(Place, Span)>::new();
-            //dbg!(after_comparison, &tainted_places, &bbs[bb]);
             if bbs[bb].terminator.is_none() {
                 return ret_vec;
             }

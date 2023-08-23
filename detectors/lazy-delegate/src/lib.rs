@@ -71,7 +71,6 @@ impl EarlyLintPass for DelegateCall {
 
     fn check_ident(&mut self, cx: &EarlyContext<'_>, id: rustc_span::symbol::Ident) {
         if id.name.to_string() == "delegate" {
-            dbg!(id.span);
             self.delegate_uses.push(id.span);
         }
 
