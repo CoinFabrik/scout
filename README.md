@@ -83,21 +83,22 @@ cargo test --all --all-features
 
 In order to run the tests for a particular test-case, run the same command on that particular test-case folder (e.g: `test-cases/delegate-call/delegate-call-1/vulnerable-example`)
 
+## Acknowledgements
+
+Scout is an open source vulnerability analyzer developed by [CoinFabrik's](https://www.coinfabrik.com/) Research and Development team.
+
+We received support through grants from both the [Web3 Foundation Grants Program](https://github.com/w3f/Grants-Program/tree/master) and the [Aleph Zero Ecosystem Funding Program](https://alephzero.org/ecosystem-funding-program).
+
+| Grant Program | Description |
+|---------------|-------------|
+| ![Web3 Foundation](https://github.com/CoinFabrik/scout/tree/main/assets/web3-foundation.png) | **Proof of Concept:** We collaborated with the [Laboratory on Foundations and Tools for Software Engineering (LaFHIS)](https://lafhis.dc.uba.ar/) at the [University of Buenos Aires](https://www.uba.ar/internacionales/index.php?lang=en) to establish analysis techniques and tools for our detectors, as well as to create an initial list of vulnerability classes and code examples. [View Grant](https://github.com/CoinFabrik/web3-grant) \| [Application Form](https://github.com/w3f/Grants-Program/blob/master/applications/ScoutCoinFabrik.md).<br><br>**Prototype:** We built a functioning prototype using linting detectors built with [Dylint](https://github.com/trailofbits/dylint) and expanded the list of vulnerability classes, detectors, and test cases. [View Prototype](https://coinfabrik.github.io/scout/) \| [Application Form](https://github.com/w3f/Grants-Program/blob/master/applications/ScoutCoinFabrik_2.md). |
+| ![Aleph Zero](https://github.com/CoinFabrik/scout/tree/main/assets/aleph-zero.png) | We improved the precision and number of detectors for the tool with a multi-phase approach. This included a manual vulnerability analysis of projects within the Aleph Zero ecosystem, comprehensive testing of the tool on leading projects, and refining its detection accuracy. |
+
 ## About CoinFabrik
 
 We - [CoinFabrik](https://www.coinfabrik.com/) - are a research and development company specialized in Web3, with a strong background in cybersecurity. Founded in 2014, we have worked on over 180 blockchain-related projects, EVM based and also for Solana, Algorand, and Polkadot. Beyond development, we offer security audits through a dedicated in-house team of senior cybersecurity professionals, currently working on code in Substrate, Solidity, Clarity, Rust, and TEAL.
 
 Our team has an academic background in computer science and mathematics, with work experience focused on cybersecurity and software development, including academic publications, patents turned into products, and conference presentations. Furthermore, we have an ongoing collaboration on knowledge transfer and open-source projects with the University of Buenos Aires.
-
-## Acknowledgements
-
-This work was supported through grants from the [Web3 Foundation Grants Program](https://github.com/w3f/Grants-Program/tree/master).
-
-Grants:
-| Stage | Grant | Description |
-|:-----:|:------:|:-----------:|
-| [Proof of Concept](https://github.com/CoinFabrik/web3-grant) | [ScoutCoinFabrik](https://github.com/w3f/Grants-Program/blob/master/applications/ScoutCoinFabrik.md) | During the Proof of Concept (PoC) stage, we collaborated with the Laboratory on Foundations and Tools for Software Engineering ([LaFHIS](https://lafhis.dc.uba.ar/)) at the [University of Buenos Aires](https://www.uba.ar/internacionales/index.php?lang=en) to establish analysis techniques and tools for our detectors, as well as to create an initial list of vulnerability classes and code examples.|
-| [Prototype](https://coinfabrik.github.io/scout/) | [ScoutCoinFabrik_2](https://github.com/w3f/Grants-Program/blob/master/applications/ScoutCoinFabrik_2.md) | We built a functioning prototype using linting detectors built with [Dylint](https://github.com/trailofbits/dylint) and expanded the list of vulnerability classes, detectors, and test cases.|
 
 ## License
 
