@@ -74,6 +74,8 @@ const config = {
         items: [
           {type: 'docSidebar', sidebarId: 'docsSidebar', label: 'Docs', position: 'left'},
           {to: 'https://blog.coinfabrik.com/', label: 'Blog', position: 'left'},
+          {to: '/acknowledgements', label: 'Acknowledgements', position: 'left'},
+          {to: '/about', label: 'About', position: 'left'},
           {
             href: 'https://github.com/CoinFabrik/scout',
             label: 'GitHub',
