@@ -77,7 +77,7 @@ impl EarlyLintPass for LazyDelegate {
         if !self.delegate_uses.is_empty() && !self.non_lazy_manual_storage_spans.is_empty() {
             span_lint_and_help(
                 cx,
-                DELEGATE_CALL,
+                LAZY_DELEGATE,
                 id.span,
                 "Delegate call with non-lazy, non-mapping storage",
                 None,
@@ -87,7 +87,7 @@ impl EarlyLintPass for LazyDelegate {
             for span in &self.non_lazy_manual_storage_spans {
                 span_lint_and_help(
                     cx,
-                    DELEGATE_CALL,
+                    LAZY_DELEGATE,
                     *span,
                     "Non-lazy non-mapping storage",
                     None,
