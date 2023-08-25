@@ -29,7 +29,7 @@ dylint_linting::impl_pre_expansion_lint! {
     /// Use instead:
     ///```rust
     ///    #[ink(storage)]
-    ///    pub struct DelegateCall {
+    ///    pub struct LazyDelegate {
     ///        admin: Lazy<AccountId, ManualKey<12345>>,
     ///    }
     ///
@@ -38,19 +38,19 @@ dylint_linting::impl_pre_expansion_lint! {
     /// - https://github.com/paritytech/ink/issues/1826
     ///```
 
-    pub DELEGATE_CALL,
+    pub LAZY_DELEGATE,
     Warn,
     "Use of delegate call with non-lazy, non-mapping storage won't modify the storage of the contract.",
-    DelegateCall::default()
+    LazyDelegate::default()
 }
 
 #[derive(Default)]
-pub struct DelegateCall {
+pub struct LazyDelegate {
     non_lazy_manual_storage_spans: Vec<Span>,
     delegate_uses: Vec<Span>,
 }
 
-impl EarlyLintPass for DelegateCall {
+impl EarlyLintPass for LazyDelegate {
     fn check_item(&mut self, _: &EarlyContext<'_>, item: &Item) {
         if is_storage_item(item)
         && let ItemKind::Struct(strt, _) = &item.kind
