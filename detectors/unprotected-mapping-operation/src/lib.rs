@@ -86,7 +86,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
         }
 
         let mut umrf_storage = UnprotectedMappingOperationFinder {
-            cx: cx,
+            cx,
             caller_def_id: None,
             insert_def_id: None,
             remove_def_id: None,
@@ -133,7 +133,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
                     }
                 }
             }
-            return callers_vec;
+            callers_vec
         }
 
         let caller_and_map_ops = find_caller_and_map_ops_in_mir(
@@ -146,7 +146,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
             ],
         );
 
-        if caller_and_map_ops.map_ops.len() > 0 {
+        if !caller_and_map_ops.map_ops.is_empty() {
             let unchecked_places = navigate_trough_basicblocks(
                 &mir_body.basic_blocks,
                 BasicBlock::from_u32(0),
@@ -215,18 +215,15 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
             }
             match &bbs[bb].terminator().kind {
                 TerminatorKind::SwitchInt { discr, targets } => {
-                    let comparison_with_caller: bool;
-                    match discr {
+                    let comparison_with_caller = match discr {
                         Operand::Copy(place) | Operand::Move(place) => {
-                            comparison_with_caller = tainted_places
+                            tainted_places
                                 .iter()
                                 .any(|tainted_place| tainted_place == place)
                                 || after_comparison
                         }
-                        Operand::Constant(_cons) => {
-                            comparison_with_caller = after_comparison;
-                        }
-                    }
+                        Operand::Constant(_cons) => after_comparison,
+                    };
                     for target in targets.all_targets() {
                         ret_vec.append(&mut navigate_trough_basicblocks(
                             bbs,
@@ -267,7 +264,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
                     }
                     for map_op in &caller_and_map_ops.map_ops {
                         if map_op.1 == bb
-                            && after_comparison == false
+                            && !after_comparison
                             && args.get(1).map_or(true, |f| {
                                 f.place().is_some_and(|f| !tainted_places.contains(&f))
                             })
@@ -337,7 +334,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
                 | TerminatorKind::Unreachable
                 | TerminatorKind::GeneratorDrop => {}
             }
-            return ret_vec;
+            ret_vec
         }
     }
 }

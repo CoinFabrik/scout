@@ -21,51 +21,8 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  # test:
-  #   name: Test
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v3
-
-  #     - name: Cache cargo-scout dependencies
-  #       id: cache-cargo-scout-dependencies
-  #       uses: actions/cache@v3
-  #       with:
-  #         path: ./apps/cargo-scout-audit/target
-  #         key: ${{ runner.os }}-cargo-${{ hashFiles('apps/cargo-scout-audit/Cargo.lock') }}
-
-  #     - name: Cache other dependencies
-  #       id: cache-other-dependencies
-  #       uses: actions/cache@v3
-  #       with:
-  #         path: |
-  #           ~/.cargo/registry
-  #           ~/.cargo/git
-  #           ./detectors/**/target
-  #           ./test-cases/**/target
-  #         key: ${{ runner.os }}-other-dependencies
-
-  #     - name: Update Rust
-  #       run: rustup update
-
-  #     - name: Install Rust nightly-2023-01-27
-  #       run: rustup install nightly-2023-01-27 --profile minimal
-
-  #     - name: Install Rust nightly-2023-04-23
-  #       run: rustup install nightly-2023-04-23 --profile minimal
-
-  #     - name: Install dylint-link
-  #       run: cargo install dylint-link
-
-  #     - name: Install cargo-scout
-  #       run: cargo install --path apps/cargo-scout-audit
-
-  #     - name: Run cargo test
-  #       run: make test
-
-  fmt:
-    name: Rustfmt
+  format:
+    name: Format
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -82,37 +39,37 @@ jobs:
       - name: Run cargo fmt
         run: make fmt-rust-check
 
-  # clippy:
-  #   name: Clippy
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v3
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-  #     - name: Cache cargo-scout dependencies
-  #       id: cache-cargo-scout-dependencies
-  #       uses: actions/cache@v3
-  #       with:
-  #         path: ./apps/cargo-scout-audit/target
-  #         key: ${{ runner.os }}-cargo-${{ hashFiles('apps/cargo-scout-audit/Cargo.lock') }}
+      - name: Cache cargo-scout-audit dependencies
+        id: cache-cargo-scout-audit-dependencies
+        uses: actions/cache@v3
+        with:
+          path: ./apps/cargo-scout-audit/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('apps/cargo-scout-audit/Cargo.lock') }}
 
-  #     - name: Update Rust
-  #       run: rustup update
+      - name: Update Rust
+        run: rustup update
 
-  #     - name: Install Rust nightly-2023-01-27
-  #       run: rustup install nightly-2023-01-27 --profile minimal
+      - name: Install Rust nightly-2023-01-27
+        run: rustup install nightly-2023-01-27 --profile minimal
 
-  #     - name: Install Rust nightly-2023-04-23
-  #       run: rustup install nightly-2023-04-23 --profile minimal
+      - name: Install Rust nightly-2023-04-23
+        run: rustup install nightly-2023-04-23 --profile minimal
 
-  #     - name: Install Clippy nightly-2023-01-27
-  #       run: rustup component add clippy --toolchain nightly-2023-01-27
+      - name: Install Clippy nightly-2023-01-27
+        run: rustup component add clippy --toolchain nightly-2023-01-27
 
-  #     - name: Install Clippy nightly-2023-04-23
-  #       run: rustup component add clippy --toolchain nightly-2023-04-23
+      - name: Install Clippy nightly-2023-04-23
+        run: rustup component add clippy --toolchain nightly-2023-04-23
 
-  #     - name: Install dylint-link
-  #       run: cargo install dylint-link
+      - name: Install dylint-link
+        run: cargo install dylint-link
 
-  #     - name: Run clippy
-  #       run: make lint-rust
+      - name: Run clippy
+        run: make lint

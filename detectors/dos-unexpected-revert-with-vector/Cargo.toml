@@ -1,5 +1,5 @@
 [package]
-name = "unexpected-revert"
+name = "dos-unexpected-revert-with-vector"
 version = "0.1.0"
 edition = "2021"
 

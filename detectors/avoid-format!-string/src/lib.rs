@@ -90,7 +90,7 @@ impl EarlyLintPass for AvoidFormatString {
                     expr.span,
                     "The format! macro should not be used.",
                     None,
-                    &format!("Instead, if this is returning an error, define a new error type"),
+                    "Instead, if this is returning an error, define a new error type",
                 );
             }
         }
@@ -125,7 +125,7 @@ fn is_test_item(item: &Item) -> bool {
             }
         }
 
-        return false;
+        false
     })
 }
 
