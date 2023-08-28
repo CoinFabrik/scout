@@ -1,5 +1,5 @@
 [package]
-name = "insufficiently_random_values"
+name = "insufficiently-random-values"
 version = "0.1.0"
 authors = ["authors go here"]
 description = "description goes here"
