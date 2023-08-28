@@ -37,6 +37,9 @@ jobs:
       - name: Check detector names with underscore
         run: python scripts/check-detectors-underscore-names.py detectors
 
+      - name: Check detector names different than their folders
+        run: python scripts/check-detectors-names-match-folder.py detectors
+
   build:
     name: Build
     needs: check-config

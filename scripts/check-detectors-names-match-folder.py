@@ -1,6 +1,6 @@
 import argparse
 import os
-
+from pathlib import Path
 
 def get_recursive_package_names(root_path):
     results = []
@@ -25,7 +25,7 @@ def get_recursive_package_names(root_path):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Check if any detectors names have underscores instead of hyphens"
+        description="Check if any detectors names don't match their folder"
     )
     parser.add_argument("detectors_path", type=str, help="Path to detectors folder")
     args = parser.parse_args()
@@ -33,13 +33,15 @@ if __name__ == "__main__":
     results = get_recursive_package_names(args.detectors_path)
     sorted_results = sorted(results, key=lambda x: x[1])
 
-    # Check if they have underscores instead of hyphens
+    # Check if they match the name of the folder
     failed_results = []
     for r in sorted_results:
-        if "_" in r[1]:
+        folder_name = Path(r[0]).parent.name
+        if folder_name != r[1]:
             failed_results.append(r)
+
     if len(failed_results) > 0:
-        print("Found detectors with underscores instead of hyphens:")
+        print("Found detectors with different package names than their folder:")
         for fr in failed_results:
             print(f"\t{fr[0]} - {fr[1]}")
         exit(1)
