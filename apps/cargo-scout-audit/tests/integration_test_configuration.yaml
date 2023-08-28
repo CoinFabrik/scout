@@ -9,11 +9,11 @@ detectors:
     testcases:
       - vulnerable_path: "../../test-cases/avoid-core-mem-forget/avoid-core-mem-forget-1/vulnerable-example/Cargo.toml"
         remediated_path: "../../test-cases/avoid-core-mem-forget/avoid-core-mem-forget-1/remediated-example/Cargo.toml"
-  avoid-format!-string:
+  avoid-format-string:
     warning_message: "The format! macro should not be used."
     testcases:
-      - vulnerable_path: "../../test-cases/avoid-format!-string/avoid-format!-string-1/vulnerable-example/Cargo.toml"
-        remediated_path: "../../test-cases/avoid-format!-string/avoid-format!-string-1/remediated-example/Cargo.toml"
+      - vulnerable_path: "../../test-cases/avoid-format-string/avoid-format-string-1/vulnerable-example/Cargo.toml"
+        remediated_path: "../../test-cases/avoid-format-string/avoid-format-string-1/remediated-example/Cargo.toml"
   delegate-call:
     warning_message: "Passing arguments to the target of a delegate call is not safe, as it allows the caller to set a malicious hash as the target."
     testcases:

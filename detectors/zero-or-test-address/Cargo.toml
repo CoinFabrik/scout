@@ -1,5 +1,5 @@
 [package]
-name = "zero_or_test_address"
+name = "zero-or-test-address"
 version = "0.1.0"
 authors = ["authors go here"]
 description = "description goes here"
@@ -20,4 +20,3 @@ dylint_testing = "2.1.5"
 
 [package.metadata.rust-analyzer]
 rustc_private = true
-
