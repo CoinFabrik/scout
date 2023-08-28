@@ -125,6 +125,7 @@ jobs:
             ~/.cargo
             apps/cargo-scout-audit/target
           key: ${{ runner.os }}-cargo-scout-dependencies-${{ github.run_id  }}
+          fail-on-cache-miss: true
 
       - name: Run tests
         working-directory: apps/cargo-scout-audit
