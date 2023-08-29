@@ -165,7 +165,7 @@ fn error_map() -> HashMap<String, String> {
     let mut map = HashMap::new();
     scout_errors()
         .into_iter()
-        .zip(error_names().into_iter())
+        .zip(error_names())
         .for_each(|(k, v)| {
             map.insert(k, v);
         });
