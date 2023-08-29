@@ -24,7 +24,7 @@ pub fn format_into_json(mut stderr: File) -> anyhow::Result<String> {
         .collect();
 
     for elem in regex.find_iter(&stderr_string) {
-        let parts = elem.as_str().split("\n").collect::<Vec<&str>>();
+        let parts = elem.as_str().split('\n').collect::<Vec<&str>>();
 
         for err in scout_errors().iter() {
             if parts[0].contains(err) && parts[1].starts_with("  --> ") {
