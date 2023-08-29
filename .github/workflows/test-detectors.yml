@@ -64,7 +64,7 @@ jobs:
         run: rustup install nightly-2023-04-23 --profile minimal
 
       - name: Install dylint-link
-        run: cargo install dylint-link
+        run: git clone --depth=1 https://github.com/CoinFabrik/dylint-scout/ && cargo install --path dylint/dylint-link
 
       - name: Install cargo-scout-audit
         run: cargo install --path apps/cargo-scout-audit
