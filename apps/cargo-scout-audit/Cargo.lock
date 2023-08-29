@@ -3,15 +3,6 @@
 version = 3
 
 [[package]]
-name = "addr2line"
-version = "0.21.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8a30b2e23b9e17a9f90641c7ab1549cd9b44f296d3ccbf309d2863cfe398a0cb"
-dependencies = [
- "gimli",
-]
-
-[[package]]
 name = "adler"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -112,9 +103,6 @@ name = "anyhow"
 version = "1.0.75"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a4668cab20f66d8d020e1fbc0ebe47217433c1b6c8f2040faf858554e394ace6"
-dependencies = [
- "backtrace",
-]
 
 [[package]]
 name = "arc-swap"
@@ -144,21 +132,6 @@ name = "autocfg"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
-
-[[package]]
-name = "backtrace"
-version = "0.3.69"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2089b7e3f35b9dd2d0ed921ead4f6d318c27680d4a5bd167b3ee120edb105837"
-dependencies = [
- "addr2line",
- "cc",
- "cfg-if",
- "libc",
- "miniz_oxide",
- "object",
- "rustc-demangle",
-]
 
 [[package]]
 name = "base16ct"
@@ -330,17 +303,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "cargo-dylint"
-version = "2.2.0"
-dependencies = [
- "anyhow",
- "clap",
- "dylint",
- "dylint_internal",
- "env_logger",
-]
-
-[[package]]
 name = "cargo-platform"
 version = "0.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -356,13 +318,11 @@ dependencies = [
  "ansi_term",
  "anyhow",
  "cargo",
- "cargo-dylint",
  "cargo_metadata",
  "clap",
  "colored",
  "config",
  "dylint",
- "dylint_internal",
  "env_logger",
  "glob",
  "itertools 0.11.0",
@@ -445,7 +405,6 @@ dependencies = [
  "anstream",
  "anstyle",
  "clap_lex",
- "once_cell",
  "strsim",
  "terminal_size",
 ]
@@ -707,6 +666,7 @@ checksum = "56ce8c6da7551ec6c462cbaf3bfbc75131ebbfa1c944aeaa9dab51ca1c5f0c3b"
 [[package]]
 name = "dylint"
 version = "2.2.0"
+source = "git+https://github.com/CoinFabrik/dylint-scout#6c9aa73a37082e0ca46b7f40c1db128bf3a3fbae"
 dependencies = [
  "ansi_term",
  "anyhow",
@@ -733,6 +693,7 @@ dependencies = [
 [[package]]
 name = "dylint_internal"
 version = "2.2.0"
+source = "git+https://github.com/CoinFabrik/dylint-scout#6c9aa73a37082e0ca46b7f40c1db128bf3a3fbae"
 dependencies = [
  "ansi_term",
  "anyhow",
@@ -744,8 +705,6 @@ dependencies = [
  "log",
  "rust-embed",
  "sedregex",
- "semver",
- "toml_edit",
 ]
 
 [[package]]
@@ -931,12 +890,6 @@ dependencies = [
  "wasi",
  "wasm-bindgen",
 ]
-
-[[package]]
-name = "gimli"
-version = "0.28.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6fb8d784f27acf97159b40fc4db5ecd8aa23b9ad5ef69cdd136d3bc80665f0c0"
 
 [[package]]
 name = "git2"
@@ -2026,15 +1979,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "object"
-version = "0.32.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "77ac5bbd07aea88c60a577a1ce218075ffd59208b2d7ca97adf9bfc5aeb21ebe"
-dependencies = [
- "memchr",
-]
-
-[[package]]
 name = "once_cell"
 version = "1.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2456,12 +2400,6 @@ dependencies = [
  "cfg-if",
  "ordered-multimap",
 ]
-
-[[package]]
-name = "rustc-demangle"
-version = "0.1.23"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d626bb9dae77e28219937af045c257c28bfd3f69333c512553507f5f9798cb76"
 
 [[package]]
 name = "rustfix"

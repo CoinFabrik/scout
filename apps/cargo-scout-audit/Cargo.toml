@@ -25,9 +25,7 @@ anyhow = "1"
 cargo = "0.72.2"
 cargo_metadata = "0.17"
 clap = { version = "4.3.0", features = ["derive"] }
-dylint = { path = "../dylint/dylint"}
-dylint_internal = { path = "../dylint/internal" }
-cargo-dylint = { path = "../dylint/cargo-dylint" }
+dylint = { git = "https://github.com/CoinFabrik/dylint-scout"}
 env_logger = "0.10"
 glob = { version = "0.3" }
 itertools = "0.11"
