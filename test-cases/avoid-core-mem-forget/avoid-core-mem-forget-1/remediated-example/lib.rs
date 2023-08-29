@@ -24,11 +24,12 @@ mod avoid_std_and_core_mem {
         }
 
         #[allow(forgetting_copy_types)]
+        #[allow(dropping_copy_types)]
         #[ink(message)]
         pub fn drop_value(&mut self) {
             let forgotten_value = self.value;
             self.value = false;
-            forget_value.drop();
+            drop(forgotten_value);
         }
 
         #[ink(message)]

@@ -148,7 +148,7 @@ fn is_test_item(item: &Item) -> bool {
             }
         }
 
-        return false;
+        false
     })
 }
 

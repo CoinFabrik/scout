@@ -153,19 +153,23 @@ fn run_dylint(
     }
 
     // If there is a need to exclude or filter by detector, the dylint tool needs to be recompiled.
+    // TODO: improve detector system so that doing this isn't necessary.
     if opts.exclude.is_some() || opts.filter.is_some() {
-        if let Some(manifest_path) = &options.manifest_path {
-            // Get the directory of manifest path
-            let manifest_path = PathBuf::from(manifest_path)
-                .parent()
-                .unwrap()
-                .to_str()
-                .unwrap()
-                .to_string();
-            fs::remove_dir_all(format!("{manifest_path}/target/dylint"))
-                .expect("Error removing directory");
-        } else {
-            fs::remove_dir_all("target/dylint").expect("Error removing directory");
+        let target_dylint_path = match &options.manifest_path {
+            Some(manifest_path) => {
+                let manifest_path = PathBuf::from(manifest_path);
+                let manifest_path_parent = manifest_path
+                    .parent()
+                    .expect("Error getting manifest path parent");
+                manifest_path_parent.join("target").join("dylint")
+            }
+            None => std::env::current_dir()
+                .expect("Failed to get current dir")
+                .join("target")
+                .join("dylint"),
+        };
+        if target_dylint_path.exists() {
+            fs::remove_dir_all(target_dylint_path).expect("Error removing target/dylint directory");
         }
     }
 

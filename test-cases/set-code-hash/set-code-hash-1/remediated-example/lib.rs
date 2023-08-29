@@ -26,7 +26,7 @@ mod set_code_hash {
 
         #[ink(message)]
         pub fn update_code(&self, value: [u8; 32]) -> Result<(), Error> {
-            if self.admin != Self::env().caller() {
+            if self.admin != self.env().caller() {
                 return Err(Error::NotAnAdmin);
             }
 

@@ -1,82 +1,124 @@
 detectors:
+  assert-violation:
+    warning_message: "Assert causes panic. Instead, return a proper error"
+    testcases:
+      - vulnerable_path: "../../test-cases/assert-violation/assert-violation-1/vulnerable-example/Cargo.toml"
+        remediated_path: "../../test-cases/assert-violation/assert-violation-1/remediated-example/Cargo.toml"
+  avoid-core-mem-forget:
+    warning_message: "Using `core::mem::forget` is not recommended."
+    testcases:
+      - vulnerable_path: "../../test-cases/avoid-core-mem-forget/avoid-core-mem-forget-1/vulnerable-example/Cargo.toml"
+        remediated_path: "../../test-cases/avoid-core-mem-forget/avoid-core-mem-forget-1/remediated-example/Cargo.toml"
+  avoid-format-string:
+    warning_message: "The format! macro should not be used."
+    testcases:
+      - vulnerable_path: "../../test-cases/avoid-format-string/avoid-format-string-1/vulnerable-example/Cargo.toml"
+        remediated_path: "../../test-cases/avoid-format-string/avoid-format-string-1/remediated-example/Cargo.toml"
+  delegate-call:
+    warning_message: "Passing arguments to the target of a delegate call is not safe, as it allows the caller to set a malicious hash as the target."
+    testcases:
+      - vulnerable_path: "../../test-cases/delegate-call/delegate-call-1/vulnerable-example/Cargo.toml"
+        remediated_path: "../../test-cases/delegate-call/delegate-call-1/remediated-example/Cargo.toml"
+  divide-before-multiply:
+    warning_message: "Division before multiplication might result in a loss of precision"
+    testcases:
+      - vulnerable_path: "../../test-cases/divide-before-multiply/divide-before-multiply-1/vulnerable-example/Cargo.toml"
+        remediated_path: "../../test-cases/divide-before-multiply/divide-before-multiply-1/remediated-example/Cargo.toml"
   dos-unbounded-operation:
     warning_message: "In order to prevent a single transaction from consuming all the gas in a block, unbounded operations must be avoided"
-    examples:
+    testcases:
       - vulnerable_path: "../../test-cases/dos-unbounded-operation/dos-unbounded-operation-1/vulnerable-example/Cargo.toml"
         remediated_path: "../../test-cases/dos-unbounded-operation/dos-unbounded-operation-1/remediated-example/Cargo.toml"
   dos-unexpected-revert-with-vector:
-    warning_message: "Abitrary users should not be able to push to a vector, otherwise it could lead to a DoS attack"
-    examples:
+    warning_message: "This vector operation is called without access control"
+    testcases:
       - vulnerable_path: "../../test-cases/dos-unexpected-revert-with-vector/dos-unexpected-revert-with-vector-1/vulnerable-example/Cargo.toml"
         remediated_path: "../../test-cases/dos-unexpected-revert-with-vector/dos-unexpected-revert-with-vector-1/remediated-example/Cargo.toml"
+  ink-version:
+    warning_message: "The latest ink! version is"
+    testcases:
+      - vulnerable_path: "../../test-cases/ink-version/ink-version-1/vulnerable-example/Cargo.toml"
+        remediated_path: "../../test-cases/ink-version/ink-version-1/remediated-example/Cargo.toml"
+  insufficiently-random-values:
+    warning_message: "In order to prevent randomness manipulations by validators block_timestamp should not be used as random number source"
+    testcases:
+      - vulnerable_path: "../../test-cases/insufficiently-random-values/insufficiently-random-values-1/vulnerable-example/Cargo.toml"
   integer-overflow-or-underflow:
     warning_message: "integer arithmetic overflow/underflow"
-    examples:
+    testcases:
       - vulnerable_path: "../../test-cases/integer-overflow-or-underflow/integer-overflow-or-underflow-1/vulnerable-example/Cargo.toml"
         remediated_path: "../../test-cases/integer-overflow-or-underflow/integer-overflow-or-underflow-1/remediated-example/Cargo.toml"
+  iterators-over-indexing:
+    warning_message: "Hardcoding an index could lead to panic if the top bound is out of bounds."
+    testcases:
+      - vulnerable_path: "../../test-cases/iterators-over-indexing/iterators-over-indexing-1/vulnerable-example/Cargo.toml"
+        remediated_path: "../../test-cases/iterators-over-indexing/iterators-over-indexing-1/remediated-example/Cargo.toml"
+  lazy-delegate:
+    warning_message: "Delegate call with non-lazy, non-mapping storage"
+    testcases:
+      - vulnerable_path: "../../test-cases/lazy-delegate/lazy-delegate-1/vulnerable-example/Cargo.toml"
+        remediated_path: "../../test-cases/lazy-delegate/lazy-delegate-1/remediated-example/Cargo.toml"
   panic-error:
     warning_message: "The panic! macro is used to stop execution when a condition is not met. This is useful for testing and prototyping, but should be avoided in production code"
-    examples:
+    testcases:
       - vulnerable_path: "../../test-cases/panic-error/panic-error-1/vulnerable-example/Cargo.toml"
         remediated_path: "../../test-cases/panic-error/panic-error-1/remediated-example/Cargo.toml"
-  set-contract-storage:
-    warning_message: "Abitrary users should not have control over keys because it implies writing any value of left mapping, lazy variable, or the main struct of the contract located in position 0 of the storage"
-    examples:
-      - vulnerable_path: "../../test-cases/set-contract-storage/set-contract-storage-1/vulnerable-example/Cargo.toml"
-        remediated_path: "../../test-cases/set-contract-storage/set-contract-storage-1/remediated-example/Cargo.toml"
-  unused-return-enum:
-    warning_message: "unused return enum"
-    examples:
-      - vulnerable_path: "../../test-cases/unused-return-enum/unused-return-enum-1/vulnerable-example/Cargo.toml"
-        remediated_path: "../../test-cases/unused-return-enum/unused-return-enum-1/remediated-example/Cargo.toml"
-      - vulnerable_path: "../../test-cases/unused-return-enum/unused-return-enum-2/vulnerable-example/Cargo.toml"
-        remediated_path: "../../test-cases/unused-return-enum/unused-return-enum-2/remediated-example/Cargo.toml"
-  reentrancy:
+  reentrancy-1:
     warning_message: "External calls could open the opportunity for a malicious contract to execute any arbitrary code"
-    examples:
+    testcases:
       - vulnerable_path: "../../test-cases/reentrancy/reentrancy-1/vulnerable-example/vault/Cargo.toml"
         remediated_path: "../../test-cases/reentrancy/reentrancy-1/remediated-example/vault/Cargo.toml"
       - vulnerable_path: "../../test-cases/reentrancy/reentrancy-2/vulnerable-example/vault/Cargo.toml"
         remediated_path: "../../test-cases/reentrancy/reentrancy-2/remediated-example/vault/Cargo.toml"
+  reentrancy-2:
+    warning_message: "External calls could open the opportunity for a malicious contract to execute any arbitrary code"
+    testcases:
       - vulnerable_path: "../../test-cases/reentrancy/reentrancy-3/vulnerable-example/vault/Cargo.toml"
         remediated_path: "../../test-cases/reentrancy/reentrancy-3/remediated-example/vault/Cargo.toml"
-  divide-before-multiply:
-    warning_message: "Division before multiplication might result in a loss of precision"
-    examples:
-      - vulnerable_path: "../../test-cases/divide-before-multiply/divide-before-multiply-1/vulnerable-example/Cargo.toml"
-        remediated_path: "../../test-cases/divide-before-multiply/divide-before-multiply-1/remediated-example/Cargo.toml"
-  delegate-call:
-    warning_message: "Passing arguments to the target of a delegate call is not safe, as it allows the caller to set a malicious hash as the target."
-    examples:
-      - vulnerable_path: "../../test-cases/delegate-call/delegate-call-1/vulnerable-example/Cargo.toml"
-        remediated_path: "../../test-cases/delegate-call/delegate-call-1/remediated-example/Cargo.toml"
+  set-code-hash:
+    warning_message: "This set_code_hash is called without access control"
+    testcases:
+      - vulnerable_path: "../../test-cases/set-code-hash/set-code-hash-1/vulnerable-example/Cargo.toml"
+        remediated_path: "../../test-cases/set-code-hash/set-code-hash-1/remediated-example/Cargo.toml"
+  set-contract-storage:
+    warning_message: "Abitrary users should not have control over keys because it implies writing any value of left mapping, lazy variable, or the main struct of the contract located in position 0 of the storage"
+    testcases:
+      - vulnerable_path: "../../test-cases/set-contract-storage/set-contract-storage-1/vulnerable-example/Cargo.toml"
+        remediated_path: "../../test-cases/set-contract-storage/set-contract-storage-1/remediated-example/Cargo.toml"
+  unprotected-mapping-operation:
+    warning_message: "This mapping operation is called without access control on a different key than the caller's address"
+    testcases:
+      - vulnerable_path: "../../test-cases/unprotected-mapping-operation/unprotected-mapping-operation-1/vulnerable-example/Cargo.toml"
+        remediated_path: "../../test-cases/unprotected-mapping-operation/unprotected-mapping-operation-1/remediated-example/Cargo.toml"
+  unprotected-self-destruct:
+    warning_message: "This terminate_contract is called without access control"
+    testcases:
+      - vulnerable_path: "../../test-cases/unprotected-self-destruct/unprotected-self-destruct-1/vulnerable-example/Cargo.toml"
+        remediated_path: "../../test-cases/unprotected-self-destruct/unprotected-self-destruct-1/remediated-example/Cargo.toml"
+  unrestricted-transfer-from:
+    warning_message: "This argument comes from a user-supplied argument"
+    testcases:
+      - vulnerable_path: "../../test-cases/unrestricted-transfer-from/unrestricted-transfer-from-1/vulnerable-example/escrow/Cargo.toml"
+        remediated_path: "../../test-cases/unrestricted-transfer-from/unrestricted-transfer-from-1/remediated-example/escrow/Cargo.toml"
   unsafe-expect:
     warning_message: "Unsafe usage of `expect`"
-    examples:
+    testcases:
       - vulnerable_path: "../../test-cases/unsafe-expect/unsafe-expect-1/vulnerable-example/Cargo.toml"
         remediated_path: "../../test-cases/unsafe-expect/unsafe-expect-1/remediated-example/Cargo.toml"
   unsafe-unwrap:
     warning_message: "Unsafe usage of `unwrap`"
-    examples:
+    testcases:
       - vulnerable_path: "../../test-cases/unsafe-unwrap/unsafe-unwrap-1/vulnerable-example/Cargo.toml"
         remediated_path: "../../test-cases/unsafe-unwrap/unsafe-unwrap-1/remediated-example/Cargo.toml"
+  unused-return-enum:
+    warning_message: "unused return enum"
+    testcases:
+      - vulnerable_path: "../../test-cases/unused-return-enum/unused-return-enum-1/vulnerable-example/Cargo.toml"
+        remediated_path: "../../test-cases/unused-return-enum/unused-return-enum-1/remediated-example/Cargo.toml"
+      - vulnerable_path: "../../test-cases/unused-return-enum/unused-return-enum-2/vulnerable-example/Cargo.toml"
+        remediated_path: "../../test-cases/unused-return-enum/unused-return-enum-2/remediated-example/Cargo.toml"
   zero-or-test-address:
     warning_message: "Not checking for a zero-address could lead to a locked contract"
-    examples:
+    testcases:
       - vulnerable_path: "../../test-cases/zero-or-test-address/zero-or-test-address-1/vulnerable-example/Cargo.toml"
         remediated_path: "../../test-cases/zero-or-test-address/zero-or-test-address-1/remediated-example/Cargo.toml"
-  unrestricted-transfer-from:
-    warning_message: "This argument comes from a user-supplied argument"
-    examples:
-      - vulnerable_path: "../../test-cases/unrestricted-transfer-from/unrestricted-transfer-from-1/escrow/vulnerable-example/Cargo.toml"
-        remediated_path: "../../test-cases/unrestricted-transfer-from/unrestricted-transfer-from-1/escrow/remediated-example/Cargo.toml"
-  assert-violation:
-    warning_message: "Assert causes panic. Instead, return a proper error"
-    examples:
-      - vulnerable_path: "../../test-cases/assert-violation/assert-violation-1/vulnerable-example/Cargo.toml"
-        remediated_path: "../../test-cases/assert-violation/assert-violation-1/remediated-example/Cargo.toml"
-  lazy-delegate:
-    warning_message: "Delegate call with non-lazy, non-mapping storage"
-    examples:
-      - vulnerable_path: "../../test-cases/lazy-delegate/lazy-delegate-1/vulnerable-example/Cargo.toml"
-        remediated_path: "../../test-cases/lazy-delegate/lazy-delegate-1/remediated-example/Cargo.toml"

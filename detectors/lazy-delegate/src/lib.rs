@@ -29,7 +29,7 @@ dylint_linting::impl_pre_expansion_lint! {
     /// Use instead:
     ///```rust
     ///    #[ink(storage)]
-    ///    pub struct DelegateCall {
+    ///    pub struct LazyDelegate {
     ///        admin: Lazy<AccountId, ManualKey<12345>>,
     ///    }
     ///
@@ -38,19 +38,19 @@ dylint_linting::impl_pre_expansion_lint! {
     /// - https://github.com/paritytech/ink/issues/1826
     ///```
 
-    pub DELEGATE_CALL,
+    pub LAZY_DELEGATE,
     Warn,
     "Use of delegate call with non-lazy, non-mapping storage won't modify the storage of the contract.",
-    DelegateCall::default()
+    LazyDelegate::default()
 }
 
 #[derive(Default)]
-pub struct DelegateCall {
+pub struct LazyDelegate {
     non_lazy_manual_storage_spans: Vec<Span>,
     delegate_uses: Vec<Span>,
 }
 
-impl EarlyLintPass for DelegateCall {
+impl EarlyLintPass for LazyDelegate {
     fn check_item(&mut self, _: &EarlyContext<'_>, item: &Item) {
         if is_storage_item(item)
         && let ItemKind::Struct(strt, _) = &item.kind
@@ -59,13 +59,11 @@ impl EarlyLintPass for DelegateCall {
                 if let Some(_) = field.ident
                 && let TyKind::Path(_, path) = &field.ty.kind
                 && path.segments.len() == 1
-                && (path.segments[0].ident.name.to_string() == "Lazy".to_string() || path.segments[0].ident.name.to_string() == "Mapping".to_string())
+                && (path.segments[0].ident.name.to_string() == *"Lazy" || path.segments[0].ident.name.to_string() == "Mapping")
                 && let Some(arg) = &path.segments[0].args
                 && let GenericArgs::AngleBracketed(AngleBracketedArgs { args, .. }) = arg.clone().into_inner()
-                && args.len() > 1 {} else {
-                    if !self.non_lazy_manual_storage_spans.contains(&item.span) {
+                && args.len() > 1 {} else if !self.non_lazy_manual_storage_spans.contains(&item.span){
                         self.non_lazy_manual_storage_spans.push(item.span);
-                    }
                 }
             }
         }
@@ -73,14 +71,13 @@ impl EarlyLintPass for DelegateCall {
 
     fn check_ident(&mut self, cx: &EarlyContext<'_>, id: rustc_span::symbol::Ident) {
         if id.name.to_string() == "delegate" {
-            dbg!(id.span);
             self.delegate_uses.push(id.span);
         }
 
         if !self.delegate_uses.is_empty() && !self.non_lazy_manual_storage_spans.is_empty() {
             span_lint_and_help(
                 cx,
-                DELEGATE_CALL,
+                LAZY_DELEGATE,
                 id.span,
                 "Delegate call with non-lazy, non-mapping storage",
                 None,
@@ -90,7 +87,7 @@ impl EarlyLintPass for DelegateCall {
             for span in &self.non_lazy_manual_storage_spans {
                 span_lint_and_help(
                     cx,
-                    DELEGATE_CALL,
+                    LAZY_DELEGATE,
                     *span,
                     "Non-lazy non-mapping storage",
                     None,
@@ -113,7 +110,7 @@ fn is_storage_item(item: &Item) -> bool {
                 return true
             }
         );
-        return false;
+        false
     })
 }
 
@@ -121,7 +118,7 @@ fn is_storage_present(token_stream: &TokenStream) -> bool {
     token_stream.trees().any(|tree| match tree {
         TokenTree::Token(token, _) => {
             if let Some(ident) = token.ident() {
-                return ident.0.name.to_ident_string().contains("storage");
+                ident.0.name.to_ident_string().contains("storage")
             } else {
                 false
             }

@@ -9,6 +9,14 @@ ink = { version = "=4.2.0", default-features = false }
 scale = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive"] }
 scale-info = { version = "2.6", default-features = false, features = ["derive"], optional = true }
 
+# Needed for compilation
+ink_env = "=4.2.0"
+ink_macro = "=4.2.0"
+ink_metadata = "=4.2.0"
+ink_prelude = "=4.2.0"
+ink_primitives = "=4.2.0"
+ink_storage = "=4.2.0"
+
 [dev-dependencies]
 ink_e2e = "=4.2.0"
 
@@ -24,3 +32,9 @@ std = [
 ]
 ink-as-dependency = []
 e2e-tests = []
+
+[profile.dev]
+overflow-checks = false
+
+[profile.release]
+overflow-checks = false
