@@ -6,7 +6,7 @@ use cargo_metadata::MetadataCommand;
 use clap::{Parser, Subcommand, ValueEnum};
 use dylint::Dylint;
 use utils::detectors::{get_excluded_detectors, get_filtered_detectors, list_detectors};
-use utils::output::{self, format_into_html, format_into_json};
+use utils::output::{format_into_html, format_into_json};
 
 use crate::detectors::Detectors;
 
@@ -137,10 +137,18 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> 
     let stderr_temp_file = tempfile::NamedTempFile::new()?;
     let stdout_temp_file = tempfile::NamedTempFile::new()?;
 
-    if opts.output.is_some() && opts.output != Some(OutputFormat::Text) {
+    if let Some(out_path) = &opts.output_path {
+        let path = PathBuf::from(&out_path);
+        if path.is_dir() {
+            panic!("The output path can't be a directory.");
+        }
+    }
+
+    if opts.output.is_some() {
         options.pipe_stderr = Some(stderr_temp_file.path().to_str().unwrap().to_string());
         options.pipe_stdout = Some(stdout_temp_file.path().to_str().unwrap().to_string());
     }
+
     // If there is a need to exclude or filter by detector, the dylint tool needs to be recompiled.
     // TODO: improve detector system so that doing this isn't necessary.
     if opts.exclude.is_some() || opts.filter.is_some() {
@@ -165,27 +173,37 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> 
     dylint::run(&options)?;
 
     if let Some(format) = opts.output {
-        let stderr_file = fs::File::open(stderr_temp_file.path())?;
-        let _stdout_file = fs::File::open(stdout_temp_file.path())?;
+        let mut stderr_file = fs::File::open(stderr_temp_file.path())?;
+        let mut _stdout_file = fs::File::open(stdout_temp_file.path())?;
 
         match format {
             OutputFormat::Json => {
-                let mut html_file = fs::File::create("report.json")?;
+                let mut json_file = match &opts.output_path {
+                    Some(path) => fs::File::create(path)?,
+                    None => fs::File::create("report.json")?,
+                };
                 std::io::Write::write_all(
-                    &mut html_file,
+                    &mut json_file,
                     format_into_json(stderr_file)?.as_bytes(),
-                )
-                .expect("Failed to write into json file");
+                )?;
             }
             OutputFormat::Html => {
-                let mut html_file = fs::File::create("report.html")?;
+                let mut html_file = match &opts.output_path {
+                    Some(path) => fs::File::create(path)?,
+                    None => fs::File::create("report.html")?,
+                };
                 std::io::Write::write_all(
                     &mut html_file,
                     format_into_html(stderr_file)?.as_bytes(),
-                )
-                .expect("Failed to write into html file");
+                )?;
             }
-            OutputFormat::Text => todo!(),
+            OutputFormat::Text => {
+                let mut txt_file = match &opts.output_path {
+                    Some(path) => fs::File::create(path)?,
+                    None => fs::File::create("report.txt")?,
+                };
+                std::io::copy(&mut stderr_file, &mut txt_file)?;
+            }
         }
 
         stderr_temp_file.close()?;

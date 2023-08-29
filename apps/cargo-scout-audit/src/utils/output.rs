@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use std::fs::File;
 
 use anyhow::Context;
-use itertools::Itertools;
 use regex::RegexBuilder;
 use serde_json::json;
 
@@ -18,15 +17,15 @@ pub fn format_into_json(mut stderr: File) -> anyhow::Result<String> {
 
     let msg_to_name = error_map();
 
-    let mut errors: HashMap<String, (Vec<String>, String)> = error_names()
+    let mut errors: HashMap<String, (Vec<String>, String)> = ERROR_NAMES
         .into_iter()
-        .map(|e| (e, (vec![], "".to_string())))
+        .map(|e| (e.to_string(), (vec![], "".to_string())))
         .collect();
 
     for elem in regex.find_iter(&stderr_string) {
         let parts = elem.as_str().split('\n').collect::<Vec<&str>>();
 
-        for err in scout_errors().iter() {
+        for err in SCOUT_ERRORS.iter() {
             if parts[0].contains(err) && parts[1].starts_with("  --> ") {
                 let name = msg_to_name.get(err).with_context(|| {
                     format!("Error making json: {} not found in the error map", err)
@@ -34,7 +33,7 @@ pub fn format_into_json(mut stderr: File) -> anyhow::Result<String> {
 
                 let span = parts[1].replace("  --> ", "");
 
-                if let Some((spans, error)) = errors.get_mut(name) {
+                if let Some((spans, error)) = errors.get_mut(*name) {
                     spans.push(span);
                     *error = err.to_string();
                 }
@@ -102,8 +101,7 @@ pub fn format_into_html(stderr: File) -> anyhow::Result<String> {
     Ok(html)
 }
 
-fn scout_errors() -> Vec<String> {
-    let errors = [
+const SCOUT_ERRORS: [&str; 23] =  [
         "Assert causes panic. Instead, return a proper error.",
         "Using `core::mem::forget` is not recommended.",
         "The format! macro should not be used.",
@@ -129,43 +127,38 @@ fn scout_errors() -> Vec<String> {
         "This argument comes from a user-supplied argument",
 
 ];
-    errors.into_iter().map(|e| e.to_string()).collect_vec()
-}
 
-fn error_names() -> Vec<String> {
-    let errors = [
-        "assert-violation",
-        "avoid-core-mem-forget",
-        "avoid-format!-string",
-        "delegate-call",
-        "divide-before-multiply",
-        "dos-unbounded-operation",
-        "dos-unexpected-revert-with-vector",
-        "ink-version",
-        "insufficiently-random-values",
-        "integer-overflow-or-underflow",
-        "iterators-over-indexing",
-        "lazy-delegate",
-        "panic-error",
-        "reentrancy",
-        "set-code-hash",
-        "unprotected-self-destruct",
-        "unprotected-mapping-operation",
-        "zero-or-test-address",
-        "unuse-return-enum",
-        "unsafe-expect",
-        "unsafe-unwrap",
-        "set-contract-storage",
-        "unrestricted-transfer-from",
-    ];
-    errors.into_iter().map(|e| e.to_string()).collect_vec()
-}
+const ERROR_NAMES: [&str; 23] = [
+    "assert-violation",
+    "avoid-core-mem-forget",
+    "avoid-format!-string",
+    "delegate-call",
+    "divide-before-multiply",
+    "dos-unbounded-operation",
+    "dos-unexpected-revert-with-vector",
+    "ink-version",
+    "insufficiently-random-values",
+    "integer-overflow-or-underflow",
+    "iterators-over-indexing",
+    "lazy-delegate",
+    "panic-error",
+    "reentrancy",
+    "set-code-hash",
+    "unprotected-self-destruct",
+    "unprotected-mapping-operation",
+    "zero-or-test-address",
+    "unuse-return-enum",
+    "unsafe-expect",
+    "unsafe-unwrap",
+    "set-contract-storage",
+    "unrestricted-transfer-from",
+];
 
-fn error_map() -> HashMap<String, String> {
+fn error_map() -> HashMap<&'static str, &'static str> {
     let mut map = HashMap::new();
-    scout_errors()
+    SCOUT_ERRORS
         .into_iter()
-        .zip(error_names())
+        .zip(ERROR_NAMES)
         .for_each(|(k, v)| {
             map.insert(k, v);
         });
