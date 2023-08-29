@@ -38,8 +38,7 @@ impl Library {
         let library_path = self.path();
         let target_dir = self.target_directory();
 
-        // we could use an env var to make it verbose/no-quiet?
-        cargo::build(&format!("linter `{}`", self.id.name()), true)
+        cargo::build(&format!("linter `{}`", self.id.name()), false)
             .sanitize_environment()
             .env_remove(env::RUSTFLAGS)
             .current_dir(&self.root)
