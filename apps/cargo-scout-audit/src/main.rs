@@ -3,10 +3,10 @@ use std::{fs, path::PathBuf};
 
 use cargo::Config;
 use cargo_metadata::MetadataCommand;
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, ValueEnum};
 use dylint::Dylint;
 use utils::detectors::{get_excluded_detectors, get_filtered_detectors, list_detectors};
-use utils::output::{format_into_html, format_into_json};
+use utils::output::{self, format_into_html, format_into_json};
 
 use crate::detectors::Detectors;
 
@@ -23,6 +23,12 @@ struct Cli {
 #[derive(Debug, Subcommand)]
 enum CargoSubCommand {
     ScoutAudit(Scout),
+}
+#[derive(Debug, Clone, Parser, ValueEnum, PartialEq)]
+enum OutputFormat {
+    Text,
+    Json,
+    Html,
 }
 
 #[derive(Debug, Parser, Clone)]
@@ -57,13 +63,10 @@ struct Scout {
     args: Vec<String>,
 
     #[clap(short, long, value_name = "Type", help = "Sets the output type")]
-    output: Option<String>,
+    output: Option<OutputFormat>,
 
     #[clap(long, value_name = "path", help = "Path to the stdout file.")]
-    stdout_path: Option<String>,
-
-    #[clap(long, value_name = "path", help = "Path to the stderr file.")]
-    stderr_path: Option<String>,
+    output_path: Option<String>,
 }
 
 fn main() {
@@ -113,23 +116,10 @@ fn run_scout(opts: Scout) {
         .build(used_detectors)
         .expect("Failed to build detectors");
 
-    if opts.output.is_some() {
-        let valid_formats = ["json", "html"];
-        let format = opts.output.clone().unwrap();
-
-        if valid_formats.contains(&format.as_str()) {
-            run_dylint(detectors_paths, opts, Some(format)).expect("Failed to run dylint")
-        }
-    } else {
-        run_dylint(detectors_paths, opts, None).expect("Failed to run dylint");
-    }
+    run_dylint(detectors_paths, opts).expect("Failed to run dylint");
 }
 
-fn run_dylint(
-    detectors_paths: Vec<PathBuf>,
-    opts: Scout,
-    format: Option<String>,
-) -> anyhow::Result<()> {
+fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> {
     let paths: Vec<String> = detectors_paths
         .iter()
         .map(|path| path.to_string_lossy().to_string())
@@ -139,19 +129,18 @@ fn run_dylint(
         paths,
         args: opts.args,
         manifest_path: opts.manifest_path,
-        pipe_stdout: opts.stdout_path,
-        pipe_stderr: opts.stderr_path,
+        pipe_stdout: opts.output_path.clone(),
+        pipe_stderr: opts.output_path.clone(),
         ..Default::default()
     };
 
-    let stderr_temp_file = tempfile::NamedTempFile::new().unwrap();
-    let stdout_temp_file = tempfile::NamedTempFile::new().unwrap();
+    let stderr_temp_file = tempfile::NamedTempFile::new()?;
+    let stdout_temp_file = tempfile::NamedTempFile::new()?;
 
-    if format.is_some() {
+    if opts.output.is_some() && opts.output != Some(OutputFormat::Text) {
         options.pipe_stderr = Some(stderr_temp_file.path().to_str().unwrap().to_string());
         options.pipe_stdout = Some(stdout_temp_file.path().to_str().unwrap().to_string());
     }
-
     // If there is a need to exclude or filter by detector, the dylint tool needs to be recompiled.
     // TODO: improve detector system so that doing this isn't necessary.
     if opts.exclude.is_some() || opts.filter.is_some() {
@@ -175,32 +164,28 @@ fn run_dylint(
 
     dylint::run(&options)?;
 
-    if let Some(format) = format {
-        let stderr_file = fs::File::open(stderr_temp_file.path()).unwrap();
-        let _stdout_file = fs::File::open(stdout_temp_file.path()).unwrap();
+    if let Some(format) = opts.output {
+        let stderr_file = fs::File::open(stderr_temp_file.path())?;
+        let _stdout_file = fs::File::open(stdout_temp_file.path())?;
 
-        match format.as_str() {
-            "json" => {
-                let mut html_file = fs::File::create("report.json").unwrap();
+        match format {
+            OutputFormat::Json => {
+                let mut html_file = fs::File::create("report.json")?;
                 std::io::Write::write_all(
                     &mut html_file,
-                    format_into_json(stderr_file)
-                        .expect("Failed to format into json")
-                        .as_bytes(),
+                    format_into_json(stderr_file)?.as_bytes(),
                 )
                 .expect("Failed to write into json file");
             }
-            "html" => {
-                let mut html_file = fs::File::create("report.html").unwrap();
+            OutputFormat::Html => {
+                let mut html_file = fs::File::create("report.html")?;
                 std::io::Write::write_all(
                     &mut html_file,
-                    format_into_html(stderr_file)
-                        .expect("Failed to format into html")
-                        .as_bytes(),
+                    format_into_html(stderr_file)?.as_bytes(),
                 )
                 .expect("Failed to write into html file");
             }
-            _ => todo!(),
+            OutputFormat::Text => todo!(),
         }
 
         stderr_temp_file.close()?;
