@@ -62,8 +62,8 @@ struct Scout {
     #[clap(last = true, help = "Arguments for `cargo check`")]
     args: Vec<String>,
 
-    #[clap(short, long, value_name = "Type", help = "Sets the output type")]
-    output: Option<OutputFormat>,
+    #[clap(short, long, value_name = "type", help = "Sets the output type", default_value = "text")]
+    output_format: OutputFormat,
 
     #[clap(long, value_name = "path", help = "Path to the stdout file.")]
     output_path: Option<String>,
