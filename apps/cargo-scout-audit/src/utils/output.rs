@@ -85,19 +85,41 @@ pub fn format_into_html(stderr: File) -> anyhow::Result<String> {
     <tr>
     <th>Error</th>
     <th>Spans</th>
+    <th>Message</th>
     </tr>
     "#,
     );
 
     let json: serde_json::Value = serde_json::from_str(&json)?;
+    /*"zero-or-test-address": {
+      "error_msg": "Not checking for a zero-address could lead to a locked contract",
+      "spans": [
+        "lib.rs:32:13",
+        "lib.rs:33:13",
+        "lib.rs:34:13"
+      ]
+    } */
+    //create a html table with a json of that format, there are multiple keys
 
-    for (name, error) in json.as_object().unwrap() {
-        html.push_str(format!("<tr>\n<td> {} </td>\n<td>\n<ul>\n", name).as_str());
-        for span in error["spans"].as_array().unwrap() {
-            html.push_str(format!("<li> {} </li>\n", span.as_str().unwrap()).as_str());
+    for (key, value) in json.as_object().unwrap() {
+        let error_msg = value["error_msg"].as_str().unwrap();
+        let spans = value["spans"].as_array().unwrap();
+        let mut spans_html = String::new();
+        for span in spans {
+            spans_html.push_str(&format!("<li>{}</li>", span.as_str().unwrap()));
         }
-        html.push_str("</ul>\n</td>\n</tr>\n");
+        html.push_str(&format!(
+            r#"
+        <tr>
+        <td>{}</td>
+        <td><ul>{}</ul></td>
+        <td>{}</td>
+        </tr>
+        "#,
+            key, spans_html, error_msg
+        ));
     }
+
     Ok(html)
 }
 
