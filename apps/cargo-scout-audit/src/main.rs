@@ -1,10 +1,12 @@
+use core::panic;
 use std::{fs, path::PathBuf};
 
 use cargo::Config;
 use cargo_metadata::MetadataCommand;
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, ValueEnum};
 use dylint::Dylint;
 use utils::detectors::{get_excluded_detectors, get_filtered_detectors, list_detectors};
+use utils::output::{format_into_html, format_into_json};
 
 use crate::detectors::Detectors;
 
@@ -21,6 +23,12 @@ struct Cli {
 #[derive(Debug, Subcommand)]
 enum CargoSubCommand {
     ScoutAudit(Scout),
+}
+#[derive(Debug, Clone, ValueEnum, PartialEq)]
+enum OutputFormat {
+    Text,
+    Json,
+    Html,
 }
 
 #[derive(Debug, Parser, Clone)]
@@ -53,6 +61,18 @@ struct Scout {
 
     #[clap(last = true, help = "Arguments for `cargo check`")]
     args: Vec<String>,
+
+    #[clap(
+        short,
+        long,
+        value_name = "type",
+        help = "Sets the output type",
+        default_value = "text"
+    )]
+    output_format: OutputFormat,
+
+    #[clap(long, value_name = "path", help = "Path to the output file.")]
+    output_path: Option<String>,
 }
 
 fn main() {
@@ -84,6 +104,7 @@ fn run_scout(opts: Scout) {
     let detectors_names = detectors
         .get_detector_names()
         .expect("Failed to build detectors");
+
     if opts.list_detectors {
         list_detectors(detectors_names).expect("Failed to list detectors");
         return;
@@ -110,12 +131,29 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> 
         .map(|path| path.to_string_lossy().to_string())
         .collect();
 
-    let options = Dylint {
+    let mut options = Dylint {
         paths,
         args: opts.args,
         manifest_path: opts.manifest_path,
+        pipe_stdout: opts.output_path.clone(),
+        pipe_stderr: opts.output_path.clone(),
         ..Default::default()
     };
+
+    let stderr_temp_file = tempfile::NamedTempFile::new()?;
+    let stdout_temp_file = tempfile::NamedTempFile::new()?;
+
+    if let Some(out_path) = &opts.output_path {
+        let path = PathBuf::from(&out_path);
+        if path.is_dir() {
+            panic!("The output path can't be a directory.");
+        }
+    }
+
+    if opts.output_path.is_some() {
+        options.pipe_stderr = Some(stderr_temp_file.path().to_str().unwrap().to_string());
+        options.pipe_stdout = Some(stdout_temp_file.path().to_str().unwrap().to_string());
+    }
 
     // If there is a need to exclude or filter by detector, the dylint tool needs to be recompiled.
     // TODO: improve detector system so that doing this isn't necessary.
@@ -139,6 +177,36 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> 
     }
 
     dylint::run(&options)?;
+
+    let mut stderr_file = fs::File::open(stderr_temp_file.path())?;
+    let mut _stdout_file = fs::File::open(stdout_temp_file.path())?;
+
+    match opts.output_format {
+        OutputFormat::Json => {
+            let mut json_file = match &opts.output_path {
+                Some(path) => fs::File::create(path)?,
+                None => fs::File::create("report.json")?,
+            };
+            std::io::Write::write_all(&mut json_file, format_into_json(stderr_file)?.as_bytes())?;
+        }
+        OutputFormat::Html => {
+            let mut html_file = match &opts.output_path {
+                Some(path) => fs::File::create(path)?,
+                None => fs::File::create("report.html")?,
+            };
+            std::io::Write::write_all(&mut html_file, format_into_html(stderr_file)?.as_bytes())?;
+        }
+        OutputFormat::Text => {
+            let mut txt_file = match &opts.output_path {
+                Some(path) => fs::File::create(path)?,
+                None => fs::File::create("report.txt")?,
+            };
+            std::io::copy(&mut stderr_file, &mut txt_file)?;
+        }
+    }
+
+    stderr_temp_file.close()?;
+    stdout_temp_file.close()?;
 
     Ok(())
 }
