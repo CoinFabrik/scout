@@ -65,7 +65,7 @@ jobs:
         run: rustup install nightly-2023-04-23 --profile minimal
 
       - name: Install dylint-link
-        run: git clone --depth=1 https://github.com/CoinFabrik/dylint-scout/ && cargo install --path dylint-scout/dylint-link
+        run: cagro install dylint-link
 
       - name: Install cargo-scout-audit
         run: cargo install --path apps/cargo-scout-audit
@@ -75,7 +75,7 @@ jobs:
         run: |
           cargo new test-run
           cd test-run
-          cargo scout-audit --filter delegate-call
+          cargo scout-audit
 
       - name: Compile cargo-scout-audit tests
         working-directory: apps/cargo-scout-audit
