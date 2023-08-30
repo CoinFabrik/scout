@@ -5,15 +5,19 @@ use anyhow::Context;
 use regex::RegexBuilder;
 use serde_json::json;
 
-pub fn format_into_json(mut stderr: File) -> anyhow::Result<String> {
+pub fn format_into_json(scout_output: File) -> anyhow::Result<String> {
+    let json_errors = jsonify(scout_output)?;
+    Ok(serde_json::to_string_pretty(&json_errors)?)
+}
+
+fn jsonify(mut scout_output: File) -> anyhow::Result<serde_json::Value> {
     let regex = RegexBuilder::new(r"^warning:.*\n  --> .*$")
         .multi_line(true)
         .case_insensitive(true)
-        .build()
-        .unwrap();
+        .build()?;
 
     let mut stderr_string = String::new();
-    std::io::Read::read_to_string(&mut stderr, &mut stderr_string)?;
+    std::io::Read::read_to_string(&mut scout_output, &mut stderr_string)?;
 
     let msg_to_name = error_map();
 
@@ -40,23 +44,25 @@ pub fn format_into_json(mut stderr: File) -> anyhow::Result<String> {
             }
         }
     }
-    let mut json_errors = json!({});
-    for (name, (spans, error)) in errors {
-        if spans.is_empty() {
-            continue;
-        }
-        let mut json_error = json!({});
+    let json_errors: serde_json::Value = errors
+        .iter()
+        .filter(|(_, (spans, _))| !spans.is_empty())
+        .map(|(name, (spans, error))| {
+            (
+                name,
+                json!({
+                    "error_msg": error,
+                    "spans": spans
+                }),
+            )
+        })
+        .collect();
 
-        json_error["error_msg"] = json!(error);
-        json_error["spans"] = json!(spans);
-        json_errors[name] = json_error;
-    }
-
-    Ok(serde_json::to_string_pretty(&json_errors)?)
+    Ok(json_errors)
 }
 
-pub fn format_into_html(stderr: File) -> anyhow::Result<String> {
-    let json = format_into_json(stderr)?;
+pub fn format_into_html(scout_output: File) -> anyhow::Result<String> {
+    let json = jsonify(scout_output)?;
     let mut html = String::new();
     html.push_str(
         r#"
@@ -89,8 +95,6 @@ pub fn format_into_html(stderr: File) -> anyhow::Result<String> {
     </tr>
     "#,
     );
-
-    let json: serde_json::Value = serde_json::from_str(&json)?;
 
     for (key, value) in json.as_object().unwrap() {
         let error_msg = value["error_msg"].as_str().unwrap();

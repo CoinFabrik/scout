@@ -24,7 +24,7 @@ struct Cli {
 enum CargoSubCommand {
     ScoutAudit(Scout),
 }
-#[derive(Debug, Clone, Parser, ValueEnum, PartialEq)]
+#[derive(Debug, Clone, ValueEnum, PartialEq)]
 enum OutputFormat {
     Text,
     Json,
@@ -62,10 +62,16 @@ struct Scout {
     #[clap(last = true, help = "Arguments for `cargo check`")]
     args: Vec<String>,
 
-    #[clap(short, long, value_name = "type", help = "Sets the output type", default_value = "text")]
+    #[clap(
+        short,
+        long,
+        value_name = "type",
+        help = "Sets the output type",
+        default_value = "text"
+    )]
     output_format: OutputFormat,
 
-    #[clap(long, value_name = "path", help = "Path to the stdout file.")]
+    #[clap(long, value_name = "path", help = "Path to the output file.")]
     output_path: Option<String>,
 }
 
@@ -144,7 +150,7 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> 
         }
     }
 
-    if opts.output.is_some() {
+    if opts.output_path.is_some() {
         options.pipe_stderr = Some(stderr_temp_file.path().to_str().unwrap().to_string());
         options.pipe_stdout = Some(stdout_temp_file.path().to_str().unwrap().to_string());
     }
@@ -172,43 +178,35 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> 
 
     dylint::run(&options)?;
 
-    if let Some(format) = opts.output {
-        let mut stderr_file = fs::File::open(stderr_temp_file.path())?;
-        let mut _stdout_file = fs::File::open(stdout_temp_file.path())?;
+    let mut stderr_file = fs::File::open(stderr_temp_file.path())?;
+    let mut _stdout_file = fs::File::open(stdout_temp_file.path())?;
 
-        match format {
-            OutputFormat::Json => {
-                let mut json_file = match &opts.output_path {
-                    Some(path) => fs::File::create(path)?,
-                    None => fs::File::create("report.json")?,
-                };
-                std::io::Write::write_all(
-                    &mut json_file,
-                    format_into_json(stderr_file)?.as_bytes(),
-                )?;
-            }
-            OutputFormat::Html => {
-                let mut html_file = match &opts.output_path {
-                    Some(path) => fs::File::create(path)?,
-                    None => fs::File::create("report.html")?,
-                };
-                std::io::Write::write_all(
-                    &mut html_file,
-                    format_into_html(stderr_file)?.as_bytes(),
-                )?;
-            }
-            OutputFormat::Text => {
-                let mut txt_file = match &opts.output_path {
-                    Some(path) => fs::File::create(path)?,
-                    None => fs::File::create("report.txt")?,
-                };
-                std::io::copy(&mut stderr_file, &mut txt_file)?;
-            }
+    match opts.output_format {
+        OutputFormat::Json => {
+            let mut json_file = match &opts.output_path {
+                Some(path) => fs::File::create(path)?,
+                None => fs::File::create("report.json")?,
+            };
+            std::io::Write::write_all(&mut json_file, format_into_json(stderr_file)?.as_bytes())?;
         }
-
-        stderr_temp_file.close()?;
-        stdout_temp_file.close()?;
+        OutputFormat::Html => {
+            let mut html_file = match &opts.output_path {
+                Some(path) => fs::File::create(path)?,
+                None => fs::File::create("report.html")?,
+            };
+            std::io::Write::write_all(&mut html_file, format_into_html(stderr_file)?.as_bytes())?;
+        }
+        OutputFormat::Text => {
+            let mut txt_file = match &opts.output_path {
+                Some(path) => fs::File::create(path)?,
+                None => fs::File::create("report.txt")?,
+            };
+            std::io::copy(&mut stderr_file, &mut txt_file)?;
+        }
     }
+
+    stderr_temp_file.close()?;
+    stdout_temp_file.close()?;
 
     Ok(())
 }
