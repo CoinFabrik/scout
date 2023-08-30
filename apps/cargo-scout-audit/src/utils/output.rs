@@ -91,7 +91,7 @@ pub fn format_into_html(stderr: File) -> anyhow::Result<String> {
     );
 
     let json: serde_json::Value = serde_json::from_str(&json)?;
-    
+
     for (key, value) in json.as_object().unwrap() {
         let error_msg = value["error_msg"].as_str().unwrap();
         let spans = value["spans"].as_array().unwrap();
