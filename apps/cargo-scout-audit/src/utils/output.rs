@@ -91,16 +91,7 @@ pub fn format_into_html(stderr: File) -> anyhow::Result<String> {
     );
 
     let json: serde_json::Value = serde_json::from_str(&json)?;
-    /*"zero-or-test-address": {
-      "error_msg": "Not checking for a zero-address could lead to a locked contract",
-      "spans": [
-        "lib.rs:32:13",
-        "lib.rs:33:13",
-        "lib.rs:34:13"
-      ]
-    } */
-    //create a html table with a json of that format, there are multiple keys
-
+    
     for (key, value) in json.as_object().unwrap() {
         let error_msg = value["error_msg"].as_str().unwrap();
         let spans = value["spans"].as_array().unwrap();
