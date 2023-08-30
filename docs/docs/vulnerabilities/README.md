@@ -336,3 +336,12 @@ This vulnerability falls under the [Validations and error handling](#vulnerabili
 and has a Critical severity.
 
 Check the following [documentation](22-unprotected-mapping-operation.md) for a more detailed explanation of this vulnerability class.
+
+### 23 - Lazy storage on delegate
+
+A bug in ink! causes delegated calls to not modify the caller's storage unless Lazy with ManualKey or Mapping is used.
+
+This vulnerability falls under the [Authorization](#vulnerability-categories) category
+and has a Critical severity.
+
+Check the following [documentation](23-lazy-delegate.md) for a more detailed explanation of this vulnerability class.
