@@ -27,7 +27,6 @@ fn jsonify(mut scout_output: File) -> anyhow::Result<serde_json::Value> {
         .collect();
 
     for elem in regex.find_iter(&stderr_string) {
-        println!("elem: {:?}", elem.as_str());
         let parts = elem.as_str().split('\n').collect::<Vec<&str>>();
 
         for err in SCOUT_ERRORS.iter() {
