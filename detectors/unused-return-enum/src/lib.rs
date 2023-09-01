@@ -67,8 +67,7 @@ dylint_linting::declare_late_lint! {
     "If any of the variants (Ok/Err) is not used, the code could be simplified or it could imply a bug"
 }
 
-struct CounterVisitor <'tcx, 'tcx_ref> {
-    cx: &'tcx_ref LateContext<'tcx>,
+struct CounterVisitor {
     count_err: u32,
     count_ok: u32,
     found_try: bool,
@@ -76,7 +75,7 @@ struct CounterVisitor <'tcx, 'tcx_ref> {
     span: Vec<Span>,
 }
 
-impl<'tcx> Visitor<'tcx> for CounterVisitor <'tcx, '_> {
+impl<'tcx> Visitor<'tcx> for CounterVisitor {
     fn visit_expr(&mut self, expr: &'tcx Expr) {
         if let ExprKind::Call(func, _args) = expr.kind && 
             let ExprKind::Path(qpath) = &func.kind && 
@@ -84,6 +83,7 @@ impl<'tcx> Visitor<'tcx> for CounterVisitor <'tcx, '_> {
             
             let vec: Vec<String> = path.segments.iter().map(|f|f.ident.to_string()).collect();
             let fun_path = vec.join("::");
+            //dbg!(&fun_path);
             if fun_path.ends_with("Ok") {
                 self.count_ok += 1;
                 self.span.push(func.span);
@@ -96,7 +96,7 @@ impl<'tcx> Visitor<'tcx> for CounterVisitor <'tcx, '_> {
             ExprKind::Ret(retval) => {
                 if retval.is_some() {
                     match retval.unwrap().kind {
-                        ExprKind::Call(func, args) => {
+                        ExprKind::Call(func, _args) => {
                             if let ExprKind::Path(qpath) = &func.kind &&
                                 let QPath::Resolved(_, path) = qpath &&
                                 let Some(last_segment) = path.segments.last() {
@@ -126,7 +126,7 @@ impl<'tcx> Visitor<'tcx> for CounterVisitor <'tcx, '_> {
 impl<'tcx> LateLintPass<'tcx> for UnusedReturnEnum {
     fn check_fn(
         &mut self,
-        cx: &rustc_lint::LateContext<'tcx>,
+        cx: &LateContext<'tcx>,
         fnkind: rustc_hir::intravisit::FnKind<'tcx>,
         decl: &'tcx rustc_hir::FnDecl<'tcx>,
         body: &'tcx rustc_hir::Body<'tcx>,
@@ -134,7 +134,7 @@ impl<'tcx> LateLintPass<'tcx> for UnusedReturnEnum {
         _: rustc_hir::HirId,
     ) {
         if let FnKind::Method(_ident, _fnsig) = fnkind {
-            
+            //dbg!(ident);
         } else {
             return;
         }
@@ -147,13 +147,21 @@ impl<'tcx> LateLintPass<'tcx> for UnusedReturnEnum {
                 match block.expr.unwrap().kind {
                     ExprKind::Call(func, _args) => {
                         if let ExprKind::Path(qpath) = &func.kind &&
-                            let QPath::Resolved(_, path) = qpath &&
-                            let Some(last_segment) = path.segments.last() {
-                            match last_segment.ident.as_str() {
-                                "Err" | "Ok" =>{},
-                                _ => {
-                                    expression_return = true;
+                            let QPath::Resolved(_, path) = qpath {
+                            
+                            if let Some(last_segment) = path.segments.last() {
+                                match last_segment.ident.as_str() {
+                                    "Err" | "Ok" =>{},
+                                    _ => {
+                                        expression_return = true;
+                                    }
                                 }
+                            }
+                            //if to ignore some automatically generated functions.
+                            // this is provisional i will improve it when i know how
+                            if let Some(first) = path.segments.first() && 
+                                first.ident.as_str() == "{{root}}"{
+                                expression_return = true;
                             }
                         }
                     },
@@ -177,7 +185,6 @@ impl<'tcx> LateLintPass<'tcx> for UnusedReturnEnum {
         };
 
         let mut visitor = CounterVisitor {
-            cx,
             count_ok: 0,
             count_err: 0,
             found_try: false,
@@ -191,8 +198,10 @@ impl<'tcx> LateLintPass<'tcx> for UnusedReturnEnum {
            !visitor.found_return &&
            !expression_return &&
             (visitor.count_err == 0 || visitor.count_ok == 0) {
-
+            //dbg!(visitor.count_err, visitor.count_ok);
+            //dbg!(body.value);
             visitor.span.iter().for_each(|span| {
+                //dbg!(span);
                 span_lint_and_help(
                     cx,
                     UNUSED_RETURN_ENUM,
