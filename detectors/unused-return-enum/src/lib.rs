@@ -1,16 +1,19 @@
 #![feature(rustc_private)]
+#![feature(let_chains)]
+#![feature(is_some_and)]
 
 extern crate rustc_ast;
+extern crate rustc_hir;
 extern crate rustc_span;
+extern crate rustc_middle;
 
 use clippy_utils::diagnostics::span_lint_and_help;
-use if_chain::if_chain;
-use rustc_ast::visit::{self, FnKind, Visitor};
-use rustc_ast::{Expr, ExprKind, FnRetTy};
-use rustc_lint::{EarlyContext, EarlyLintPass};
+use rustc_hir::intravisit::{Visitor, walk_expr, FnKind,};
+use rustc_hir::{TyKind, QPath, Expr, ExprKind};
+use rustc_lint::{LateLintPass, LateContext};
 use rustc_span::Span;
 
-dylint_linting::declare_early_lint! {
+dylint_linting::declare_late_lint! {
     /// ### What it does
     /// It warns if a fuction that returns a Result type does not return a Result enum variant (Ok/Err)
     ///
@@ -64,114 +67,140 @@ dylint_linting::declare_early_lint! {
     "If any of the variants (Ok/Err) is not used, the code could be simplified or it could imply a bug"
 }
 
-struct CounterVisitor {
+struct CounterVisitor <'tcx, 'tcx_ref> {
+    cx: &'tcx_ref LateContext<'tcx>,
     count_err: u32,
     count_ok: u32,
     found_try: bool,
-    span: Vec<Option<Span>>,
+    found_return: bool,
+    span: Vec<Span>,
 }
 
-impl<'ast> Visitor<'ast> for CounterVisitor {
-    fn visit_expr(&mut self, ex: &'ast Expr) {
-        match &ex.kind {
-            ExprKind::Call(func, _args) => {
-                if let ExprKind::Path(_, path) = &func.kind {
-                    if let Some(segment) = path.segments.last() {
-                        if segment.ident.to_string() == "Err" {
-                            self.span.push(Some(ex.span));
-                            self.count_err += 1
-                        }
-                        if segment.ident.to_string() == "Ok" {
-                            self.span.push(Some(ex.span));
-                            self.count_ok += 1
-                        }
+impl<'tcx> Visitor<'tcx> for CounterVisitor <'tcx, '_> {
+    fn visit_expr(&mut self, expr: &'tcx Expr) {
+        if let ExprKind::Call(func, _args) = expr.kind && 
+            let ExprKind::Path(qpath) = &func.kind && 
+            let QPath::Resolved(_ty, path) = qpath {
+            
+            let vec: Vec<String> = path.segments.iter().map(|f|f.ident.to_string()).collect();
+            let fun_path = vec.join("::");
+            if fun_path.ends_with("Ok") {
+                self.count_ok += 1;
+                self.span.push(func.span);
+            } else if fun_path.ends_with("Err") {
+                self.count_err += 1;
+                self.span.push(func.span);
+            }
+        }
+        match expr.kind {
+            ExprKind::Ret(retval) => {
+                if retval.is_some() {
+                    match retval.unwrap().kind {
+                        ExprKind::Call(func, args) => {
+                            if let ExprKind::Path(qpath) = &func.kind &&
+                                let QPath::Resolved(_, path) = qpath &&
+                                let Some(last_segment) = path.segments.last() {
+                                    
+                                match last_segment.ident.as_str() {
+                                    "Err" | "Ok" =>{},
+                                    _ => {
+                                        self.found_return = true;
+                                    }
+                                }
+                            }
+                        },
+                        _=>{}
                     }
                 }
-            }
-            ExprKind::Try(_) => {
-                self.span.push(Some(ex.span));
-                self.found_try = true;
-            }
+            },
+            ExprKind::Match( _expr, _arms, source) => {
+                if rustc_hir::MatchSource::TryDesugar == source {
+                    self.found_try = true;
+                }
+            },
             _ => {}
         }
-
-        visit::walk_expr(self, ex);
-    }
-
-    fn visit_local(&mut self, l: &'ast rustc_ast::Local) {
-        if let Some(expr) = &l.kind.init() {
-            if let ExprKind::Try(try_expr) = &expr.kind {
-                self.span.push(Some(try_expr.span));
-                self.found_try = true;
-            }
-        }
+        walk_expr(self, expr);
     }
 }
-
-impl EarlyLintPass for UnusedReturnEnum {
+impl<'tcx> LateLintPass<'tcx> for UnusedReturnEnum {
     fn check_fn(
         &mut self,
-        cx: &EarlyContext<'_>,
-        fn_kind: FnKind<'_>,
+        cx: &rustc_lint::LateContext<'tcx>,
+        fnkind: rustc_hir::intravisit::FnKind<'tcx>,
+        decl: &'tcx rustc_hir::FnDecl<'tcx>,
+        body: &'tcx rustc_hir::Body<'tcx>,
         _: Span,
-        _: rustc_ast::NodeId,
+        _: rustc_hir::HirId,
     ) {
-        let (fn_sig, block) = match fn_kind {
-            FnKind::Fn(_, _, fn_sig, _, _, body) => (fn_sig, body),
+        if let FnKind::Method(_ident, _fnsig) = fnkind {
+            
+        } else {
+            return;
+        }
+        
+        let mut expression_return: bool = false;
+        //if the function uses expression return (not using ; at the end),
+        //the base expression of the function is a block and the return value is stored in block.expr
+        if let ExprKind::Block(block, _label) = body.value.kind {
+            if block.expr.is_some() {
+                match block.expr.unwrap().kind {
+                    ExprKind::Call(func, _args) => {
+                        if let ExprKind::Path(qpath) = &func.kind &&
+                            let QPath::Resolved(_, path) = qpath &&
+                            let Some(last_segment) = path.segments.last() {
+                            match last_segment.ident.as_str() {
+                                "Err" | "Ok" =>{},
+                                _ => {
+                                    expression_return = true;
+                                }
+                            }
+                        }
+                    },
+                    _ => {}
+                }
+            }
+        }
+
+        match decl.output {
+            rustc_hir::FnRetTy::Return(ret) => {
+                if let TyKind::Path(qpath) = &ret.kind && 
+                    let QPath::Resolved(_ty, path) = qpath {
+
+                    //ignore function if not returns a Result type
+                    if path.segments.last().is_some_and(|f|f.ident.to_string() != "Result") {
+                        return;
+                    }
+                };
+            }
             _ => return,
         };
 
-        // If code comes from macro expansion, return
-        if fn_sig.span.from_expansion() {
-            return;
-        }
-
-        // If the return type of the function is not a "Result" enum, we don't want to lint it
-        if_chain!(
-            if let FnRetTy::Ty(t) = &fn_sig.decl.output;
-            if let rustc_ast::TyKind::Path(_, path) = &t.kind;
-            if let Some(segment) = path.segments.last();
-            if segment.ident.to_string() != "Result";
-            then {
-                return;
-            }
-        );
-
         let mut visitor = CounterVisitor {
+            cx,
             count_ok: 0,
             count_err: 0,
             found_try: false,
+            found_return: false,
             span: Vec::new(),
         };
 
-        block.into_iter().for_each(|item| {
-            for statement in &item.stmts {
-                match &statement.kind {
-                    rustc_ast::StmtKind::Expr(expr) | rustc_ast::StmtKind::Semi(expr) => {
-                        visitor.visit_expr(expr);
-                    }
-                    rustc_ast::StmtKind::Local(l) => {
-                        visitor.visit_local(l);
-                    }
-                    rustc_ast::StmtKind::Item(_) => {}
-                    rustc_ast::StmtKind::Empty => {}
-                    rustc_ast::StmtKind::MacCall(_) => {}
-                }
-            }
-        });
+        walk_expr(&mut visitor, body.value);
 
-        if !visitor.found_try && (visitor.count_err == 0 || visitor.count_ok == 0) {
+        if !visitor.found_try &&
+           !visitor.found_return &&
+           !expression_return &&
+            (visitor.count_err == 0 || visitor.count_ok == 0) {
+
             visitor.span.iter().for_each(|span| {
-                if let Some(span) = span {
-                    span_lint_and_help(
-                        cx,
-                        UNUSED_RETURN_ENUM,
-                        *span,
-                        "unused return enum",
-                        None,
-                        "If any of the variants (Ok/Err) is not used, the code could be simplified or it could imply a bug",
-                    );
-                }
+                span_lint_and_help(
+                    cx,
+                    UNUSED_RETURN_ENUM,
+                    *span,
+                    "unused return enum",
+                    None,
+                    "If any of the variants (Ok/Err) is not used, the code could be simplified or it could imply a bug",
+                );
             });
         }
     }
