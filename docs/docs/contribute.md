@@ -12,6 +12,8 @@ Create a new issue on our [repository](https://github.com/CoinFabrik/scout) with
 
 If your detector or test case doesn't belong to an existing [vulnerability class](https://coinfabrik.github.io/scout/docs/vulnerabilities#vulnerability-classes), please provide documentation for the new vulnerability class you're proposing.
 
+> :exclamation: **Requirement**: All detectors and test cases should follow the **kebab-case** naming convention, using **lowercase and hyphens** only.
+
 ### Detectors
 
 To contribute a new detector:
