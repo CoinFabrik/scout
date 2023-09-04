@@ -37,6 +37,7 @@ The team discusses the creation of the list in this
 | Centralization                 | Analysis of centralization and single points of failure.                                          |
 | Denial of Service              | Denial of service. attacks.                                                                       |
 | Gas Usage                      | Performance issues, enhancements and vulnerabilities related to use of gas.                       |
+| Known Bugs                     | Known issues that remain unresolved.                                                              |
 | MEV                            | Patterns that could lead to the exploitation of Maximal Extractable Value.                        |
 | Privacy                        | Patterns revealing sensible user or state data.                                                   |
 | Reentrancy                     | Consistency of contract state under recursive calls.                                              |
@@ -341,7 +342,7 @@ Check the following [documentation](22-unprotected-mapping-operation.md) for a m
 
 A bug in ink! causes delegated calls to not modify the caller's storage unless Lazy with ManualKey or Mapping is used.
 
-This vulnerability falls under the [Authorization](#vulnerability-categories) category
+This vulnerability falls under the [Known Bugs](#vulnerability-categories) category
 and has a Critical severity.
 
 Check the following [documentation](23-lazy-delegate.md) for a more detailed explanation of this vulnerability class.
