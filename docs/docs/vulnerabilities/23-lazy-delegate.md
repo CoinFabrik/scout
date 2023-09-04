@@ -2,7 +2,7 @@
 
 ## Description
 
-- Vulnerability Category: `Authorization`
+- Vulnerability Category: `Known Bugs`
 - Vulnerability Severity: `Critical`
 - Detectors: [`lazy-delegate`](https://github.com/CoinFabrik/scout/tree/main/detectors/lazy-delegate)
 - Test Cases: [`lazy-delegate-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/lazy-delegate/lazy-delegate-1)
