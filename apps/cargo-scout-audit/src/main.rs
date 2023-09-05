@@ -6,7 +6,7 @@ use cargo_metadata::MetadataCommand;
 use clap::{Parser, Subcommand, ValueEnum};
 use dylint::Dylint;
 use utils::detectors::{get_excluded_detectors, get_filtered_detectors, list_detectors};
-use utils::output::{format_into_html, format_into_json};
+use utils::output::{format_into_html, format_into_json, format_into_sarif};
 
 use crate::detectors::Detectors;
 
@@ -29,6 +29,7 @@ enum OutputFormat {
     Text,
     Json,
     Html,
+    Sarif,
 }
 
 #[derive(Debug, Parser, Clone)]
@@ -202,6 +203,13 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> 
                 None => fs::File::create("report.txt")?,
             };
             std::io::copy(&mut stderr_file, &mut txt_file)?;
+        }
+        OutputFormat::Sarif => {
+            let mut sarif_file = match &opts.output_path {
+                Some(path) => fs::File::create(path)?,
+                None => fs::File::create("report.sarif")?,
+            };
+            std::io::Write::write_all(&mut sarif_file, format_into_sarif(stderr_file)?.as_bytes())?;
         }
     }
 
