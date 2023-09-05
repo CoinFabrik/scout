@@ -63,10 +63,15 @@ fn test() {
         println!("\n{} {}", "Testing detector:".bright_cyan(), detector_name);
         for example in detector_config.testcases.iter() {
             if let Some(vulnerable_path) = &example.vulnerable_path {
-                execute_and_validate_testcase(lint_message, &vulnerable_path, true);
+                execute_and_validate_testcase(&detector_name, lint_message, &vulnerable_path, true);
             }
             if let Some(remediated_path) = &example.remediated_path {
-                execute_and_validate_testcase(lint_message, &remediated_path, false);
+                execute_and_validate_testcase(
+                    &detector_name,
+                    lint_message,
+                    &remediated_path,
+                    false,
+                );
             }
         }
     }
@@ -89,7 +94,12 @@ fn test() {
     }
 }
 
-fn execute_and_validate_testcase(lint_message: &str, path: &str, is_vulnerable: bool) {
+fn execute_and_validate_testcase(
+    detector_name: &str,
+    lint_message: &str,
+    path: &str,
+    is_vulnerable: bool,
+) {
     print!("{} {}", "Running testcase:".green(), path);
     let start_time = std::time::Instant::now();
 
@@ -102,6 +112,7 @@ fn execute_and_validate_testcase(lint_message: &str, path: &str, is_vulnerable: 
         output_path: Some(tempfile.path().to_string_lossy().to_string()),
         local_detectors: Some(get_detectors_path()),
         manifest_path: Some(path.to_string()),
+        filter: Some(detector_name.to_string()),
         ..Default::default()
     };
     run_scout(scout_config);
