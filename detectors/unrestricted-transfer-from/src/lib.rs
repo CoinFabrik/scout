@@ -89,7 +89,8 @@ impl<'tcx> LateLintPass<'tcx> for UnrestrictedTransferFrom {
                         if_chain! {
                             if let ExprKind::Path(qpath) = &path.kind;
                             if let rustc_hir::QPath::TypeRelative(ty, path_segment) = qpath;
-                            if path_segment.ident.name.to_string() == "transfer_from";
+                            if path_segment.ident.name.to_string() == "transfer_from"
+                            || path_segment.ident.name.to_string() == "transfer_from_builder";
                             if let rustc_hir::TyKind::Path(qpath_2) = &ty.kind;
                             if let rustc_hir::QPath::Resolved(_, path_2) = qpath_2;
                             if path_2.segments.iter().any(|s|s.ident.name.to_string() == "PSP22Ref");

@@ -12,7 +12,7 @@ pub fn format_into_json(scout_output: File) -> anyhow::Result<String> {
 }
 
 fn jsonify(mut scout_output: File) -> anyhow::Result<serde_json::Value> {
-    let regex = RegexBuilder::new(r"^warning:.*\n  --> .*$")
+    let regex = RegexBuilder::new(r"warning:.*\n*.*-->.*$")
         .multi_line(true)
         .case_insensitive(true)
         .build()?;
@@ -32,15 +32,15 @@ fn jsonify(mut scout_output: File) -> anyhow::Result<serde_json::Value> {
         let parts = elem.as_str().split('\n').collect::<Vec<&str>>();
 
         for err in Detector::iter().map(|e| e.get_lint_message()) {
-            if parts[0].contains(err) && parts[1].starts_with("  --> ") {
+            if parts[0].contains(err) && parts[1].trim().starts_with("-->") {
                 let name = msg_to_name.get(err).with_context(|| {
                     format!("Error making json: {} not found in the error map", err)
                 })?;
 
-                let span = parts[1].replace("  --> ", "");
+                let span = parts[1].replace("--> ", "");
 
                 if let Some((spans, error)) = errors.get_mut(name) {
-                    spans.push(span);
+                    spans.push(span.trim().to_string());
                     *error = err.to_string();
                 }
             }
