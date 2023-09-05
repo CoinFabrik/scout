@@ -125,7 +125,7 @@ pub fn format_into_html(scout_output: File) -> anyhow::Result<String> {
     Ok(html)
 }
 
-pub fn format_into_sarif(scout_output: File) -> anyhow::Result<String> {
+fn serify(scout_output: File) -> anyhow::Result<serde_json::Value> {
     let errors = get_errors_from_output(scout_output)?;
     let sarif_output = json!({
         "$schema": "https://json.schemastore.org/sarif-2.1.0",
@@ -144,9 +144,12 @@ pub fn format_into_sarif(scout_output: File) -> anyhow::Result<String> {
         ]
     });
 
-    let json_errors = serde_json::to_value(sarif_output).expect("Failed to serialize to JSON");
+    let json_errors = serde_json::to_value(sarif_output)?;
+    Ok(json_errors)
+}
 
-    Ok(json_errors.to_string())
+pub fn format_into_sarif(scout_output: File) -> anyhow::Result<String> {
+    Ok(serify(scout_output)?.to_string())
 }
 
 fn build_sarif_results(
