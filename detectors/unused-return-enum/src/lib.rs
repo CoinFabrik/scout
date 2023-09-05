@@ -9,6 +9,7 @@ use rustc_ast::visit::{self, FnKind, Visitor};
 use rustc_ast::{Expr, ExprKind, FnRetTy};
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::Span;
+use scout_audit_internal::Detector;
 
 dylint_linting::declare_early_lint! {
     /// ### What it does
@@ -61,7 +62,7 @@ dylint_linting::declare_early_lint! {
     /// ```
     pub UNUSED_RETURN_ENUM,
     Warn,
-    "If any of the variants (Ok/Err) is not used, the code could be simplified or it could imply a bug"
+    Detector::UnusedReturnEnum.get_lint_message()
 }
 
 struct CounterVisitor {
@@ -167,7 +168,7 @@ impl EarlyLintPass for UnusedReturnEnum {
                         cx,
                         UNUSED_RETURN_ENUM,
                         *span,
-                        "unused return enum",
+                        Detector::UnusedReturnEnum.get_lint_message(),
                         None,
                         "If any of the variants (Ok/Err) is not used, the code could be simplified or it could imply a bug",
                     );

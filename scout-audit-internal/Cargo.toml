@@ -1,0 +1,10 @@
+[package]
+name = "scout-audit-internal"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+detector = ["dep:strum"]
+
+[dependencies]
+strum = { version = "0.25", features = ["derive"], optional = true }

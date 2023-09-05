@@ -11,6 +11,7 @@ use rustc_hir::BinOpKind;
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::Span;
+use scout_audit_internal::Detector;
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -35,7 +36,7 @@ dylint_linting::declare_late_lint! {
     /// ```
     pub DIVIDE_BEFORE_MULTIPLY,
     Warn,
-    "Division should be performed after multiplication"
+    Detector::DivideBeforeMultiply.get_lint_message()
 }
 
 fn get_divisions_inside_expr(expr: &Expr<'_>) -> Vec<Span> {
@@ -76,7 +77,7 @@ impl<'tcx> LateLintPass<'tcx> for DivideBeforeMultiply {
                         cx,
                         DIVIDE_BEFORE_MULTIPLY,
                         division,
-                        "Division before multiplication might result in a loss of precision",
+                        Detector::DivideBeforeMultiply.get_lint_message(),
                         None,
                         "Consider reversing the order of operations to reduce the loss of precision.",
                     );

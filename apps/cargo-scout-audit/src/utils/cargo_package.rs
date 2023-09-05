@@ -48,7 +48,7 @@ pub fn package_with_root(metadata: &Metadata, package_root: &Path) -> Result<Car
         .into_iter()
         .next()
         .cloned()
-        .ok_or_else(|| anyhow!("Foun no packages in `{}`", package_root.to_string_lossy()))
+        .ok_or_else(|| anyhow!("Found no packages in `{}`", package_root.to_string_lossy()))
 }
 
 pub fn package_library_name(metadata: &Metadata, package_root: &Path) -> Result<String> {

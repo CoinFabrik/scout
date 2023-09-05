@@ -6,6 +6,7 @@ use clippy_utils::diagnostics::span_lint_and_help;
 use if_chain::if_chain;
 use rustc_hir::{BinOpKind, Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
+use scout_audit_internal::Detector;
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -21,7 +22,7 @@ dylint_linting::declare_late_lint! {
     ///
     pub INSUFFICIENTLY_RANDOM_VALUES,
     Warn,
-    "Weak pseudo random number using block timestamp or block number"
+    Detector::InsufficientlyRandomValues.get_lint_message()
 }
 
 impl<'tcx> LateLintPass<'tcx> for InsufficientlyRandomValues {
@@ -37,7 +38,7 @@ impl<'tcx> LateLintPass<'tcx> for InsufficientlyRandomValues {
                     cx,
                     INSUFFICIENTLY_RANDOM_VALUES,
                     expr.span,
-                    "In order to prevent randomness manipulations by validators block_timestamp should not be used as random number source",
+                    Detector::InsufficientlyRandomValues.get_lint_message(),
                     None,
                     "This expression seems to use block_timestamp as a pseudo random number",
                 );

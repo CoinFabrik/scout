@@ -12,6 +12,7 @@ use rustc_ast::{
 };
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::{sym, Span};
+use scout_audit_internal::Detector;
 
 dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does
@@ -46,7 +47,7 @@ dylint_linting::impl_pre_expansion_lint! {
 
     pub ASSERT_VIOLATION,
     Warn,
-    "Assert causes panic. Instead, return a proper error.",
+    Detector::AssertViolation.get_lint_message(),
     AssertViolation::default()
 }
 
@@ -115,7 +116,7 @@ fn check_macro_call(cx: &EarlyContext, span: Span, mac: &P<MacCall>) {
             cx,
             ASSERT_VIOLATION,
             span,
-            "Assert causes panic. Instead, return a proper error.",
+            Detector::AssertViolation.get_lint_message(),
             None,
             "You could use instead an Error enum.",
         );

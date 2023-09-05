@@ -8,6 +8,7 @@ use std::fs;
 
 use clippy_utils::diagnostics::span_lint_and_help;
 use rustc_lint::EarlyLintPass;
+use scout_audit_internal::Detector;
 use semver::*;
 
 dylint_linting::declare_early_lint! {
@@ -16,10 +17,9 @@ dylint_linting::declare_early_lint! {
     /// ### Why is this bad?
     /// Using an outdated version of ink! could lead to security vulnerabilities, bugs, and other issues.
     ///```
-
     pub CHECK_INK_VERSION,
     Warn,
-    "Use the latest version of ink!"
+    Detector::InkVersion.get_lint_message()
 }
 
 impl EarlyLintPass for CheckInkVersion {
@@ -51,9 +51,9 @@ impl EarlyLintPass for CheckInkVersion {
                 cx,
                 CHECK_INK_VERSION,
                 rustc_span::DUMMY_SP,
-                &format!("The latest ink! version is {latest_version}, and your version is {ink_version}"),
+                Detector::InkVersion.get_lint_message(),
                 None,
-                &format!("Please, use version {latest_version} of ink! in your Cargo.toml"),
+                &format!("The latest ink! version is {latest_version}, and your version is {ink_version}"),
             );
         }
     }

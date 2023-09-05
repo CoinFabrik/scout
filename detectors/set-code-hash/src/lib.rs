@@ -21,11 +21,12 @@ use rustc_middle::mir::{
 use rustc_middle::ty::TyKind;
 use rustc_span::def_id::DefId;
 use rustc_span::Span;
+use scout_audit_internal::Detector;
 
 dylint_linting::impl_late_lint! {
     pub UNPROTECTED_SET_CODE_HASH,
     Warn,
-    "Don't call terminate_contract without checking the caller authority",
+    Detector::SetCodeHash.get_lint_message(),
     UnprotectedSetCodeHash::default()
 }
 
@@ -151,7 +152,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSetCodeHash {
                             cx,
                             UNPROTECTED_SET_CODE_HASH,
                             fn_span,
-                            "This set_code_hash is called without access control",
+                            Detector::SetCodeHash.get_lint_message(),
                         );
                     }
                 }
@@ -168,7 +169,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSetCodeHash {
                         cx,
                         UNPROTECTED_SET_CODE_HASH,
                         place.1,
-                        "This set_code_hash is called without access control",
+                        Detector::SetCodeHash.get_lint_message(),
                     );
                 }
             }

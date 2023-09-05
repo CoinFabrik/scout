@@ -18,11 +18,12 @@ use rustc_hir::{PatKind, QPath};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_middle::mir::{BasicBlock, BasicBlocks, Local, Operand, StatementKind, TerminatorKind};
 use rustc_span::Span;
+use scout_audit_internal::Detector;
 
 dylint_linting::impl_late_lint! {
     pub UNRESTRICTED_TRANSFER_FROM,
     Warn,
-    "Don't use user-supplied arguments as 'from' field in transfer_from",
+    Detector::UnrestrictedTransferFrom.get_lint_message(),
     UnrestrictedTransferFrom::default()
 }
 
@@ -176,7 +177,7 @@ impl<'tcx> LateLintPass<'tcx> for UnrestrictedTransferFrom {
                 cx,
                 UNRESTRICTED_TRANSFER_FROM,
                 utf_storage.span.unwrap(),
-                "This argument comes from a user-supplied argument",
+                Detector::UnrestrictedTransferFrom.get_lint_message(),
             );
         }
 

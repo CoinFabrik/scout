@@ -22,11 +22,12 @@ use rustc_middle::mir::{
 use rustc_middle::ty::TyKind;
 use rustc_span::def_id::DefId;
 use rustc_span::Span;
+use scout_audit_internal::Detector;
 
 dylint_linting::impl_late_lint! {
     pub UNPROTECTED_MAPPING_OPERATION,
     Warn,
-    "Verify authorization before modifying or removing keys from a mapping",
+    Detector::UnprotectedMappingOperation.get_lint_message(),
     UnprotectedMappingOperation::default()
 }
 
@@ -160,7 +161,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
                     cx,
                     UNPROTECTED_MAPPING_OPERATION,
                     place.1,
-                    "This mapping operation is called without access control on a different key than the caller's address",
+                    Detector::UnprotectedMappingOperation.get_lint_message(),
                 );
             }
         }

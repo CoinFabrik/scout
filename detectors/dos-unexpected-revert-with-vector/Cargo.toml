@@ -11,6 +11,8 @@ clippy_utils = { git = "https://github.com/rust-lang/rust-clippy", rev = "f16bfa
 dylint_linting = "2.1.9"
 if_chain = "1.0.2"
 
+scout-audit-internal = { path = "../../scout-audit-internal", features = ["detector"] }
+
 [dev-dependencies]
 dylint_testing = "2.1.9"
 
