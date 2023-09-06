@@ -32,3 +32,4 @@ jobs:
           RUSTTARGET: ${{ matrix.target }}
           ARCHIVE_TYPES: ${{ matrix.archive }}
           SRC_DIR: apps/cargo-scout-audit
+          TOOLCHAIN_VERSION: stable
