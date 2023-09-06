@@ -60,6 +60,15 @@ impl<'a> DetectorBuilder<'a> {
     fn download_detector(&self) -> Result<PathBuf> {
         if self.detectors_config.dependency.source_id().is_git() {
             download_git_repo(&self.detectors_config.dependency, self.cargo_config)
+        } else if self.detectors_config.dependency.source_id().is_path() {
+            if let Some(path) = self.detectors_config.dependency.source_id().local_path() {
+                Ok(path)
+            } else {
+                bail!(
+                    "Path source should have a local path: {}",
+                    self.detectors_config.dependency.source_id()
+                )
+            }
         } else {
             bail!(format!(
                 "Unsupported source id: {}",

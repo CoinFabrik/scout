@@ -13,6 +13,7 @@ use rustc_ast::{
 };
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::Span;
+use scout_audit_internal::Detector;
 
 dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does
@@ -37,10 +38,9 @@ dylint_linting::impl_pre_expansion_lint! {
     /// - https://github.com/paritytech/ink/issues/1825
     /// - https://github.com/paritytech/ink/issues/1826
     ///```
-
     pub LAZY_DELEGATE,
     Warn,
-    "Use of delegate call with non-lazy, non-mapping storage won't modify the storage of the contract.",
+    Detector::LazyDelegate.get_lint_message(),
     LazyDelegate::default()
 }
 
@@ -79,7 +79,7 @@ impl EarlyLintPass for LazyDelegate {
                 cx,
                 LAZY_DELEGATE,
                 id.span,
-                "Delegate call with non-lazy, non-mapping storage",
+                Detector::LazyDelegate.get_lint_message(),
                 None,
                 "Use lazy storage with manual keys",
             );
@@ -89,7 +89,7 @@ impl EarlyLintPass for LazyDelegate {
                     cx,
                     LAZY_DELEGATE,
                     *span,
-                    "Non-lazy non-mapping storage",
+                    Detector::LazyDelegate.get_lint_message(),
                     None,
                     "Use lazy storage with manual keys. \nMore info in https://github.com/paritytech/ink/issues/1826 and https://github.com/paritytech/ink/issues/1825",
                 );

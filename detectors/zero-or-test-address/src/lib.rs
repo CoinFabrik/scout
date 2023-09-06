@@ -20,6 +20,7 @@ use rustc_lint::{LateContext, LateLintPass};
 use rustc_middle::ty::TyCtxt;
 use rustc_span::def_id::LocalDefId;
 use rustc_span::Span;
+use scout_audit_internal::Detector;
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -51,7 +52,7 @@ dylint_linting::declare_late_lint! {
     /// ```
     pub ZERO_OR_TEST_ADDRESS,
     Warn,
-    "Check if AccountId parameters are compared with a zero address"
+    Detector::ZeroOrTestAddress.get_lint_message()
 }
 
 impl<'tcx> LateLintPass<'tcx> for ZeroOrTestAddress {
@@ -185,7 +186,7 @@ impl<'tcx> LateLintPass<'tcx> for ZeroOrTestAddress {
                     cx,
                     ZERO_OR_TEST_ADDRESS,
                     param.span,
-                    "Not checking for a zero-address could lead to a locked contract",
+                    Detector::ZeroOrTestAddress.get_lint_message(),
                     None,
                     "This function should check if the AccountId passed is zero and revert if it is",
                 );

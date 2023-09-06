@@ -22,6 +22,7 @@ use rustc_lint::{LateContext, LateLintPass};
 use rustc_middle::ty::TyKind;
 use rustc_span::def_id::LocalDefId;
 use rustc_span::{Span, Symbol};
+use scout_audit_internal::Detector;
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -87,7 +88,7 @@ dylint_linting::declare_late_lint! {
     /// ```
     pub REENTRANCY,
     Warn,
-    "Reentrancy vulnerability"
+    Detector::Reentrancy2.get_lint_message()
 }
 
 const SET_ALLOW_REENTRY: &str = "set_allow_reentry";
@@ -275,7 +276,7 @@ impl<'tcx> LateLintPass<'tcx> for Reentrancy {
                     cx,
                     REENTRANCY,
                     span,
-                    "External calls could open the opportunity for a malicious contract to execute any arbitrary code",
+                    Detector::Reentrancy2.get_lint_message(),
                     None,
                     "This statement seems to call another contract after the flag set_allow_reentry was enabled [todo: check state changes after this statement]",
                 );

@@ -12,6 +12,7 @@ use rustc_ast::{
 };
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::{sym, Span};
+use scout_audit_internal::Detector;
 
 dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does
@@ -44,7 +45,7 @@ dylint_linting::impl_pre_expansion_lint! {
     /// ```
     pub AVOID_FORMAT_STRING,
     Warn,
-    "`format!` should be avoided in production code",
+    Detector::AvoidFormatString.get_lint_message(),
     AvoidFormatString::default()
 }
 
@@ -88,7 +89,7 @@ impl EarlyLintPass for AvoidFormatString {
                     cx,
                     AVOID_FORMAT_STRING,
                     expr.span,
-                    "The format! macro should not be used.",
+                    Detector::AvoidFormatString.get_lint_message(),
                     None,
                     "Instead, if this is returning an error, define a new error type",
                 );

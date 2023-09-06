@@ -67,16 +67,6 @@ jobs:
       - name: Install dylint-link
         run: cargo install dylint-link
 
-      - name: Install cargo-scout-audit
-        run: cargo install --path apps/cargo-scout-audit
-
-      - name: Build detectors
-        working-directory: ${{ runner.temp }}
-        run: |
-          cargo new test-run
-          cd test-run
-          cargo scout-audit
-
       - name: Compile cargo-scout-audit tests
         working-directory: apps/cargo-scout-audit
         run: cargo test --no-run

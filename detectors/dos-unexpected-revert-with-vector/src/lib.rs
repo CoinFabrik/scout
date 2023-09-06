@@ -21,6 +21,7 @@ use rustc_middle::mir::{
 use rustc_middle::ty::TyKind;
 use rustc_span::def_id::DefId;
 use rustc_span::Span;
+use scout_audit_internal::Detector;
 
 dylint_linting::impl_late_lint! {
     /// ### What it does
@@ -52,7 +53,7 @@ dylint_linting::impl_late_lint! {
     /// ```
     pub UNEXPECTED_REVERT_WARN,
     Warn,
-    "vectors only must be used with proper access control, otherwise a user could add an excessive number of entries leading to a DoS attack",
+    Detector::DosUnexpectedRevertWithVector.get_lint_message(),
     UnexpectedRevertWarn::default()
 }
 
@@ -184,7 +185,7 @@ impl<'tcx> LateLintPass<'tcx> for UnexpectedRevertWarn {
                     cx,
                     UNEXPECTED_REVERT_WARN,
                     place.1,
-                    "This vector operation is called without access control",
+                    Detector::DosUnexpectedRevertWithVector.get_lint_message(),
                 );
             }
         }

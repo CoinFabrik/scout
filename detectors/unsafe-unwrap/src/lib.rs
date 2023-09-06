@@ -11,6 +11,7 @@ use rustc_hir::{
 };
 use rustc_lint::LateLintPass;
 use rustc_span::{Span, Symbol};
+use scout_audit_internal::Detector;
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -45,7 +46,7 @@ dylint_linting::declare_late_lint! {
     /// ```
     pub UNSAFE_UNWRAP,
     Warn,
-    "Using the expression `unwrap` might panic if the result value is an error or `None`"
+    Detector::UnsafeUnwrap.get_lint_message()
 }
 
 impl<'tcx> LateLintPass<'tcx> for UnsafeUnwrap {
@@ -89,7 +90,7 @@ impl<'tcx> LateLintPass<'tcx> for UnsafeUnwrap {
                         cx,
                         UNSAFE_UNWRAP,
                         *span,
-                        "Unsafe usage of `unwrap`",
+                        Detector::UnsafeUnwrap.get_lint_message(),
                         None,
                         "Please, use a custom error instead of `unwrap`",
                     );
