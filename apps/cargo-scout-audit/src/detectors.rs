@@ -15,7 +15,7 @@ mod library;
 mod source;
 
 use cargo_metadata::Metadata;
-pub use configuration::get_detectors_configuration;
+pub use configuration::{get_detectors_configuration, get_local_detectors_configuration};
 
 #[derive(Debug)]
 pub struct Detectors {

@@ -13,6 +13,7 @@ use rustc_hir::{Body, FnDecl, HirId};
 use rustc_hir::{Expr, ExprKind, PatKind, QPath};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::Span;
+use scout_audit_internal::Detector;
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -61,7 +62,7 @@ dylint_linting::declare_late_lint! {
 
     pub DELEGATE_CALL,
     Warn,
-    "Passing arguments to the target of a delegate call is not safe, as it allows the caller to set a malicious hash as the target."
+    Detector::DelegateCall.get_lint_message()
 }
 impl<'tcx> LateLintPass<'tcx> for DelegateCall {
     fn check_fn(
@@ -151,7 +152,7 @@ impl<'tcx> LateLintPass<'tcx> for DelegateCall {
                 cx,
                 DELEGATE_CALL,
                 delegate_storage.span.unwrap(),
-                "Passing arguments to the target of a delegate call is not safe, as it allows the caller to set a malicious hash as the target.",
+                Detector::DelegateCall.get_lint_message(),
                 None,
                 "Consider using a memory value (self.target) as the target of the delegate call.",
             );
