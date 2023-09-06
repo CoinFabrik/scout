@@ -675,7 +675,7 @@ dependencies = [
  "cargo-util",
  "cargo_metadata",
  "dirs",
- "dylint_internal",
+ "dylint_internal 2.2.0 (git+https://github.com/CoinFabrik/dylint-scout)",
  "glob",
  "heck",
  "if_chain",
@@ -693,6 +693,16 @@ dependencies = [
 [[package]]
 name = "dylint_internal"
 version = "2.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b8052cf45dad1c8937f9f25e931b2e656b69d6c5eee3161ac53d976ed49ab5f2"
+dependencies = [
+ "anyhow",
+ "if_chain",
+]
+
+[[package]]
+name = "dylint_internal"
+version = "2.2.0"
 source = "git+https://github.com/CoinFabrik/dylint-scout#55d8931ff4a37a32671d2f12e0ca14dad95c7278"
 dependencies = [
  "ansi_term",
@@ -705,6 +715,21 @@ dependencies = [
  "log",
  "rust-embed",
  "sedregex",
+]
+
+[[package]]
+name = "dylint_linting"
+version = "2.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4023cb5d0fe16bcbec4b14b18513f447d7131a516da9d80c6a5c62c05bf71ba9"
+dependencies = [
+ "cargo_metadata",
+ "dylint_internal 2.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "paste",
+ "rustversion",
+ "serde",
+ "thiserror",
+ "toml 0.7.6",
 ]
 
 [[package]]
@@ -2125,6 +2150,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "paste"
+version = "1.0.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "de3145af08024dea9fa9914f381a17b8fc6034dfb00f3a84013f7ff43f29ed4c"
+
+[[package]]
 name = "pathdiff"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2489,6 +2520,7 @@ checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
 name = "scout-audit-internal"
 version = "0.1.0"
 dependencies = [
+ "dylint_linting",
  "strum",
 ]
 
