@@ -4,7 +4,7 @@
 extern crate rustc_ast;
 extern crate rustc_span;
 
-use clippy_utils::diagnostics::span_lint_and_help;
+//use clippy_utils::diagnostics::span_lint_and_help;
 use if_chain::if_chain;
 use rustc_ast::ast::GenericArgs;
 use rustc_ast::{
@@ -13,7 +13,7 @@ use rustc_ast::{
 };
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::Span;
-use scout_audit_internal::Detector;
+use scout_audit_internal::{Detector, span_lint_and_help};
 
 dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does
