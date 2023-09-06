@@ -5,7 +5,7 @@ use std::{collections::HashMap, str::FromStr};
 use anyhow::{Context, Ok};
 use regex::RegexBuilder;
 use scout_audit_internal::{Detector, IntoEnumIterator};
-use serde_json::json;
+use serde_json::{json, Value};
 
 pub fn format_into_json(scout_output: File) -> anyhow::Result<String> {
     let json_errors = jsonify(scout_output)?;
