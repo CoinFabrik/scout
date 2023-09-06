@@ -1,17 +1,38 @@
-use std::collections::HashMap;
 use std::fs::File;
+use std::vec;
+use std::{collections::HashMap, str::FromStr};
 
 use anyhow::Context;
 use regex::RegexBuilder;
 use scout_audit_internal::{Detector, IntoEnumIterator};
-use serde_json::json;
+use serde_json::{json, Value};
 
 pub fn format_into_json(scout_output: File) -> anyhow::Result<String> {
     let json_errors = jsonify(scout_output)?;
     Ok(serde_json::to_string_pretty(&json_errors)?)
 }
 
-fn jsonify(mut scout_output: File) -> anyhow::Result<serde_json::Value> {
+fn jsonify(scout_output: File) -> anyhow::Result<serde_json::Value> {
+    let json_errors: serde_json::Value = get_errors_from_output(scout_output)?
+        .iter()
+        .filter(|(_, (spans, _))| !spans.is_empty())
+        .map(|(name, (spans, error))| {
+            (
+                name,
+                json!({
+                    "error_msg": error,
+                    "spans": spans
+                }),
+            )
+        })
+        .collect();
+
+    Ok(json_errors)
+}
+
+fn get_errors_from_output(
+    mut scout_output: File,
+) -> anyhow::Result<HashMap<String, (Vec<String>, String)>> {
     let regex = RegexBuilder::new(r"warning:.*\n*.*-->.*$")
         .multi_line(true)
         .case_insensitive(true)
@@ -46,21 +67,7 @@ fn jsonify(mut scout_output: File) -> anyhow::Result<serde_json::Value> {
             }
         }
     }
-    let json_errors: serde_json::Value = errors
-        .iter()
-        .filter(|(_, (spans, _))| !spans.is_empty())
-        .map(|(name, (spans, error))| {
-            (
-                name,
-                json!({
-                    "error_msg": error,
-                    "spans": spans
-                }),
-            )
-        })
-        .collect();
-
-    Ok(json_errors)
+    Ok(errors)
 }
 
 pub fn format_into_html(scout_output: File) -> anyhow::Result<String> {
@@ -118,4 +125,70 @@ pub fn format_into_html(scout_output: File) -> anyhow::Result<String> {
     }
 
     Ok(html)
+}
+
+fn serify(scout_output: File) -> anyhow::Result<serde_json::Value> {
+    let errors = get_errors_from_output(scout_output)?;
+    let sarif_output = json!({
+        "$schema": "https://json.schemastore.org/sarif-2.1.0",
+        "version": "2.1.0",
+        "runs": [
+            {
+                "tool": {
+                    "driver": {
+                        "name": env!("CARGO_PKG_NAME"),
+                        "version": env!("CARGO_PKG_VERSION"),
+                        "informationUri": "../../README.md",
+                    }
+                },
+                "results": build_sarif_results(&errors)?,
+            }
+        ]
+    });
+
+    let json_errors = serde_json::to_value(sarif_output)?;
+    Ok(json_errors)
+}
+
+pub fn format_into_sarif(scout_output: File) -> anyhow::Result<String> {
+    Ok(serify(scout_output)?.to_string())
+}
+
+fn build_sarif_results(
+    errors: &HashMap<String, (Vec<String>, String)>,
+) -> anyhow::Result<Vec<serde_json::Value>> {
+    let runs: Vec<Value> = errors
+        .iter()
+        .filter(|(_, (spans, _))| !spans.is_empty())
+        .map(|(name, (spans, msg))| {
+            let locations = spans
+                .iter()
+                .map(|span| {
+                    let split: Vec<&str> = span.split(':').collect();
+
+                    json!({
+                        "physicalLocation": {
+                            "artifactLocation": {
+                                "uri": split[0]
+                            },
+                            "region": {
+                                "startLine": u64::from_str(split[1]).unwrap(),
+                                "startColumn": u64::from_str(split[2]).unwrap(),
+                            }
+                        }
+                    })
+                })
+                .collect::<Vec<serde_json::Value>>();
+
+            json!({
+                "ruleId": name,
+                "level": "error",
+                "message": {
+                    "text": msg
+                },
+                "locations": locations,
+            })
+        })
+        .collect();
+    Ok(runs)
 }
