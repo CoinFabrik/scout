@@ -2,7 +2,7 @@ use std::fs::File;
 use std::vec;
 use std::{collections::HashMap, str::FromStr};
 
-use anyhow::{Context, Ok};
+use anyhow::Context;
 use regex::RegexBuilder;
 use scout_audit_internal::{Detector, IntoEnumIterator};
 use serde_json::{json, Value};
