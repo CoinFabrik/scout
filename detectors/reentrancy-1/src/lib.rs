@@ -12,6 +12,7 @@ use rustc_hir::{Body, FnDecl, HirId, Stmt};
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::Span;
+use scout_audit_internal::Detector;
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -77,7 +78,7 @@ dylint_linting::declare_late_lint! {
     /// ```
     pub REENTRANCY,
     Warn,
-    "description goes here"
+    Detector::Reentrancy1.get_lint_message()
 }
 
 impl<'tcx> LateLintPass<'tcx> for Reentrancy {
@@ -202,7 +203,7 @@ impl<'tcx> LateLintPass<'tcx> for Reentrancy {
                 REENTRANCY,
                 // body.value.span,
                 reentrant_storage.span.unwrap(),
-                "External calls could open the opportunity for a malicious contract to execute any arbitrary code",
+                Detector::Reentrancy1.get_lint_message(),
                 None,
                 "This statement seems to call another contract after the flag set_allow_reentry was enabled [todo: check state changes after this statement]",
             );

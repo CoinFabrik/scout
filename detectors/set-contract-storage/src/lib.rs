@@ -13,6 +13,7 @@ use rustc_hir::{Body, FnDecl, HirId};
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::Span;
+use scout_audit_internal::Detector;
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -52,7 +53,7 @@ dylint_linting::declare_late_lint! {
     /// ```
     pub SET_STORAGE_WARN,
     Warn,
-    "set_contract_storage only must be used with proper access control or input sanitation"
+    Detector::SetContractStorage.get_lint_message()
 }
 
 fn expr_check_owner(expr: &Expr) -> bool {
@@ -140,7 +141,7 @@ impl<'tcx> LateLintPass<'tcx> for SetStorageWarn {
                 SET_STORAGE_WARN,
                 // body.value.span,
                 reentrant_storage.span.unwrap(),
-                "Abitrary users should not have control over keys because it implies writing any value of left mapping, lazy variable, or the main struct of the contract located in position 0 of the storage",
+                Detector::SetContractStorage.get_lint_message(),
                 None,
                 "Set access control and proper authorization validation for the set_contract_storage() function",
             );

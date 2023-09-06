@@ -8,6 +8,7 @@ use rustc_ast::visit::{walk_expr, FnKind, Visitor};
 use rustc_ast::{Expr, ExprKind};
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::Span;
+use scout_audit_internal::Detector;
 
 dylint_linting::declare_early_lint! {
     /// ### What it does
@@ -48,7 +49,7 @@ dylint_linting::declare_early_lint! {
 
     pub ITERATOR_OVER_INDEXING,
     Warn,
-    "Using arbitrary index instead of iterator could panic."
+    Detector::IteratorsOverIndexing.get_lint_message()
 }
 
 struct ForLoopVisitor {
@@ -107,7 +108,7 @@ impl EarlyLintPass for IteratorOverIndexing {
                 cx,
                 ITERATOR_OVER_INDEXING,
                 *sp,
-                "Hardcoding an index could lead to panic if the top bound is out of bounds.",
+                Detector::IteratorsOverIndexing.get_lint_message(),
                 None,
                 "Instead, use an iterator or index to `.len()`.",
             );

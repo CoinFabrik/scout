@@ -1,10 +1,7 @@
 [package]
 name = "zero-or-test-address"
 version = "0.1.0"
-authors = ["authors go here"]
-description = "description goes here"
 edition = "2021"
-publish = false
 
 [lib]
 crate-type = ["cdylib"]
@@ -14,6 +11,8 @@ clippy_utils = { git = "https://github.com/rust-lang/rust-clippy", rev = "f16bfa
 dylint_internal = "2.1.5"
 dylint_linting = "2.1.5"
 if_chain = "1.0.2"
+
+scout-audit-internal = { path = "../../scout-audit-internal", features = ["detector"] }
 
 [dev-dependencies]
 dylint_testing = "2.1.5"
