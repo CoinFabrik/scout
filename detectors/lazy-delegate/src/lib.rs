@@ -13,7 +13,7 @@ use rustc_ast::{
 };
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::Span;
-use scout_audit_internal::{Detector, span_lint_and_help};
+use scout_audit_internal::{span_lint_and_help, Detector};
 
 dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does

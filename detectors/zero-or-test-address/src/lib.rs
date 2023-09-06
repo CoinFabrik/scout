@@ -20,7 +20,7 @@ use rustc_lint::{LateContext, LateLintPass};
 use rustc_middle::ty::TyCtxt;
 use rustc_span::def_id::LocalDefId;
 use rustc_span::Span;
-use scout_audit_internal::{Detector, span_lint_and_help};
+use scout_audit_internal::{span_lint_and_help, Detector};
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
