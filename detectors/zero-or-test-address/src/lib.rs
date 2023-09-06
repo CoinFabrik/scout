@@ -8,7 +8,7 @@ extern crate rustc_span;
 
 use std::collections::HashSet;
 
-use clippy_utils::diagnostics::span_lint_and_help;
+//use clippy_utils::diagnostics::span_lint_and_help;
 use if_chain::if_chain;
 use rustc_ast::LitKind;
 use rustc_hir::def::Res;
@@ -20,7 +20,7 @@ use rustc_lint::{LateContext, LateLintPass};
 use rustc_middle::ty::TyCtxt;
 use rustc_span::def_id::LocalDefId;
 use rustc_span::Span;
-use scout_audit_internal::Detector;
+use scout_audit_internal::{Detector, span_lint_and_help};
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
