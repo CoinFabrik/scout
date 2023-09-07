@@ -58,9 +58,6 @@ jobs:
             apps/cargo-scout-audit/target
           key: ${{ runner.os }}-cargo-scout-dependencies-${{ github.run_id }}
 
-      - name: Install Rust nightly-2023-01-27
-        run: rustup install nightly-2023-01-27 --profile minimal
-
       - name: Install Rust nightly-2023-04-23
         run: rustup install nightly-2023-04-23 --profile minimal
 
