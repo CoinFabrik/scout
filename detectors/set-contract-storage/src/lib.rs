@@ -6,12 +6,12 @@ extern crate rustc_span;
 
 use clippy_utils::diagnostics::span_lint_and_help;
 use if_chain::if_chain;
+use rustc_hir::def_id::LocalDefId;
 use rustc_hir::intravisit::Visitor;
 use rustc_hir::intravisit::{walk_expr, FnKind};
 use rustc_hir::QPath;
 use rustc_hir::{Body, FnDecl};
 use rustc_hir::{Expr, ExprKind};
-use rustc_hir::def_id::LocalDefId;
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::Span;
 use scout_audit_internal::Detector;
