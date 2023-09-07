@@ -57,7 +57,7 @@ impl<'tcx> LateLintPass<'tcx> for UnsafeUnwrap {
         _: &'tcx rustc_hir::FnDecl<'tcx>,
         body: &'tcx rustc_hir::Body<'tcx>,
         _: rustc_span::Span,
-        _: rustc_hir::HirId,
+        _: rustc_hir::def_id::LocalDefId,
     ) {
         struct UnsafeUnwrapVisitor {
             has_unwrap: bool,
