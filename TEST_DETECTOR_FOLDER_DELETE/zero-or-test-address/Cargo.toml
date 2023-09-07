@@ -1,0 +1,21 @@
+[package]
+name = "zero-or-test-address"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+clippy_utils = { git = "https://github.com/rust-lang/rust-clippy", rev = "f16bfa478f131b2ec2ad9742f88dc6a9beea52b7" }
+dylint_internal = "2.1.5"
+dylint_linting = "2.1.5"
+if_chain = "1.0.2"
+
+scout-audit-internal = { path = "../../scout-audit-internal", features = ["detector", "lint_helper"] }
+
+[dev-dependencies]
+dylint_testing = "2.1.5"
+
+[package.metadata.rust-analyzer]
+rustc_private = true

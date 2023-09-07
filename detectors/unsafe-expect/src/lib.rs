@@ -57,7 +57,7 @@ impl<'tcx> LateLintPass<'tcx> for UnsafeExpect {
         _: &'tcx rustc_hir::FnDecl<'tcx>,
         body: &'tcx rustc_hir::Body<'tcx>,
         _: rustc_span::Span,
-        _: rustc_hir::HirId,
+        _: rustc_hir::def_id::LocalDefId,
     ) {
         struct UnsafeExpectVisitor {
             has_expect: bool,

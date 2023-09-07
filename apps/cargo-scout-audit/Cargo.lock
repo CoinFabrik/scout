@@ -665,8 +665,9 @@ checksum = "56ce8c6da7551ec6c462cbaf3bfbc75131ebbfa1c944aeaa9dab51ca1c5f0c3b"
 
 [[package]]
 name = "dylint"
-version = "2.2.0"
-source = "git+https://github.com/CoinFabrik/dylint-scout#55d8931ff4a37a32671d2f12e0ca14dad95c7278"
+version = "2.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "01428e3fad655202ec50df7b66015d59f7a66d76c9d0eba7148fc057c1008b08"
 dependencies = [
  "ansi_term",
  "anyhow",
@@ -700,10 +701,9 @@ dependencies = [
  "if_chain",
 ]
 
-[[package]]
-name = "dylint_internal"
-version = "2.2.0"
-source = "git+https://github.com/CoinFabrik/dylint-scout#55d8931ff4a37a32671d2f12e0ca14dad95c7278"
+version = "2.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "510bc05a42055d62ed89ee9561d974f338d30bf786917da7c033146a860ceac1
 dependencies = [
  "ansi_term",
  "anyhow",

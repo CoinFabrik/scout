@@ -6,10 +6,11 @@ extern crate rustc_span;
 
 use clippy_utils::diagnostics::span_lint_and_help;
 use if_chain::if_chain;
+use rustc_hir::def_id::LocalDefId;
 use rustc_hir::intravisit::Visitor;
 use rustc_hir::intravisit::{walk_expr, FnKind};
 use rustc_hir::QPath;
-use rustc_hir::{Body, FnDecl, HirId};
+use rustc_hir::{Body, FnDecl};
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::Span;
@@ -81,7 +82,7 @@ impl<'tcx> LateLintPass<'tcx> for SetStorageWarn {
         _: &'tcx FnDecl<'_>,
         body: &'tcx Body<'_>,
         _: Span,
-        _: HirId,
+        _: LocalDefId,
     ) {
         struct SetContractStorage {
             span: Option<Span>,
