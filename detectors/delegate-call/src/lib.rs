@@ -7,14 +7,14 @@ extern crate rustc_span;
 use clippy_utils::diagnostics::span_lint_and_help;
 use if_chain::if_chain;
 use rustc_hir::def::Res;
+use rustc_hir::def_id::LocalDefId;
 use rustc_hir::intravisit::Visitor;
 use rustc_hir::intravisit::{walk_expr, FnKind};
-use rustc_hir::{Body, FnDecl, HirId};
+use rustc_hir::{Body, FnDecl};
 use rustc_hir::{Expr, ExprKind, PatKind, QPath};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::Span;
 use scout_audit_internal::Detector;
-
 dylint_linting::declare_late_lint! {
     /// ### What it does
     /// Checks for delegated calls to contracts passed as arguments.
@@ -72,7 +72,7 @@ impl<'tcx> LateLintPass<'tcx> for DelegateCall {
         _: &'tcx FnDecl<'_>,
         body: &'tcx Body<'_>,
         _: Span,
-        _: HirId,
+        _: LocalDefId,
     ) {
         struct DelegateCallStorage<'tcx> {
             span: Option<Span>,
