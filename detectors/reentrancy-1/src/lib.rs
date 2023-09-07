@@ -6,9 +6,10 @@ extern crate rustc_span;
 
 use clippy_utils::diagnostics::span_lint_and_help;
 use if_chain::if_chain;
+use rustc_hir::def_id::LocalDefId;
 use rustc_hir::intravisit::{walk_expr, FnKind};
 use rustc_hir::intravisit::{walk_stmt, Visitor};
-use rustc_hir::{Body, FnDecl, HirId, Stmt};
+use rustc_hir::{Body, FnDecl, Stmt};
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::Span;
@@ -89,7 +90,7 @@ impl<'tcx> LateLintPass<'tcx> for Reentrancy {
         _: &'tcx FnDecl<'_>,
         body: &'tcx Body<'_>,
         _: Span,
-        _: HirId,
+        _: LocalDefId,
     ) {
         struct ReentrantStorage {
             span: Option<Span>,
