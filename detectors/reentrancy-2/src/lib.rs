@@ -86,7 +86,7 @@ dylint_linting::declare_late_lint! {
     ///     return caller_balance;
     /// }
     /// ```
-    pub REENTRANCY,
+    pub REENTRANCY_2,
     Warn,
     Detector::Reentrancy2.get_lint_message()
 }
@@ -98,7 +98,7 @@ const MAPPING: &str = "Mapping";
 const ACCOUNT_ID: &str = "AccountId";
 const U128: &str = "u128";
 
-impl<'tcx> LateLintPass<'tcx> for Reentrancy {
+impl<'tcx> LateLintPass<'tcx> for Reentrancy2 {
     fn check_fn(
         &mut self,
         cx: &LateContext<'tcx>,
@@ -274,7 +274,7 @@ impl<'tcx> LateLintPass<'tcx> for Reentrancy {
             reentrancy_visitor.reentrancy_spans.into_iter().for_each(|span| {
                 span_lint_and_help(
                     cx,
-                    REENTRANCY,
+                    REENTRANCY_2,
                     span,
                     Detector::Reentrancy2.get_lint_message(),
                     None,
