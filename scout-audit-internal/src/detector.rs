@@ -13,11 +13,12 @@ use lint_message::*;
 use rustc_lint::{Lint, LintContext};
 #[cfg(feature = "lint_helper")]
 use rustc_span::Span;
+#[cfg(feature = "lint_helper")]
 use serde_json::json;
-use strum::{Display, EnumIter, EnumString, IntoEnumIterator};
+use strum::{Display, EnumIter};
 
 /// Available detectors.
-#[derive(Debug, Display, Clone, EnumIter, PartialEq, Eq, Hash, EnumString)]
+#[derive(Debug, Display, Clone, EnumIter, PartialEq, Eq, Hash)]
 #[strum(serialize_all = "kebab-case")]
 pub enum Detector {
     AssertViolation,
