@@ -113,6 +113,7 @@ fn execute_and_validate_testcase(
         local_detectors: Some(get_detectors_path()),
         manifest_path: Some(path.to_string()),
         filter: Some(detector_name.to_string()),
+        verbose: true,
         ..Default::default()
     };
     run_scout(scout_config);
