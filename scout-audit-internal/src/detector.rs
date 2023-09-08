@@ -98,20 +98,6 @@ impl Detector {
         print_scout_output(*lint, span);
         span_lint_clippy(cx, lint, span, self.get_lint_message());
     }
-
-    pub fn sarif_rules() -> Vec<serde_json::Value> {
-        let mut rules = Vec::new();
-        for detector in Detector::iter() {
-            let rule = json!({
-                "id": detector.to_string(),
-                "fullDescription": {
-                    "text": detector.get_lint_message()
-                }
-            });
-            rules.push(rule);
-        }
-        rules
-    }
 }
 
 #[cfg(feature = "lint_helper")]

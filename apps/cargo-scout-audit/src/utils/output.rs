@@ -151,7 +151,6 @@ fn serify(scout_output: File, scout_internals: File) -> anyhow::Result<serde_jso
                         "name": env!("CARGO_PKG_NAME"),
                         "version": env!("CARGO_PKG_VERSION"),
                         "rules": Detector::iter().filter(|e| {
-                            //check if e is key of errors
                             errors.contains_key(&e.to_string()) && !errors.get(&e.to_string()).unwrap().0.is_empty()
                         }).map(|e| {
                             json!({
