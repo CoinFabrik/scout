@@ -6,7 +6,6 @@ extern crate rustc_hir;
 extern crate rustc_middle;
 extern crate rustc_span;
 
-use clippy_utils::diagnostics::span_lint;
 use rustc_hir::QPath;
 use rustc_hir::{
     intravisit::{walk_expr, Visitor},
@@ -130,11 +129,10 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
             if caller_and_terminate.callers.is_empty() {
                 for terminate in caller_and_terminate.terminates {
                     if let TerminatorKind::Call { fn_span, .. } = terminate.0.terminator().kind {
-                        span_lint(
+                        Detector::UnprotectedSelfDestruct.span_lint(
                             cx,
                             UNPROTECTED_SELF_DESTRUCT,
                             fn_span,
-                            Detector::UnprotectedSelfDestruct.get_lint_message(),
                         );
                     }
                 }
@@ -147,11 +145,10 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
                     &mut vec![],
                 );
                 for place in unchecked_places {
-                    span_lint(
+                    Detector::UnprotectedSelfDestruct.span_lint(
                         cx,
                         UNPROTECTED_SELF_DESTRUCT,
                         place.1,
-                        Detector::UnprotectedSelfDestruct.get_lint_message(),
                     );
                 }
             }

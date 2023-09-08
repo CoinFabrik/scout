@@ -20,7 +20,7 @@ use rustc_lint::{LateContext, LateLintPass};
 use rustc_middle::ty::TyCtxt;
 use rustc_span::def_id::LocalDefId;
 use rustc_span::Span;
-use scout_audit_internal::{span_lint_and_help, Detector};
+use scout_audit_internal::Detector;
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -182,12 +182,10 @@ impl<'tcx> LateLintPass<'tcx> for ZeroOrTestAddress {
 
         for param in zerocheck_storage.acc_id_params {
             if !zerocheck_storage.checked_params.contains(&param.hir_id) {
-                span_lint_and_help(
+                Detector::ZeroOrTestAddress.span_lint_and_help(
                     cx,
                     ZERO_OR_TEST_ADDRESS,
                     param.span,
-                    Detector::ZeroOrTestAddress.get_lint_message(),
-                    None,
                     "This function should check if the AccountId passed is zero and revert if it is",
                 );
             }

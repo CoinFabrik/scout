@@ -2,7 +2,6 @@
 extern crate rustc_ast;
 extern crate rustc_span;
 
-use clippy_utils::diagnostics::span_lint_and_help;
 use if_chain::if_chain;
 use rustc_ast::visit::{walk_expr, FnKind, Visitor};
 use rustc_ast::{Expr, ExprKind};
@@ -104,12 +103,10 @@ impl EarlyLintPass for IteratorOverIndexing {
         });
 
         for sp in visitor.span.iter() {
-            span_lint_and_help(
+            Detector::IteratorsOverIndexing.span_lint_and_help(
                 cx,
                 ITERATOR_OVER_INDEXING,
                 *sp,
-                Detector::IteratorsOverIndexing.get_lint_message(),
-                None,
                 "Instead, use an iterator or index to `.len()`.",
             );
         }

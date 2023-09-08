@@ -1,10 +1,23 @@
+extern crate rustc_driver;
+extern crate rustc_errors;
+extern crate rustc_lint;
+extern crate rustc_span;
 mod lint_message;
 
+#[cfg(feature = "lint_helper")]
+use clippy_utils::diagnostics::{
+    span_lint as span_lint_clippy, span_lint_and_help as span_lint_and_help_clippy,
+};
 use lint_message::*;
-use strum::{Display, EnumIter};
+#[cfg(feature = "lint_helper")]
+use rustc_lint::{Lint, LintContext};
+#[cfg(feature = "lint_helper")]
+use rustc_span::Span;
+use serde_json::json;
+use strum::{Display, EnumIter, EnumString, IntoEnumIterator};
 
 /// Available detectors.
-#[derive(Debug, Display, Clone, EnumIter, PartialEq, Eq, Hash)]
+#[derive(Debug, Display, Clone, EnumIter, PartialEq, Eq, Hash, EnumString)]
 #[strum(serialize_all = "kebab-case")]
 pub enum Detector {
     AssertViolation,
@@ -67,4 +80,58 @@ impl Detector {
             Detector::ZeroOrTestAddress => ZERO_OR_TEST_ADDRESS_LINT_MESSAGE,
         }
     }
+
+    #[cfg(feature = "lint_helper")]
+    pub fn span_lint_and_help<T: LintContext>(
+        &self,
+        cx: &T,
+        lint: &'static Lint,
+        span: Span,
+        help: &str,
+    ) {
+        print_scout_output(*lint, span);
+        span_lint_and_help_clippy(cx, lint, span, self.get_lint_message(), None, help);
+    }
+
+    #[cfg(feature = "lint_helper")]
+    pub fn span_lint<T: LintContext>(&self, cx: &T, lint: &'static Lint, span: Span) {
+        print_scout_output(*lint, span);
+        span_lint_clippy(cx, lint, span, self.get_lint_message());
+    }
+
+    pub fn sarif_rules() -> Vec<serde_json::Value> {
+        let mut rules = Vec::new();
+        for detector in Detector::iter() {
+            let rule = json!({
+                "id": detector.to_string(),
+                "fullDescription": {
+                    "text": detector.get_lint_message()
+                }
+            });
+            rules.push(rule);
+        }
+        rules
+    }
+}
+
+#[cfg(feature = "lint_helper")]
+fn print_scout_output(lint: Lint, span: Span) {
+    let span_debug_string: Vec<String> = format!("{:?}", span)
+        .split(':')
+        .map(|s| s.trim().to_string())
+        .collect();
+
+    let span = json!({
+        "physicalLocation": {
+            "artifactLocation": {
+                "uri": span_debug_string[0],
+            },
+            "region": {
+                "startLine": span_debug_string[1].parse::<i32>().unwrap(),
+                "startColumn": span_debug_string[2].parse::<i32>().unwrap(),
+                "endLine": span_debug_string[3].parse::<i32>().unwrap(),
+                "endColumn": span_debug_string[4].split(' ').collect::<Vec<&str>>()[0].trim().parse::<i32>().unwrap(),            }
+        }
+    });
+    println!("scout-internal:{}@{}", lint.name, span);
 }

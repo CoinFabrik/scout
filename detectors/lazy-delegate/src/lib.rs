@@ -13,7 +13,7 @@ use rustc_ast::{
 };
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::Span;
-use scout_audit_internal::{span_lint_and_help, Detector};
+use scout_audit_internal::Detector;
 
 dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does
@@ -75,22 +75,18 @@ impl EarlyLintPass for LazyDelegate {
         }
 
         if !self.delegate_uses.is_empty() && !self.non_lazy_manual_storage_spans.is_empty() {
-            span_lint_and_help(
+            Detector::LazyDelegate.span_lint_and_help(
                 cx,
                 LAZY_DELEGATE,
                 id.span,
-                Detector::LazyDelegate.get_lint_message(),
-                None,
                 "Use lazy storage with manual keys",
             );
 
             for span in &self.non_lazy_manual_storage_spans {
-                span_lint_and_help(
+                Detector::LazyDelegate.span_lint_and_help(
                     cx,
                     LAZY_DELEGATE,
                     *span,
-                    Detector::LazyDelegate.get_lint_message(),
-                    None,
                     "Use lazy storage with manual keys. \nMore info in https://github.com/paritytech/ink/issues/1826 and https://github.com/paritytech/ink/issues/1825",
                 );
             }

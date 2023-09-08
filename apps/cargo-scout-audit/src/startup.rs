@@ -135,17 +135,17 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> 
         .map(|path| path.to_string_lossy().to_string())
         .collect();
 
+    let stderr_temp_file = tempfile::NamedTempFile::new()?;
+    let stdout_temp_file = tempfile::NamedTempFile::new()?;
+
     let mut options = Dylint {
         paths,
         args: opts.args,
         manifest_path: opts.manifest_path,
-        pipe_stdout: opts.output_path.clone(),
+        pipe_stdout: Some(stdout_temp_file.path().to_str().unwrap().to_string()),
         pipe_stderr: opts.output_path.clone(),
         ..Default::default()
     };
-
-    let stderr_temp_file = tempfile::NamedTempFile::new()?;
-    let stdout_temp_file = tempfile::NamedTempFile::new()?;
 
     if let Some(out_path) = &opts.output_path {
         let path = PathBuf::from(&out_path);
@@ -154,9 +154,8 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> 
         }
     }
 
-    if opts.output_path.is_some() || opts.output_format != OutputFormat::Text {
+    if opts.output_format != OutputFormat::Text {
         options.pipe_stderr = Some(stderr_temp_file.path().to_str().unwrap().to_string());
-        options.pipe_stdout = Some(stdout_temp_file.path().to_str().unwrap().to_string());
     }
 
     // If there is a need to exclude or filter by detector, the dylint tool needs to be recompiled.
@@ -183,7 +182,7 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> 
     dylint::run(&options)?;
 
     let mut stderr_file = fs::File::open(stderr_temp_file.path())?;
-    let mut _stdout_file = fs::File::open(stdout_temp_file.path())?;
+    let stdout_file = fs::File::open(stdout_temp_file.path())?;
 
     match opts.output_format {
         OutputFormat::Json => {
@@ -201,18 +200,20 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> 
             std::io::Write::write_all(&mut html_file, format_into_html(stderr_file)?.as_bytes())?;
         }
         OutputFormat::Text => {
-            let mut txt_file = match &opts.output_path {
-                Some(path) => fs::File::create(path)?,
-                None => fs::File::create("report.txt")?,
-            };
-            std::io::copy(&mut stderr_file, &mut txt_file)?;
+            if let Some(output_file) = opts.output_path {
+                let mut txt_file = fs::File::create(output_file)?;
+                std::io::copy(&mut stderr_file, &mut txt_file)?;
+            }
         }
         OutputFormat::Sarif => {
             let mut sarif_file = match &opts.output_path {
                 Some(path) => fs::File::create(path)?,
                 None => fs::File::create("report.sarif")?,
             };
-            std::io::Write::write_all(&mut sarif_file, format_into_sarif(stderr_file)?.as_bytes())?;
+            std::io::Write::write_all(
+                &mut sarif_file,
+                format_into_sarif(stderr_file, stdout_file)?.as_bytes(),
+            )?;
         }
     }
 

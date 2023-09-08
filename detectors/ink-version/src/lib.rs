@@ -6,7 +6,6 @@ extern crate rustc_span;
 
 use std::fs;
 
-use clippy_utils::diagnostics::span_lint_and_help;
 use rustc_lint::EarlyLintPass;
 use scout_audit_internal::Detector;
 use semver::*;
@@ -47,12 +46,10 @@ impl EarlyLintPass for CheckInkVersion {
         let ink_version = VersionReq::parse(&ink_version.replace('\"', "")).unwrap();
 
         if !ink_version.matches(&req) {
-            span_lint_and_help(
+            Detector::InkVersion.span_lint_and_help(
                 cx,
                 CHECK_INK_VERSION,
                 rustc_span::DUMMY_SP,
-                Detector::InkVersion.get_lint_message(),
-                None,
                 &format!("The latest ink! version is {latest_version}, and your version is {ink_version}"),
             );
         }

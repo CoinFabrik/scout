@@ -5,12 +5,7 @@
 #[cfg(feature = "detector")]
 mod detector;
 
-#[cfg(feature = "lint_helper")]
-mod lint_helper;
-
 #[cfg(feature = "detector")]
 pub use detector::Detector;
-#[cfg(feature = "lint_helper")]
-pub use lint_helper::span_lint_and_help;
 #[cfg(feature = "detector")]
 pub use strum::IntoEnumIterator;

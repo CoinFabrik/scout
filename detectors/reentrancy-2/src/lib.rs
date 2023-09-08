@@ -9,7 +9,6 @@ extern crate rustc_type_ir;
 
 use std::collections::{HashMap, HashSet};
 
-use clippy_utils::diagnostics::span_lint_and_help;
 use if_chain::if_chain;
 use rustc_abi::VariantIdx;
 use rustc_ast::ast::LitKind;
@@ -272,12 +271,10 @@ impl<'tcx> LateLintPass<'tcx> for Reentrancy {
         // Iterate over all potential reentrancy spans and emit a warning for each.
         if reentrancy_visitor.has_insert_operation {
             reentrancy_visitor.reentrancy_spans.into_iter().for_each(|span| {
-                span_lint_and_help(
+                Detector::Reentrancy2.span_lint_and_help(
                     cx,
                     REENTRANCY,
                     span,
-                    Detector::Reentrancy2.get_lint_message(),
-                    None,
                     "This statement seems to call another contract after the flag set_allow_reentry was enabled [todo: check state changes after this statement]",
                 );
             })

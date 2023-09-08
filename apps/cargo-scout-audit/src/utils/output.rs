@@ -1,6 +1,7 @@
+use std::collections::HashMap;
 use std::fs::File;
+use std::io::BufRead;
 use std::vec;
-use std::{collections::HashMap, str::FromStr};
 
 use anyhow::Context;
 use regex::RegexBuilder;
@@ -13,7 +14,7 @@ pub fn format_into_json(scout_output: File) -> anyhow::Result<String> {
 }
 
 fn jsonify(scout_output: File) -> anyhow::Result<serde_json::Value> {
-    let json_errors: serde_json::Value = get_errors_from_output(scout_output)?
+    let json_errors: serde_json::Value = get_errors_from_output(scout_output, None)?
         .iter()
         .filter(|(_, (spans, _))| !spans.is_empty())
         .map(|(name, (spans, error))| {
@@ -32,6 +33,7 @@ fn jsonify(scout_output: File) -> anyhow::Result<serde_json::Value> {
 
 fn get_errors_from_output(
     mut scout_output: File,
+    scout_internals: Option<File>,
 ) -> anyhow::Result<HashMap<String, (Vec<String>, String)>> {
     let regex = RegexBuilder::new(r"warning:.*\n*.*-->.*$")
         .multi_line(true)
@@ -41,6 +43,16 @@ fn get_errors_from_output(
     let mut stderr_string = String::new();
     std::io::Read::read_to_string(&mut scout_output, &mut stderr_string)?;
 
+    let mut scout_internals_spans: Vec<String> = vec![];
+
+    if let Some(mut scout_internals) = scout_internals {
+        for line in std::io::BufReader::new(&mut scout_internals).lines() {
+            let line = line?;
+            let span = line.split('@').collect::<Vec<&str>>()[1];
+            scout_internals_spans.push(span.to_string());
+        }
+    }
+
     let msg_to_name: HashMap<String, String> = Detector::iter()
         .map(|e| (e.get_lint_message().to_string(), e.to_string()))
         .collect();
@@ -49,7 +61,7 @@ fn get_errors_from_output(
         .map(|e| (e.to_string(), (vec![], "".to_string())))
         .collect();
 
-    for elem in regex.find_iter(&stderr_string) {
+    for (i, elem) in regex.find_iter(&stderr_string).enumerate() {
         let parts = elem.as_str().split('\n').collect::<Vec<&str>>();
 
         for err in Detector::iter().map(|e| e.get_lint_message()) {
@@ -58,10 +70,8 @@ fn get_errors_from_output(
                     format!("Error making json: {} not found in the error map", err)
                 })?;
 
-                let span = parts[1].replace("--> ", "");
-
                 if let Some((spans, error)) = errors.get_mut(name) {
-                    spans.push(span.trim().to_string());
+                    spans.push(scout_internals_spans[i].to_string());
                     *error = err.to_string();
                 }
             }
@@ -127,8 +137,10 @@ pub fn format_into_html(scout_output: File) -> anyhow::Result<String> {
     Ok(html)
 }
 
-fn serify(scout_output: File) -> anyhow::Result<serde_json::Value> {
-    let errors = get_errors_from_output(scout_output)?;
+fn serify(scout_output: File, scout_internals: File) -> anyhow::Result<serde_json::Value> {
+    let errors: HashMap<String, (Vec<String>, String)> =
+        get_errors_from_output(scout_output, Some(scout_internals))?;
+
     let sarif_output = json!({
         "$schema": "https://json.schemastore.org/sarif-2.1.0",
         "version": "2.1.0",
@@ -138,20 +150,30 @@ fn serify(scout_output: File) -> anyhow::Result<serde_json::Value> {
                     "driver": {
                         "name": env!("CARGO_PKG_NAME"),
                         "version": env!("CARGO_PKG_VERSION"),
-                        "informationUri": "../../README.md",
+                        "rules": Detector::iter().filter(|e| {
+                            //check if e is key of errors
+                            errors.contains_key(&e.to_string()) && !errors.get(&e.to_string()).unwrap().0.is_empty()
+                        }).map(|e| {
+                            json!({
+                                "id": e.to_string(),
+                                "shortDescription": {
+                                    "text": e.get_lint_message()
+                                }})
+
+                        }).collect::<Vec<serde_json::Value>>(),
+                        "informationUri": "https://coinfabrik.github.io/scout/",
                     }
                 },
                 "results": build_sarif_results(&errors)?,
             }
         ]
     });
-
     let json_errors = serde_json::to_value(sarif_output)?;
     Ok(json_errors)
 }
 
-pub fn format_into_sarif(scout_output: File) -> anyhow::Result<String> {
-    Ok(serify(scout_output)?.to_string())
+pub fn format_into_sarif(scout_output: File, scout_internals: File) -> anyhow::Result<String> {
+    Ok(serify(scout_output, scout_internals)?.to_string())
 }
 
 fn build_sarif_results(
@@ -159,36 +181,24 @@ fn build_sarif_results(
 ) -> anyhow::Result<Vec<serde_json::Value>> {
     let runs: Vec<Value> = errors
         .iter()
-        .filter(|(_, (spans, _))| !spans.is_empty())
-        .map(|(name, (spans, msg))| {
-            let locations = spans
-                .iter()
-                .map(|span| {
-                    let split: Vec<&str> = span.split(':').collect();
-
-                    json!({
-                        "physicalLocation": {
-                            "artifactLocation": {
-                                "uri": split[0]
-                            },
-                            "region": {
-                                "startLine": u64::from_str(split[1]).unwrap(),
-                                "startColumn": u64::from_str(split[2]).unwrap(),
-                            }
-                        }
-                    })
-                })
-                .collect::<Vec<serde_json::Value>>();
-
-            json!({
-                "ruleId": name,
-                "level": "error",
-                "message": {
-                    "text": msg
-                },
-                "locations": locations,
+        .flat_map(|(name, (spans, msg))| {
+            spans.iter().filter_map(move |span| {
+                let span: Result<serde_json::Value, _> = serde_json::from_str(span);
+                if let Ok(span_value) = span {
+                    Some(json!({
+                        "ruleId": name,
+                        "level": "error",
+                        "message": {
+                            "text": msg
+                        },
+                        "locations": [span_value],
+                    }))
+                } else {
+                    None
+                }
             })
         })
         .collect();
+
     Ok(runs)
 }

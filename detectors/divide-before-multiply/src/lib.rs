@@ -3,7 +3,6 @@
 extern crate rustc_hir;
 extern crate rustc_span;
 
-use clippy_utils::diagnostics::span_lint_and_help;
 use if_chain::if_chain;
 use rustc_hir::intravisit::walk_expr;
 use rustc_hir::intravisit::Visitor;
@@ -73,12 +72,10 @@ impl<'tcx> LateLintPass<'tcx> for DivideBeforeMultiply {
             if BinOpKind::Mul == op.node;
             then{
                 for division in get_divisions_inside_expr(expr) {
-                    span_lint_and_help(
+                    Detector::DivideBeforeMultiply.span_lint_and_help(
                         cx,
                         DIVIDE_BEFORE_MULTIPLY,
                         division,
-                        Detector::DivideBeforeMultiply.get_lint_message(),
-                        None,
                         "Consider reversing the order of operations to reduce the loss of precision.",
                     );
                 }
