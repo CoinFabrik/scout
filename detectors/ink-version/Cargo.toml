@@ -11,11 +11,11 @@ clippy_utils = { workspace = true }
 dylint_linting = { workspace = true }
 if_chain = { workspace = true }
 reqwest = { version = "0.11", features = ["blocking", "json"] }
-
-scout-audit-internal = { workspace = true }
 semver = "1.0.4"
 serde_json = "1.0"
 toml = "0.7.6"
+
+scout-audit-internal = { workspace = true }
 
 [dev-dependencies]
 dylint_testing = { workspace = true }
