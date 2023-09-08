@@ -7,18 +7,18 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-clippy_utils = { git = "https://github.com/rust-lang/rust-clippy", rev = "f16bfa478f131b2ec2ad9742f88dc6a9beea52b7" }
-dylint_linting = "2.1.5"
-if_chain = "1.0.2"
+clippy_utils = { workspace = true }
+dylint_linting = { workspace = true }
+if_chain = { workspace = true }
 reqwest = { version = "0.11", features = ["blocking", "json"] }
+
+scout-audit-internal = { workspace = true }
 semver = "1.0.4"
 serde_json = "1.0"
 toml = "0.7.6"
 
-scout-audit-internal = { path = "../../scout-audit-internal", features = ["detector"] }
-
 [dev-dependencies]
-dylint_testing = "2.1.5"
+dylint_testing = { workspace = true }
 
 [package.metadata.rust-analyzer]
 rustc_private = true
