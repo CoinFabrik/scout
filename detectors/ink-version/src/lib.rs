@@ -59,14 +59,11 @@ impl EarlyLintPass for CheckInkVersion {
     }
 }
 
-fn get_version() -> Result<String, reqwest::Error> {
-    let client = reqwest::blocking::Client::builder()
-        .user_agent("Scout/1.0")
-        .build()?;
-    let resp: serde_json::Value = client
-        .get("https://crates.io/api/v1/crates/ink")
-        .send()?
-        .json()?;
+fn get_version() -> Result<String, ureq::Error> {
+    let resp: serde_json::Value = ureq::get("https://crates.io/api/v1/crates/ink")
+        .set("User-Agent", "Scout/1.0")
+        .call()?
+        .into_json()?;
     let version = resp
         .get("crate")
         .unwrap()
