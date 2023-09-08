@@ -62,9 +62,6 @@ jobs:
       - name: Install Clippy nightly-2023-04-23
         run: rustup component add clippy --toolchain nightly-2023-04-23
 
-      - name: Install rustc components
-        run: rustup component add rust-src rustc-dev llvm-tools-preview
-
       - name: Install dylint-link
         run: cargo install dylint-link
 
