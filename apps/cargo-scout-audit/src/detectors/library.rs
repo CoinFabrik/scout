@@ -2,6 +2,7 @@ use std::{env::consts, path::PathBuf};
 
 use ::cargo::core::PackageId;
 use anyhow::Result;
+use cargo_metadata::Metadata;
 
 use crate::utils::{cargo, env};
 
@@ -13,6 +14,7 @@ pub struct Library {
     pub lib_name: String,
     pub toolchain: String,
     pub target_dir: PathBuf,
+    pub metadata: Metadata,
 }
 
 impl Library {
@@ -23,6 +25,7 @@ impl Library {
         lib_name: String,
         toolchain: String,
         target_dir: PathBuf,
+        metadata: Metadata,
     ) -> Self {
         Self {
             root,
@@ -30,15 +33,16 @@ impl Library {
             lib_name,
             toolchain,
             target_dir,
+            metadata,
         }
     }
 
     /// Builds the library and returns its path.
-    pub fn build(&self) -> Result<PathBuf> {
+    pub fn build(&self, verbose: bool) -> Result<PathBuf> {
         let library_path = self.path();
         let target_dir = self.target_directory();
 
-        cargo::build(&format!("linter `{}`", self.id.name()), false)
+        cargo::build(&format!("linter `{}`", self.id.name()), !verbose)
             .sanitize_environment()
             .env_remove(env::RUSTFLAGS)
             .current_dir(&self.root)
@@ -66,12 +70,17 @@ impl Library {
     }
 
     pub fn path(&self) -> PathBuf {
-        self.root.join("target").join("release").join(format!(
-            "{}{}@{}{}",
-            consts::DLL_PREFIX,
-            self.lib_name.replace('-', "_"),
-            self.toolchain,
-            consts::DLL_SUFFIX
-        ))
+        self.metadata
+            .target_directory
+            .clone()
+            .into_std_path_buf()
+            .join("release")
+            .join(format!(
+                "{}{}@{}{}",
+                consts::DLL_PREFIX,
+                self.lib_name.replace('-', "_"),
+                self.toolchain,
+                consts::DLL_SUFFIX
+            ))
     }
 }

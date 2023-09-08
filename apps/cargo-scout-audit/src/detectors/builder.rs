@@ -7,12 +7,13 @@ use glob::glob;
 use itertools::Itertools;
 
 use super::{configuration::DetectorConfiguration, library::Library, source::download_git_repo};
-use crate::utils::{cargo_package, rustup};
+use crate::utils::{cargo_package, path::is_special_directory, rustup};
 
 pub struct DetectorBuilder<'a> {
     cargo_config: &'a Config,
     detectors_config: DetectorConfiguration,
     root_metadata: Metadata,
+    verbose: bool,
 }
 
 impl<'a> DetectorBuilder<'a> {
@@ -21,11 +22,13 @@ impl<'a> DetectorBuilder<'a> {
         cargo_config: &'a Config,
         detectors_config: DetectorConfiguration,
         root_metadata: Metadata,
+        verbose: bool,
     ) -> Self {
         Self {
             cargo_config,
             detectors_config,
             root_metadata,
+            verbose,
         }
     }
 
@@ -128,28 +131,29 @@ impl<'a> DetectorBuilder<'a> {
         let packages = paths
             .into_iter()
             .map(|path| {
-                if path.is_dir() {
-                    let package_metadata = cargo_package::package_metadata(&path)?;
-                    let package_id = cargo_package::package_id(
-                        self.detectors_config.dependency.source_id(),
-                        &package_metadata,
-                        &path,
-                    )?;
-                    let lib_name = cargo_package::package_library_name(&package_metadata, &path)?;
-                    let toolchain = rustup::active_toolchain(&path)?;
-                    Ok(Some(Library::new(
-                        path,
-                        package_id,
-                        lib_name,
-                        toolchain,
-                        self.root_metadata
-                            .target_directory
-                            .clone()
-                            .into_std_path_buf(),
-                    )))
-                } else {
-                    Ok(None)
+                if !path.is_dir() || is_special_directory(&path) {
+                    return Ok(None);
                 }
+
+                let package_metadata = cargo_package::package_metadata(&path)?;
+                let package_id = cargo_package::package_id(
+                    self.detectors_config.dependency.source_id(),
+                    &package_metadata,
+                    &path,
+                )?;
+                let lib_name = cargo_package::package_library_name(&package_metadata, &path)?;
+                let toolchain = rustup::active_toolchain(&path)?;
+                Ok(Some(Library::new(
+                    path,
+                    package_id,
+                    lib_name,
+                    toolchain,
+                    self.root_metadata
+                        .target_directory
+                        .clone()
+                        .into_std_path_buf(),
+                    package_metadata,
+                )))
             })
             .collect::<Result<Vec<_>>>()?;
         let packages: Vec<Library> = packages.into_iter().flatten().collect();
@@ -160,7 +164,7 @@ impl<'a> DetectorBuilder<'a> {
     fn build_packages(&self, libraries: Vec<Library>) -> Result<Vec<PathBuf>> {
         let library_paths = libraries
             .into_iter()
-            .map(|library| library.build())
+            .map(|library| library.build(self.verbose))
             .collect::<Result<Vec<_>>>()?;
 
         Ok(library_paths)
