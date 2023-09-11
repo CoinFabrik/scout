@@ -68,7 +68,7 @@ fn get_version() -> String {
     let version = resp
         .get("crate")
         .unwrap()
-        .get("max_version")
+        .get("max_stable_version")
         .unwrap()
         .to_string();
     version
