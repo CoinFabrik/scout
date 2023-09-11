@@ -57,6 +57,7 @@ jobs:
             ~/.cargo
             apps/cargo-scout-audit/target
             detectors/target
+            detectors/Cargo.lock
           key: ${{ runner.os }}-cargo-scout-dependencies-${{ github.run_id }}
 
       - name: Install Rust nightly-2023-04-23
@@ -118,6 +119,7 @@ jobs:
             ~/.cargo
             apps/cargo-scout-audit/target
             detectors/target
+            detectors/Cargo.lock
           key: ${{ runner.os }}-cargo-scout-dependencies-${{ github.run_id  }}
           fail-on-cache-miss: true
 
