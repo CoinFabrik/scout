@@ -148,7 +148,6 @@ fn get_detectors_path() -> String {
     utils::get_repository_root_path()
         .expect("Failed to get detectors path")
         .join("detectors")
-        .join("*")
         .to_string_lossy()
         .to_string()
 }
