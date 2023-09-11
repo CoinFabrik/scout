@@ -1,17 +1,15 @@
 use std::{env::consts, path::PathBuf};
 
-use ::cargo::core::PackageId;
 use anyhow::Result;
 use cargo_metadata::Metadata;
 
 use crate::utils::{cargo, env};
+use itertools::Itertools;
 
 /// Represents a Rust library.
 #[derive(Debug, Clone)]
 pub struct Library {
     pub root: PathBuf,
-    pub id: PackageId,
-    pub lib_name: String,
     pub toolchain: String,
     pub target_dir: PathBuf,
     pub metadata: Metadata,
@@ -19,18 +17,9 @@ pub struct Library {
 
 impl Library {
     /// Creates a new instance of `Library`.
-    pub fn new(
-        root: PathBuf,
-        id: PackageId,
-        lib_name: String,
-        toolchain: String,
-        target_dir: PathBuf,
-        metadata: Metadata,
-    ) -> Self {
+    pub fn new(root: PathBuf, toolchain: String, target_dir: PathBuf, metadata: Metadata) -> Self {
         Self {
             root,
-            id,
-            lib_name,
             toolchain,
             target_dir,
             metadata,
@@ -38,29 +27,49 @@ impl Library {
     }
 
     /// Builds the library and returns its path.
-    pub fn build(&self, verbose: bool) -> Result<PathBuf> {
-        let library_path = self.path();
-        let target_dir = self.target_directory();
-
-        cargo::build(&format!("linter `{}`", self.id.name()), !verbose)
+    pub fn build(&self, verbose: bool) -> Result<Vec<PathBuf>> {
+        // Build entire workspace
+        cargo::build(&format!("detectors"), !verbose)
             .sanitize_environment()
             .env_remove(env::RUSTFLAGS)
             .current_dir(&self.root)
             .args(["--release"])
             .success()?;
 
-        if !library_path.exists() {
-            anyhow::bail!("Could not determine if {library_path:?} exists");
+        // Verify all libraries were built
+        let compiled_library_paths = self
+            .metadata
+            .packages
+            .clone()
+            .into_iter()
+            .map(|p| self.path(p.name))
+            .collect_vec();
+
+        let unexistant_libraries = compiled_library_paths
+            .clone()
+            .into_iter()
+            .filter(|p| !p.exists())
+            .collect_vec();
+        if !unexistant_libraries.is_empty() {
+            anyhow::bail!("Could not determine if {:?} exist", unexistant_libraries);
         }
 
+        // Copy libraries to target directory
+        let target_dir = self.target_directory();
         if !target_dir.exists() {
             std::fs::create_dir_all(&target_dir)?;
         }
 
-        let new_library_path = target_dir.join(library_path.file_name().unwrap());
-        std::fs::copy(&library_path, &new_library_path)?;
-
-        Ok(new_library_path)
+        let target_compiled_library_paths = compiled_library_paths
+            .into_iter()
+            .map(|p| {
+                let target_path = target_dir.join(p.file_name().unwrap());
+                std::fs::copy(&p, &target_path)?;
+                Ok(target_path)
+            })
+            .collect::<Result<Vec<PathBuf>>>()?;
+        
+        Ok(target_compiled_library_paths)
     }
 
     pub fn target_directory(&self) -> PathBuf {
@@ -69,7 +78,7 @@ impl Library {
             .join(&self.toolchain)
     }
 
-    pub fn path(&self) -> PathBuf {
+    pub fn path(&self, library_name: String) -> PathBuf {
         self.metadata
             .target_directory
             .clone()
@@ -78,7 +87,7 @@ impl Library {
             .join(format!(
                 "{}{}@{}{}",
                 consts::DLL_PREFIX,
-                self.lib_name.replace('-', "_"),
+                library_name.replace('-', "_"),
                 self.toolchain,
                 consts::DLL_SUFFIX
             ))

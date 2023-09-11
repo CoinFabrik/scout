@@ -77,7 +77,7 @@ pub struct Scout {
     #[clap(long, value_name = "path", help = "Path to the output file.")]
     pub output_path: Option<String>,
 
-    #[clap(long, value_name = "path", help = "Glob to local detectors.")]
+    #[clap(long, value_name = "path", help = "Path to detectors workspace.")]
     pub local_detectors: Option<String>,
 
     #[clap(
@@ -107,12 +107,8 @@ pub fn run_scout(opts: Scout) {
         cargo::core::Verbosity::Quiet
     });
     let detectors_config = match &opts.local_detectors {
-        Some(path) => get_local_detectors_configuration(
-            glob::glob(path)
-                .expect("Failed to parse local detectors paths")
-                .map(|p| p.expect("Failed to parse local detectors paths")),
-        )
-        .expect("Failed to get local detectors configuration"),
+        Some(path) => get_local_detectors_configuration(&PathBuf::from(path))
+            .expect("Failed to get local detectors configuration"),
         None => get_detectors_configuration().expect("Failed to get detectors configuration"),
     };
 
@@ -123,7 +119,7 @@ pub fn run_scout(opts: Scout) {
         .expect("Failed to build detectors");
 
     if opts.list_detectors {
-        list_detectors(detectors_names).expect("Failed to list detectors");
+        list_detectors(detectors_names);
         return;
     }
 
