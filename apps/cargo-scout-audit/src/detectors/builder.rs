@@ -3,10 +3,10 @@ use std::path::PathBuf;
 use anyhow::{bail, ensure, Context, Ok, Result};
 use cargo::Config;
 use cargo_metadata::Metadata;
+use itertools::Itertools;
 
 use super::{configuration::DetectorConfiguration, library::Library, source::download_git_repo};
 use crate::utils::{cargo_package, rustup};
-use itertools::Itertools;
 
 pub struct DetectorBuilder<'a> {
     cargo_config: &'a Config,

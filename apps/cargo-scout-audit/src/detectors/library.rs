@@ -2,9 +2,9 @@ use std::{env::consts, path::PathBuf};
 
 use anyhow::Result;
 use cargo_metadata::Metadata;
+use itertools::Itertools;
 
 use crate::utils::{cargo, env};
-use itertools::Itertools;
 
 /// Represents a Rust library.
 #[derive(Debug, Clone)]
@@ -68,7 +68,7 @@ impl Library {
                 Ok(target_path)
             })
             .collect::<Result<Vec<PathBuf>>>()?;
-        
+
         Ok(target_compiled_library_paths)
     }
 
