@@ -29,7 +29,7 @@ impl Library {
     /// Builds the library and returns its path.
     pub fn build(&self, verbose: bool) -> Result<Vec<PathBuf>> {
         // Build entire workspace
-        cargo::build(&format!("detectors"), !verbose)
+        cargo::build("detectors", !verbose)
             .sanitize_environment()
             .env_remove(env::RUSTFLAGS)
             .current_dir(&self.root)

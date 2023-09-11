@@ -148,7 +148,7 @@ impl<'a> DetectorBuilder<'a> {
                 .split('@')
                 .collect::<Vec<_>>()[0]
                 .to_string()
-                .replace("_", "-");
+                .replace('_', "-");
             if used_detectors.contains(&detector_name) {
                 filtered_paths.push(path)
             } else {
