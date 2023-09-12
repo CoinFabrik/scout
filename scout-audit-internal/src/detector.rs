@@ -113,15 +113,25 @@ fn print_scout_output(lint: Lint, span: Span) {
         .map(|s| s.trim().to_string())
         .collect();
 
-    let mut span_info: [u32; 4] = [0, 0, 0, 0];
-    if span_debug_string.len() == 5 {
-        for i in 0..3 {
-            span_info[i] = span_debug_string[i + 1].parse::<u32>().unwrap();
-        }
-        span_info[3] = span_debug_string[4].split(' ').collect::<Vec<&str>>()[0]
-            .trim()
-            .parse::<u32>()
-            .unwrap();
+    let no_span_detectors = ["CHECK_INK_VERSION"];
+
+    if no_span_detectors.contains(&lint.name.to_owned().as_str()) {
+        let span = json!({
+            "physicalLocation": {
+                "artifactLocation": {
+                    "uri": "Cargo.toml",
+                },
+                "region": {
+                    "startLine": 1,
+                    "startColumn": 1,
+                    "endLine": 1,
+                    "endColumn": 1,
+                }
+            }
+        });
+
+        println!("scout-internal:{}@{}", lint.name, span);
+        return;
     }
 
     let span = json!({
@@ -130,11 +140,10 @@ fn print_scout_output(lint: Lint, span: Span) {
                 "uri": span_debug_string[0],
             },
             "region": {
-                "startLine": span_info[0],
-                "startColumn": span_info[1],
-                "endLine": span_info[2],
-                "endColumn": span_info[3],
-            }
+                "startLine": span_debug_string[1].parse::<i32>().unwrap(),
+                "startColumn": span_debug_string[2].parse::<i32>().unwrap(),
+                "endLine": span_debug_string[3].parse::<i32>().unwrap(),
+                "endColumn": span_debug_string[4].split(' ').collect::<Vec<&str>>()[0].trim().parse::<i32>().unwrap(),            }
         }
     });
     println!("scout-internal:{}@{}", lint.name, span);

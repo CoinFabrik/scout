@@ -35,13 +35,18 @@ fn get_errors_from_output(
     mut scout_output: File,
     scout_internals: Option<File>,
 ) -> anyhow::Result<HashMap<String, (Vec<String>, String)>> {
-    let regex = RegexBuilder::new(r"warning:.*\n*.*-->.*$")
+    let regex = RegexBuilder::new(r"warning:.*") // r"warning:.*\n*.*-->.*$"
         .multi_line(true)
         .case_insensitive(true)
         .build()?;
 
     let mut stderr_string = String::new();
     std::io::Read::read_to_string(&mut scout_output, &mut stderr_string)?;
+
+    for line in std::io::BufReader::new(&mut scout_output).lines() {
+        let line = line?;
+        println!("{}", line)
+    }
 
     let mut scout_internals_spans: Vec<String> = vec![];
 
@@ -65,7 +70,7 @@ fn get_errors_from_output(
         let parts = elem.as_str().split('\n').collect::<Vec<&str>>();
 
         for err in Detector::iter().map(|e| e.get_lint_message()) {
-            if parts[0].contains(err) && parts[1].trim().starts_with("-->") {
+            if parts[0].contains(err) {
                 let name = msg_to_name.get(err).with_context(|| {
                     format!("Error making json: {} not found in the error map", err)
                 })?;
