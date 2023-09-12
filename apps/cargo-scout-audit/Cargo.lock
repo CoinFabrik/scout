@@ -323,7 +323,6 @@ dependencies = [
  "config",
  "dylint",
  "env_logger",
- "glob",
  "itertools 0.11.0",
  "log",
  "regex",

@@ -77,8 +77,16 @@ pub struct Scout {
     #[clap(long, value_name = "path", help = "Path to the output file.")]
     pub output_path: Option<String>,
 
-    #[clap(long, value_name = "path", help = "Glob to local detectors.")]
+    #[clap(long, value_name = "path", help = "Path to detectors workspace.")]
     pub local_detectors: Option<String>,
+
+    #[clap(
+        short,
+        long,
+        help = "Prints verbose information.",
+        default_value_t = false
+    )]
+    pub verbose: bool,
 }
 
 pub fn run_scout(opts: Scout) {
@@ -93,24 +101,25 @@ pub fn run_scout(opts: Scout) {
     let metadata = metadata.exec().expect("Failed to get metadata");
 
     let cargo_config = Config::default().expect("Failed to get config");
+    cargo_config.shell().set_verbosity(if opts.verbose {
+        cargo::core::Verbosity::Verbose
+    } else {
+        cargo::core::Verbosity::Quiet
+    });
     let detectors_config = match &opts.local_detectors {
-        Some(path) => get_local_detectors_configuration(
-            glob::glob(path)
-                .expect("Failed to parse local detectors paths")
-                .map(|p| p.expect("Failed to parse local detectors paths")),
-        )
-        .expect("Failed to get local detectors configuration"),
+        Some(path) => get_local_detectors_configuration(&PathBuf::from(path))
+            .expect("Failed to get local detectors configuration"),
         None => get_detectors_configuration().expect("Failed to get detectors configuration"),
     };
 
-    let detectors = Detectors::new(cargo_config, detectors_config, metadata);
+    let detectors = Detectors::new(cargo_config, detectors_config, metadata, opts.verbose);
 
     let detectors_names = detectors
         .get_detector_names()
         .expect("Failed to build detectors");
 
     if opts.list_detectors {
-        list_detectors(detectors_names).expect("Failed to list detectors");
+        list_detectors(detectors_names);
         return;
     }
 
@@ -141,6 +150,7 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> 
         manifest_path: opts.manifest_path,
         pipe_stdout: opts.output_path.clone(),
         pipe_stderr: opts.output_path.clone(),
+        quiet: !opts.verbose,
         ..Default::default()
     };
 
