@@ -162,7 +162,9 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> 
         if path.is_dir() {
             panic!("The output path can't be a directory.");
         }
+        options.pipe_stderr = Some(stderr_temp_file.path().to_str().unwrap().to_string());
     }
+
     if opts.output_format != OutputFormat::Text {
         options.pipe_stderr = Some(stderr_temp_file.path().to_str().unwrap().to_string());
     }
