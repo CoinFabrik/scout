@@ -113,16 +113,28 @@ fn print_scout_output(lint: Lint, span: Span) {
         .map(|s| s.trim().to_string())
         .collect();
 
+    let mut span_info: [u32; 4] = [0, 0, 0, 0];
+    if span_debug_string.len() == 5 {
+        for i in 0..3 {
+            span_info[i] = span_debug_string[i + 1].parse::<u32>().unwrap();
+        }
+        span_info[3] = span_debug_string[4].split(' ').collect::<Vec<&str>>()[0]
+            .trim()
+            .parse::<u32>()
+            .unwrap();
+    }
+
     let span = json!({
         "physicalLocation": {
             "artifactLocation": {
                 "uri": span_debug_string[0],
             },
             "region": {
-                "startLine": span_debug_string[1].parse::<i32>().unwrap(),
-                "startColumn": span_debug_string[2].parse::<i32>().unwrap(),
-                "endLine": span_debug_string[3].parse::<i32>().unwrap(),
-                "endColumn": span_debug_string[4].split(' ').collect::<Vec<&str>>()[0].trim().parse::<i32>().unwrap(),            }
+                "startLine": span_info[0],
+                "startColumn": span_info[1],
+                "endLine": span_info[2],
+                "endColumn": span_info[3],
+            }
         }
     });
     println!("scout-internal:{}@{}", lint.name, span);
