@@ -708,21 +708,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "dylint_linting"
-version = "2.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "498c7b1533da863f28bce694dcc1ecc0685a32e3b87e29881116702dffddd088"
-dependencies = [
- "cargo_metadata",
- "dylint_internal",
- "paste",
- "rustversion",
- "serde",
- "thiserror",
- "toml 0.7.7",
-]
-
-[[package]]
 name = "ecdsa"
 version = "0.16.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2140,12 +2125,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "paste"
-version = "1.0.14"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "de3145af08024dea9fa9914f381a17b8fc6034dfb00f3a84013f7ff43f29ed4c"
-
-[[package]]
 name = "pathdiff"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2511,8 +2490,6 @@ checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
 name = "scout-audit-internal"
 version = "0.1.0"
 dependencies = [
- "dylint_linting",
- "serde_json",
  "strum",
 ]
 

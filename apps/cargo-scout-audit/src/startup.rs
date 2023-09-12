@@ -164,7 +164,7 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> 
         }
     }
 
-    if opts.output_format != OutputFormat::Text {
+    if opts.output_path.is_some() || opts.output_format != OutputFormat::Text {
         options.pipe_stderr = Some(stderr_temp_file.path().to_str().unwrap().to_string());
     }
 
