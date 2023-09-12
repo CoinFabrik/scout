@@ -113,6 +113,7 @@ fn execute_and_validate_testcase(
         local_detectors: Some(get_detectors_path()),
         manifest_path: Some(path.to_string()),
         filter: Some(detector_name.to_string()),
+        verbose: true,
         ..Default::default()
     };
     run_scout(scout_config);
@@ -147,7 +148,6 @@ fn get_detectors_path() -> String {
     utils::get_repository_root_path()
         .expect("Failed to get detectors path")
         .join("detectors")
-        .join("*")
         .to_string_lossy()
         .to_string()
 }

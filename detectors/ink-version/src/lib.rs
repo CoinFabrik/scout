@@ -23,8 +23,7 @@ dylint_linting::declare_early_lint! {
 
 impl EarlyLintPass for CheckInkVersion {
     fn check_crate(&mut self, cx: &rustc_lint::EarlyContext<'_>, _: &rustc_ast::Crate) {
-        let latest_version =
-            get_version().expect("Failed to get latest version of ink! from crates.io");
+        let latest_version = get_version();
 
         let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
 
@@ -56,19 +55,18 @@ impl EarlyLintPass for CheckInkVersion {
     }
 }
 
-fn get_version() -> Result<String, reqwest::Error> {
-    let client = reqwest::blocking::Client::builder()
-        .user_agent("Scout/1.0")
-        .build()?;
-    let resp: serde_json::Value = client
-        .get("https://crates.io/api/v1/crates/ink")
-        .send()?
-        .json()?;
+fn get_version() -> String {
+    let resp: serde_json::Value = ureq::get("https://crates.io/api/v1/crates/ink")
+        .set("User-Agent", "Scout/1.0")
+        .call()
+        .expect("Failed to get ink! version from crates.io")
+        .into_json()
+        .expect("Failed to parse ink! version from crates.io");
     let version = resp
         .get("crate")
         .unwrap()
-        .get("max_version")
+        .get("max_stable_version")
         .unwrap()
         .to_string();
-    Ok(version)
+    version
 }

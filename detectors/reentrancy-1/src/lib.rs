@@ -76,12 +76,12 @@ dylint_linting::declare_late_lint! {
     ///     return caller_balance;
     /// }
     /// ```
-    pub REENTRANCY,
+    pub REENTRANCY_1,
     Warn,
     Detector::Reentrancy1.get_lint_message()
 }
 
-impl<'tcx> LateLintPass<'tcx> for Reentrancy {
+impl<'tcx> LateLintPass<'tcx> for Reentrancy1 {
     fn check_fn(
         &mut self,
         cx: &LateContext<'tcx>,
@@ -200,7 +200,7 @@ impl<'tcx> LateLintPass<'tcx> for Reentrancy {
         {
             Detector::Reentrancy1.span_lint_and_help(
                 cx,
-                REENTRANCY,
+                REENTRANCY_1,
                 // body.value.span,
                 reentrant_storage.span.unwrap(),
 

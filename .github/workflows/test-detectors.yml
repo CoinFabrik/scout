@@ -56,6 +56,8 @@ jobs:
           path: |
             ~/.cargo
             apps/cargo-scout-audit/target
+            detectors/target
+            detectors/Cargo.lock
           key: ${{ runner.os }}-cargo-scout-dependencies-${{ github.run_id }}
 
       - name: Install Rust nightly-2023-04-23
@@ -67,6 +69,10 @@ jobs:
       - name: Compile cargo-scout-audit tests
         working-directory: apps/cargo-scout-audit
         run: cargo test --no-run
+
+      - name: Compile detectors
+        working-directory: detectors
+        run: cargo build --release
 
   test:
     name: Test
@@ -112,6 +118,8 @@ jobs:
           path: |
             ~/.cargo
             apps/cargo-scout-audit/target
+            detectors/target
+            detectors/Cargo.lock
           key: ${{ runner.os }}-cargo-scout-dependencies-${{ github.run_id  }}
           fail-on-cache-miss: true
 
