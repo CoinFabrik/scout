@@ -1,4 +1,5 @@
 #![feature(rustc_private)]
+
 //! # Scout Audit Internal
 //!
 //! This library is for internal usage only by [`cargo_scout_audit`](https://crates.io/crates/cargo-scout-audit)

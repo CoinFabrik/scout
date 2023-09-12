@@ -11,4 +11,3 @@ lint_helper = [ "dep:clippy_utils"]
 strum = { version = "0.25", features = ["derive"], optional = true }
 serde_json = {version = "1.0"}
 clippy_utils = { git = "https://github.com/rust-lang/rust-clippy", rev = "f16bfa478f131b2ec2ad9742f88dc6a9beea52b7", optional = true}
-dylint_linting = "2.1.5"

@@ -8,7 +8,6 @@ extern crate rustc_span;
 
 use std::collections::HashSet;
 
-//use clippy_utils::diagnostics::span_lint_and_help;
 use if_chain::if_chain;
 use rustc_ast::LitKind;
 use rustc_hir::def::Res;

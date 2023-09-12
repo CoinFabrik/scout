@@ -1,7 +1,12 @@
+#[cfg(feature = "lint_helper")]
 extern crate rustc_driver;
+#[cfg(feature = "lint_helper")]
 extern crate rustc_errors;
+#[cfg(feature = "lint_helper")]
 extern crate rustc_lint;
+#[cfg(feature = "lint_helper")]
 extern crate rustc_span;
+
 mod lint_message;
 
 #[cfg(feature = "lint_helper")]

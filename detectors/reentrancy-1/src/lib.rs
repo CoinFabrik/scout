@@ -201,9 +201,7 @@ impl<'tcx> LateLintPass<'tcx> for Reentrancy1 {
             Detector::Reentrancy1.span_lint_and_help(
                 cx,
                 REENTRANCY_1,
-                // body.value.span,
                 reentrant_storage.span.unwrap(),
-
                 "This statement seems to call another contract after the flag set_allow_reentry was enabled [todo: check state changes after this statement]",
             );
         }
