@@ -1,4 +1,4 @@
-#![feature(rustc_private)]
+#![cfg_attr(feature = "lint_helper", feature(rustc_private))]
 //! # Scout Audit Internal
 //!
 //! This library is for internal usage only by [`cargo_scout_audit`](https://crates.io/crates/cargo-scout-audit)
