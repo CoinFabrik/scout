@@ -35,7 +35,7 @@ fn get_errors_from_output(
     mut scout_output: File,
     scout_internals: Option<File>,
 ) -> anyhow::Result<HashMap<String, (Vec<String>, String)>> {
-    let regex = RegexBuilder::new(r"warning:.*") // r"warning:.*\n*.*-->.*$"
+    let regex = RegexBuilder::new(r"warning:.*")
         .multi_line(true)
         .case_insensitive(true)
         .build()?;
