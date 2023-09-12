@@ -5,9 +5,9 @@ edition = "2021"
 
 [features]
 detector = ["dep:strum"]
-lint_helper = [ "dep:clippy_utils"]
+lint_helper = ["dep:clippy_utils", "dep:serde_json"]
 
 [dependencies]
 strum = { version = "0.25", features = ["derive"], optional = true }
-serde_json = {version = "1.0"}
+serde_json = {version = "1.0", optional = true}
 clippy_utils = { git = "https://github.com/rust-lang/rust-clippy", rev = "f16bfa478f131b2ec2ad9742f88dc6a9beea52b7", optional = true}
