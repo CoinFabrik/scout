@@ -1,35 +1,35 @@
 name: Release
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - "v*"
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   release:
-    name: release ${{ matrix.target }}
+    name: Release
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - target: x86_64-pc-windows-gnu
-            archive: zip
-          - target: x86_64-unknown-linux-musl
-            archive: tar.gz tar.xz tar.zst
-          - target: x86_64-apple-darwin
-            archive: zip
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v3
 
-      - name: Compile and release
-        uses: rust-build/rust-build.action@v1.4.3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Login to crates.io
+        run: echo ${{ secrets.CRATES_TOKEN }} | cargo login
+
+      - name: Publish to crates.io
+        run: python scripts/publish-to-crates-io.py
+
+      - name: Create release notes
+        run: sed -n "/^## ${{ github.ref_name }}/,/^## v/{ /## v/d; p; }" CHANGELOG.md | awk 'NF {print $0}' | tee body.md
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1
         with:
-          RUSTTARGET: ${{ matrix.target }}
-          ARCHIVE_TYPES: ${{ matrix.archive }}
-          SRC_DIR: apps/cargo-scout-audit
-          TOOLCHAIN_VERSION: stable
+          tag_name: ${{ github.ref }}
+          name: ${{ github.ref_name }}
+          body_path: body.md
+          draft: false
+          prerelease: ${{ contains(github.ref, 'pre') || contains(github.ref, 'rc') }}
+          token: ${{ secrets.GITHUB_TOKEN }}
