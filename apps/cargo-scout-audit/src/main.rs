@@ -6,6 +6,6 @@ fn main() {
 
     let cli = Cli::parse();
     match cli.subcmd {
-        CargoSubCommand::ScoutAudit(opts) => run_scout(opts),
+        CargoSubCommand::ScoutAudit(opts) => run_scout(opts).unwrap(),
     }
 }

@@ -1,6 +1,7 @@
 use core::panic;
 use std::{fs, path::PathBuf};
 
+use anyhow::{bail, Context, Result};
 use cargo::Config;
 use cargo_metadata::MetadataCommand;
 use clap::{Parser, Subcommand, ValueEnum};
@@ -38,7 +39,7 @@ pub enum OutputFormat {
 #[command(author, version, about, long_about = None)]
 pub struct Scout {
     #[clap(short, long, value_name = "path", help = "Path to Cargo.toml.")]
-    pub manifest_path: Option<String>,
+    pub manifest_path: Option<PathBuf>,
 
     // Exlude detectors
     #[clap(
@@ -75,10 +76,10 @@ pub struct Scout {
     pub output_format: OutputFormat,
 
     #[clap(long, value_name = "path", help = "Path to the output file.")]
-    pub output_path: Option<String>,
+    pub output_path: Option<PathBuf>,
 
     #[clap(long, value_name = "path", help = "Path to detectors workspace.")]
-    pub local_detectors: Option<String>,
+    pub local_detectors: Option<PathBuf>,
 
     #[clap(
         short,
@@ -89,18 +90,26 @@ pub struct Scout {
     pub verbose: bool,
 }
 
-pub fn run_scout(opts: Scout) {
+pub fn run_scout(opts: Scout) -> Result<()> {
+    // Validations
     if opts.filter.is_some() && opts.exclude.is_some() {
         panic!("You can't use `--exclude` and `--filter` at the same time.");
     }
 
-    let mut metadata = MetadataCommand::new();
-    if opts.manifest_path.is_some() {
-        metadata.manifest_path(opts.manifest_path.clone().unwrap());
+    if let Some(path) = &opts.output_path {
+        if path.is_dir() {
+            bail!("The output path can't be a directory.");
+        }
     }
-    let metadata = metadata.exec().expect("Failed to get metadata");
 
-    let cargo_config = Config::default().expect("Failed to get config");
+    // Prepare configurations
+    let mut metadata = MetadataCommand::new();
+    if let Some(manifest_path) = &opts.manifest_path {
+        metadata.manifest_path(manifest_path);
+    }
+    let metadata = metadata.exec().context("Failed to get metadata")?;
+
+    let cargo_config = Config::default().context("Failed to get config")?;
     cargo_config.shell().set_verbosity(if opts.verbose {
         cargo::core::Verbosity::Verbose
     } else {
@@ -108,89 +117,82 @@ pub fn run_scout(opts: Scout) {
     });
     let detectors_config = match &opts.local_detectors {
         Some(path) => get_local_detectors_configuration(&PathBuf::from(path))
-            .expect("Failed to get local detectors configuration"),
-        None => get_detectors_configuration().expect("Failed to get detectors configuration"),
+            .context("Failed to get local detectors configuration")?,
+        None => get_detectors_configuration().context("Failed to get detectors configuration")?,
     };
 
-    let detectors = Detectors::new(cargo_config, detectors_config, metadata, opts.verbose);
+    // Misc configurations
+    // If there is a need to exclude or filter by detector, the dylint tool needs to be recompiled.
+    // TODO: improve detector system so that doing this isn't necessary.
+    if opts.exclude.is_some() || opts.filter.is_some() {
+        remove_target_dylint(&opts.manifest_path)?;
+    }
 
+    // Instantiate detectors
+    let detectors = Detectors::new(cargo_config, detectors_config, metadata, opts.verbose);
     let detectors_names = detectors
         .get_detector_names()
-        .expect("Failed to build detectors");
+        .context("Failed to build detectors")?;
 
     if opts.list_detectors {
         list_detectors(detectors_names);
-        return;
+        return Ok(());
     }
 
-    let used_detectors: Vec<String> = if opts.filter.is_some() {
-        get_filtered_detectors(opts.clone().filter.unwrap(), detectors_names).unwrap()
-    } else if opts.exclude.is_some() {
-        get_excluded_detectors(opts.clone().exclude.unwrap(), detectors_names).unwrap()
+    let used_detectors = if let Some(filter) = &opts.filter {
+        get_filtered_detectors(filter.to_string(), detectors_names)?
+    } else if let Some(excluded) = &opts.exclude {
+        get_excluded_detectors(excluded.to_string(), detectors_names)?
     } else {
         detectors_names
     };
 
     let detectors_paths = detectors
         .build(used_detectors)
-        .expect("Failed to build detectors");
+        .context("Failed to build detectors")?;
 
-    run_dylint(detectors_paths, opts).expect("Failed to run dylint");
+    // Run dylint
+    run_dylint(detectors_paths, opts).context("Failed to run dylint")?;
+
+    Ok(())
 }
 
-fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> {
-    let paths: Vec<String> = detectors_paths
+fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> Result<()> {
+    // Convert detectors paths to string
+    let detectors_paths: Vec<String> = detectors_paths
         .iter()
         .map(|path| path.to_string_lossy().to_string())
         .collect();
 
+    // Initialize options
     let stderr_temp_file = tempfile::NamedTempFile::new()?;
     let stdout_temp_file = tempfile::NamedTempFile::new()?;
 
-    let mut options = Dylint {
-        paths,
+    let is_output_stdout = opts.output_format == OutputFormat::Text && opts.output_path.is_none();
+
+    let pipe_stdout = Some(stdout_temp_file.path().to_string_lossy().to_string());
+    let pipe_stderr = if is_output_stdout {
+        None
+    } else {
+        Some(stderr_temp_file.path().to_string_lossy().to_string())
+    };
+
+    let options = Dylint {
+        paths: detectors_paths,
         args: opts.args,
-        manifest_path: opts.manifest_path,
-        pipe_stdout: Some(stdout_temp_file.path().to_str().unwrap().to_string()),
-        pipe_stderr: opts.output_path.clone(),
+        manifest_path: opts.manifest_path.map(|p| p.to_string_lossy().to_string()),
+        pipe_stdout,
+        pipe_stderr,
         quiet: !opts.verbose,
         ..Default::default()
     };
 
-    if let Some(out_path) = &opts.output_path {
-        let path = PathBuf::from(&out_path);
-        if path.is_dir() {
-            panic!("The output path can't be a directory.");
-        }
-        options.pipe_stderr = Some(stderr_temp_file.path().to_str().unwrap().to_string());
-    }
-
-    if opts.output_format != OutputFormat::Text {
-        options.pipe_stderr = Some(stderr_temp_file.path().to_str().unwrap().to_string());
-    }
-
-    // If there is a need to exclude or filter by detector, the dylint tool needs to be recompiled.
-    // TODO: improve detector system so that doing this isn't necessary.
-    if opts.exclude.is_some() || opts.filter.is_some() {
-        let target_dylint_path = match &options.manifest_path {
-            Some(manifest_path) => {
-                let manifest_path = PathBuf::from(manifest_path);
-                let manifest_path_parent = manifest_path
-                    .parent()
-                    .expect("Error getting manifest path parent");
-                manifest_path_parent.join("target").join("dylint")
-            }
-            None => std::env::current_dir()
-                .expect("Failed to get current dir")
-                .join("target")
-                .join("dylint"),
-        };
-        if target_dylint_path.exists() {
-            fs::remove_dir_all(target_dylint_path).expect("Error removing target/dylint directory");
-        }
-    }
-
     dylint::run(&options)?;
+
+    // Format output and write to file (if necessary)
+    if is_output_stdout {
+        return Ok(());
+    }
 
     let mut stderr_file = fs::File::open(stderr_temp_file.path())?;
     let stdout_file = fs::File::open(stdout_temp_file.path())?;
@@ -211,6 +213,7 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> 
             std::io::Write::write_all(&mut html_file, format_into_html(stderr_file)?.as_bytes())?;
         }
         OutputFormat::Text => {
+            // If the output path is not set, dylint prints the report to stdout
             if let Some(output_file) = opts.output_path {
                 let mut txt_file = fs::File::create(output_file)?;
                 std::io::copy(&mut stderr_file, &mut txt_file)?;
@@ -231,5 +234,21 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> anyhow::Result<()> 
     stderr_temp_file.close()?;
     stdout_temp_file.close()?;
 
+    Ok(())
+}
+
+fn remove_target_dylint(manifest_path: &Option<PathBuf>) -> Result<()> {
+    let target_dylint_path = match manifest_path {
+        Some(manifest_path) => {
+            let manifest_path_parent = manifest_path
+                .parent()
+                .context("Error getting manifest path parent")?;
+            manifest_path_parent.join("target").join("dylint")
+        }
+        None => std::env::current_dir()?.join("target").join("dylint"),
+    };
+    if target_dylint_path.exists() {
+        fs::remove_dir_all(target_dylint_path)?;
+    }
     Ok(())
 }
