@@ -36,7 +36,7 @@ struct YourVisitor {
 impl<'ast> Visitor<'ast> for YourVisitor {
     fn visit_expr(&mut self, ex: &'ast Expr) {
         // Implement the logic of your lint here
-        
+
         // Call `walk_expr` to visit the descendants of `ex`
         rustc_ast::visit::walk_expr(self, ex);
     }
@@ -53,4 +53,3 @@ impl EarlyLintPass for YourLint {
         // Implement check_fn and emit any necessary diagnostic messages
     }
 }
-

@@ -48,8 +48,9 @@ pub mod flipper {
 
     #[cfg(all(test, feature = "e2e-tests"))]
     mod e2e_tests {
-        use super::*;
         use ink_e2e::build_message;
+
+        use super::*;
 
         type E2EResult<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
@@ -63,22 +64,22 @@ pub mod flipper {
                 .expect("instantiate failed")
                 .account_id;
 
-            let get = build_message::<FlipperRef>(contract_acc_id.clone())
-                .call(|flipper| flipper.get());
+            let get =
+                build_message::<FlipperRef>(contract_acc_id.clone()).call(|flipper| flipper.get());
             let get_res = client.call_dry_run(&ink_e2e::bob(), &get, 0, None).await;
             assert!(matches!(get_res.return_value(), false));
 
             // when
-            let flip = build_message::<FlipperRef>(contract_acc_id.clone())
-                .call(|flipper| flipper.flip());
+            let flip =
+                build_message::<FlipperRef>(contract_acc_id.clone()).call(|flipper| flipper.flip());
             let _flip_res = client
                 .call(&ink_e2e::bob(), flip, 0, None)
                 .await
                 .expect("flip failed");
 
             // then
-            let get = build_message::<FlipperRef>(contract_acc_id.clone())
-                .call(|flipper| flipper.get());
+            let get =
+                build_message::<FlipperRef>(contract_acc_id.clone()).call(|flipper| flipper.get());
             let get_res = client.call_dry_run(&ink_e2e::bob(), &get, 0, None).await;
             assert!(matches!(get_res.return_value(), true));
 
@@ -98,8 +99,8 @@ pub mod flipper {
                 .account_id;
 
             // then
-            let get = build_message::<FlipperRef>(contract_acc_id.clone())
-                .call(|flipper| flipper.get());
+            let get =
+                build_message::<FlipperRef>(contract_acc_id.clone()).call(|flipper| flipper.get());
             let get_res = client.call_dry_run(&ink_e2e::bob(), &get, 0, None).await;
             assert!(matches!(get_res.return_value(), false));
 
