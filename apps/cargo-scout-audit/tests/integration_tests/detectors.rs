@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::io::Read;
+use std::path::PathBuf;
 
 use cargo_scout_audit::startup::{run_scout, OutputFormat, Scout};
 use colored::Colorize;
@@ -109,9 +110,9 @@ fn execute_and_validate_testcase(
     // Run scout
     let scout_config = Scout {
         output_format: OutputFormat::Text,
-        output_path: Some(tempfile.path().to_string_lossy().to_string()),
-        local_detectors: Some(get_detectors_path()),
-        manifest_path: Some(path.to_string()),
+        output_path: Some(PathBuf::from(tempfile.path())),
+        local_detectors: Some(PathBuf::from(get_detectors_path())),
+        manifest_path: Some(PathBuf::from(path.to_string())),
         filter: Some(detector_name.to_string()),
         verbose: true,
         ..Default::default()

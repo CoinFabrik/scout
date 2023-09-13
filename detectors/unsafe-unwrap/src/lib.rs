@@ -4,7 +4,6 @@ extern crate rustc_ast;
 extern crate rustc_hir;
 extern crate rustc_span;
 
-use clippy_utils::diagnostics::span_lint_and_help;
 use rustc_hir::{
     intravisit::{walk_expr, Visitor},
     Expr, ExprKind,
@@ -86,12 +85,10 @@ impl<'tcx> LateLintPass<'tcx> for UnsafeUnwrap {
         if visitor.has_unwrap {
             visitor.has_unwrap_span.iter().for_each(|span| {
                 if let Some(span) = span {
-                    span_lint_and_help(
+                    Detector::UnsafeUnwrap.span_lint_and_help(
                         cx,
                         UNSAFE_UNWRAP,
                         *span,
-                        Detector::UnsafeUnwrap.get_lint_message(),
-                        None,
                         "Please, use a custom error instead of `unwrap`",
                     );
                 }

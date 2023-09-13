@@ -3,7 +3,6 @@
 
 extern crate rustc_hir;
 
-use clippy_utils::diagnostics::span_lint_and_help;
 use clippy_utils::higher;
 use if_chain::if_chain;
 use rustc_hir::{Expr, ExprKind, QPath};
@@ -92,12 +91,10 @@ impl<'tcx> LateLintPass<'tcx> for DosUnboundedOperation {
             }
         }
         if warn {
-            span_lint_and_help(
+            Detector::DosUnboundedOperation.span_lint_and_help(
                 cx,
                 DOS_UNBOUNDED_OPERATION,
                 expr.span,
-                Detector::DosUnboundedOperation.get_lint_message(),
-                None,
                 "This loop seems to do not have a fixed number of iterations",
             );
         }

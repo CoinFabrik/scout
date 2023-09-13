@@ -2,7 +2,6 @@
 
 extern crate rustc_hir;
 
-use clippy_utils::diagnostics::span_lint_and_help;
 use if_chain::if_chain;
 use rustc_hir::{BinOpKind, Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
@@ -34,12 +33,10 @@ impl<'tcx> LateLintPass<'tcx> for InsufficientlyRandomValues {
             if path.ident.as_str() == "block_timestamp" ||
                 path.ident.as_str() == "block_number";
             then {
-                span_lint_and_help(
+                Detector::InsufficientlyRandomValues.span_lint_and_help(
                     cx,
                     INSUFFICIENTLY_RANDOM_VALUES,
                     expr.span,
-                    Detector::InsufficientlyRandomValues.get_lint_message(),
-                    None,
                     "This expression seems to use block_timestamp as a pseudo random number",
                 );
             }

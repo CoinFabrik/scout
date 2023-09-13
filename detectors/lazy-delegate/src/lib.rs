@@ -4,7 +4,6 @@
 extern crate rustc_ast;
 extern crate rustc_span;
 
-use clippy_utils::diagnostics::span_lint_and_help;
 use if_chain::if_chain;
 use rustc_ast::ast::GenericArgs;
 use rustc_ast::{
@@ -75,22 +74,18 @@ impl EarlyLintPass for LazyDelegate {
         }
 
         if !self.delegate_uses.is_empty() && !self.non_lazy_manual_storage_spans.is_empty() {
-            span_lint_and_help(
+            Detector::LazyDelegate.span_lint_and_help(
                 cx,
                 LAZY_DELEGATE,
                 id.span,
-                Detector::LazyDelegate.get_lint_message(),
-                None,
                 "Use lazy storage with manual keys",
             );
 
             for span in &self.non_lazy_manual_storage_spans {
-                span_lint_and_help(
+                Detector::LazyDelegate.span_lint_and_help(
                     cx,
                     LAZY_DELEGATE,
                     *span,
-                    Detector::LazyDelegate.get_lint_message(),
-                    None,
                     "Use lazy storage with manual keys. \nMore info in https://github.com/paritytech/ink/issues/1826 and https://github.com/paritytech/ink/issues/1825",
                 );
             }

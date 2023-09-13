@@ -4,7 +4,7 @@
 extern crate rustc_ast;
 extern crate rustc_span;
 
-use clippy_utils::{diagnostics::span_lint_and_help, sym};
+use clippy_utils::sym;
 use if_chain::if_chain;
 use rustc_ast::{
     ptr::P,
@@ -109,12 +109,10 @@ fn check_macro_call(cx: &EarlyContext, span: Span, mac: &P<MacCall>) {
         if let TokenKind::Literal(lit) = token.kind;
         if lit.kind == LitKind::Str;
         then {
-            span_lint_and_help(
+            Detector::PanicError.span_lint_and_help(
                 cx,
                 PANIC_ERROR,
                 span,
-                Detector::PanicError.get_lint_message(),
-                None,
                 &format!("You could use instead an Error enum and then 'return Err(Error::{})'", capitalize_err_msg(lit.symbol.as_str()).replace(' ', "")),
             );
         }

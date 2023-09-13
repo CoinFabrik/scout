@@ -36,7 +36,7 @@ struct YourVisitor<'tcx> {
 impl<'tcx> Visitor<'tcx> for YourVisitor<'tcx> {
     fn visit_expr(&mut self, ex: &'tcx Expr<'_>) {
         // Implement the logic of your lint here
-        
+
         // Call `walk_expr` to visit the descendants of `ex`
         intravisit::walk_expr(self, ex);
     }
@@ -57,4 +57,3 @@ impl<'tcx> LateLintPass<'tcx> for YourLint {
         // Implement check_fn and emit any necessary diagnostic messages
     }
 }
-

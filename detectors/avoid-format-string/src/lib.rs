@@ -4,7 +4,7 @@
 extern crate rustc_ast;
 extern crate rustc_span;
 
-use clippy_utils::{diagnostics::span_lint_and_help, sym};
+use clippy_utils::sym;
 use if_chain::if_chain;
 use rustc_ast::{
     tokenstream::{TokenStream, TokenTree},
@@ -85,12 +85,10 @@ impl EarlyLintPass for AvoidFormatString {
             if mac.path == sym!(format);
 
             then {
-                span_lint_and_help(
+                Detector::AvoidFormatString.span_lint_and_help(
                     cx,
                     AVOID_FORMAT_STRING,
                     expr.span,
-                    Detector::AvoidFormatString.get_lint_message(),
-                    None,
                     "Instead, if this is returning an error, define a new error type",
                 );
             }

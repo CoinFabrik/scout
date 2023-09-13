@@ -4,7 +4,6 @@
 extern crate rustc_hir;
 extern crate rustc_span;
 
-use clippy_utils::diagnostics::span_lint_and_help;
 use if_chain::if_chain;
 use rustc_hir::def_id::LocalDefId;
 use rustc_hir::intravisit::{walk_expr, FnKind};
@@ -199,13 +198,10 @@ impl<'tcx> LateLintPass<'tcx> for Reentrancy1 {
             && reentrant_storage.allow_reentrancy_flag
             && reentrant_storage.state_change
         {
-            span_lint_and_help(
+            Detector::Reentrancy1.span_lint_and_help(
                 cx,
                 REENTRANCY_1,
-                // body.value.span,
                 reentrant_storage.span.unwrap(),
-                Detector::Reentrancy1.get_lint_message(),
-                None,
                 "This statement seems to call another contract after the flag set_allow_reentry was enabled [todo: check state changes after this statement]",
             );
         }
