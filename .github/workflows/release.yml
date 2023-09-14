@@ -66,7 +66,7 @@ jobs:
           toolchain: ${{ matrix.t }}
           manifest_path: apps/cargo-scout-audit/Cargo.toml
           bin: cargo-scout-audit
-          archive: scout-audit-${{ github.ref_name }}-${{ matrix.t }}-${{ matrix.o }}
+          archive: cargo-scout-audit-${{ github.ref_name }}-${{ matrix.t }}-${{ matrix.o }}
           tar: unix
           zip: windows
           token: ${{ secrets.GITHUB_TOKEN }}

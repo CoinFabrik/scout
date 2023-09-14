@@ -36,8 +36,8 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Check system for dependancies
-        if: ${{ matrix.os }} != 'ubuntu-latest'
-        run: pip install yaml
+        # if: ${{ matrix.os }} != 'ubuntu-latest'
+        run: pip install pyyaml
 
       - name: Check test matrix is complete
         run: python scripts/check-ci-detectors-to-test.py .github/workflows/test-detectors.yml detectors
