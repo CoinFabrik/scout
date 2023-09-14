@@ -44,25 +44,25 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: release
     steps:
-      - uses: actions/checkout@v3
-      - name: Install toolchain
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           override: true
 
       - name: Build binaries
-      - uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release
+        run: cargo build --release
 
       - name: Rename binary
         run: mv target/release/scout-audit scout-audit-${{ github.ref_name }}-${{ matrix.os }}
 
-      - name: Upload binaries
-      - uses: taiki-e/upload-rust-binary-action@v1
-        bin: scout-audit-${{ github.ref_name }}-${{ matrix.os }}
-        tar: unix
-        zip: windows
-        token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Rename binary
+        uses: taiki-e/upload-rust-binary-action@v1
+        with:
+          bin: scout-audit-${{ github.ref_name }}-${{ matrix.os }}
+          tar: unix
+          zip: windows
+          token: ${{ secrets.GITHUB_TOKEN }}
