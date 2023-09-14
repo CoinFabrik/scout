@@ -57,9 +57,9 @@ jobs:
         run: cd apps/cargo-scout-audit && cargo build --release
 
       - name: Rename binary
-        run: mv target/release/cargo-scout-audit scout-audit-${{ github.ref_name }}-${{ matrix.os }}
+        run: mv apps/cargo-scout-audit/target/release/cargo-scout-audit scout-audit-${{ github.ref_name }}-${{ matrix.os }}
 
-      - name: Rename binary
+      - name: Publish binary
         uses: taiki-e/upload-rust-binary-action@v1
         with:
           bin: scout-audit-${{ github.ref_name }}-${{ matrix.os }}
