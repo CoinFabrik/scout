@@ -37,19 +37,19 @@ jobs:
 
       - name: Check system for dependancies
         # if: ${{ matrix.os }} != 'ubuntu-latest'
-        run: pip install pyyaml
+        run: pip3 install pyyaml
 
       - name: Check test matrix is complete
-        run: python scripts/check-ci-detectors-to-test.py .github/workflows/test-detectors.yml detectors
+        run: python3 scripts/check-ci-detectors-to-test.py .github/workflows/test-detectors.yml detectors
 
       - name: Check detectors for repeated names
-        run: python scripts/check-detectors-repeated-names.py detectors
+        run: python3 scripts/check-detectors-repeated-names.py detectors
 
       - name: Check detector names with underscore
-        run: python scripts/check-detectors-underscore-names.py detectors
+        run: python3 scripts/check-detectors-underscore-names.py detectors
 
       - name: Check detector names different than their folders
-        run: python scripts/check-detectors-names-match-folder.py detectors
+        run: python3 scripts/check-detectors-names-match-folder.py detectors
 
   build:
     name: Build
