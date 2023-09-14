@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.2 (2023-09-14)
+
+- Test CI
+
 ## v0.1.1 (2023-06-30)
 
 - Update detector status
