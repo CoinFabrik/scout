@@ -22,7 +22,7 @@ jobs:
       #  run: python scripts/publish-to-crates-io.py
 
       - name: Create release notes
-        run: sed -n "/^## ${{ github.ref_name }}/,/^## v/{ /## v/d; p; }" CHANGELOG.md | awk 'NF {print $0}' | tee body.md
+        run: sed -n '/^## ${{ github.ref_name }}/,/^## v/{/^## ${{ github.ref_name }}/p; /^## v/!p;}' CHANGELOG.md | awk 'NF {print $0}' | tee body.md
 
       - name: Create release
         uses: softprops/action-gh-release@v1
@@ -52,7 +52,7 @@ jobs:
     needs: release
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Rust
         uses: actions-rs/toolchain@v1
