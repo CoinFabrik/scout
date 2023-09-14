@@ -63,7 +63,8 @@ jobs:
         uses: taiki-e/upload-rust-binary-action@v1
         with:
           manifest_path: apps/cargo-scout-audit/Cargo.toml
-          bin: scout-audit-${{ github.ref_name }}-${{ matrix.os }}
+          bin: cargo-scout-audit
+          archive: scout-audit-${{ github.ref_name }}-${{ matrix.os }}
           tar: unix
           zip: windows
           token: ${{ secrets.GITHUB_TOKEN }}
