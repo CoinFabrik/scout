@@ -1,10 +1,9 @@
+#[cfg(windows)]
+use std::path::Path;
 use std::{
     io::{IsTerminal, Write},
     process::Stdio,
 };
-
-#[cfg(windows)]
-use std::path::Path;
 
 use ansi_term::Style;
 
