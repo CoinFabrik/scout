@@ -145,4 +145,6 @@ jobs:
 
       - name: Run tests
         working-directory: apps/cargo-scout-audit
-        run: INTEGRATION_TESTS_TO_RUN=${{ matrix.test }} cargo test -- --nocapture
+        env:
+          INTEGRATION_TESTS_TO_RUN: ${{ matrix.test }}
+        run: cargo test -- --nocapture
