@@ -35,6 +35,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Check system for dependancies
+        if: ${{ matrix.os }} != 'ubuntu-latest'
+        run: pip install yaml
+
       - name: Check test matrix is complete
         run: python scripts/check-ci-detectors-to-test.py .github/workflows/test-detectors.yml detectors
 
