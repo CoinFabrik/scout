@@ -3,6 +3,9 @@ use std::{
     process::Stdio,
 };
 
+#[cfg(windows)]
+use std::path::Path;
+
 use ansi_term::Style;
 
 use super::command::Command;
@@ -32,14 +35,14 @@ fn cargo(subcommand: &str, verb: &str, description: &str, quiet: bool) -> Comman
     {
         // Dylint annotation
         // smoelius: Work around: https://github.com/rust-lang/rustup/pull/2978
-        let cargo_home = cargo_home().unwrap();
-        let old_path = crate::env::var(crate::env::PATH).unwrap();
+        let cargo_home = home::cargo_home().unwrap();
+        let old_path = std::env::var("PATH").unwrap();
         let new_path = std::env::join_paths(
             std::iter::once(Path::new(&cargo_home).join("bin"))
                 .chain(std::env::split_paths(&old_path)),
         )
         .unwrap();
-        command.envs(vec![(crate::env::PATH, new_path)]);
+        command.envs(vec![("PATH", new_path)]);
     }
     command.args([subcommand]);
     if quiet {
