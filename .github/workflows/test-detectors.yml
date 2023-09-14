@@ -35,7 +35,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Check system for dependancies
+      - name: Install python dependencies
         # if: ${{ matrix.os }} != 'ubuntu-latest'
         run: pip3 install pyyaml
 
