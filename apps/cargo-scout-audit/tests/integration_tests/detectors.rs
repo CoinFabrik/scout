@@ -117,7 +117,7 @@ fn execute_and_validate_testcase(
         verbose: true,
         ..Default::default()
     };
-    run_scout(scout_config);
+    run_scout(scout_config).unwrap();
 
     // Read output
     let mut output = String::new();
