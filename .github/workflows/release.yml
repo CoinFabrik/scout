@@ -35,6 +35,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
   upload-binaries:
+    name: Upload binaries
     strategy:
       matrix:
         os:
@@ -47,24 +48,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-
-      # - name: Build binaries
-      #   run: cd apps/cargo-scout-audit && cargo build --release
-
-      # - name: Rename binary
-      #  run: mv apps/cargo-scout-audit/target/release/cargo-scout-audit scout-audit-${{ github.ref_name }}-${{ matrix.os }}
-
-      - name: Publish binary
+      - name: Build and publish
         uses: taiki-e/upload-rust-binary-action@v1
         with:
           manifest_path: apps/cargo-scout-audit/Cargo.toml
           bin: cargo-scout-audit
-          archive: scout-audit-${{ github.ref_name }}-${{ matrix.os }}
+          archive: cargo-scout-audit-${{ github.ref_name }}-${{ matrix.os }}
           tar: unix
           zip: windows
           token: ${{ secrets.GITHUB_TOKEN }}
