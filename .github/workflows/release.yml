@@ -15,14 +15,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # - name: Login to crates.io
-      #   run: echo ${{ secrets.CRATES_TOKEN }} | cargo login
+      #- name: Login to crates.io
+      #  run: echo ${{ secrets.CRATES_TOKEN }} | cargo login
 
-      # - name: Publish to crates.io
-      #   run: python scripts/publish-to-crates-io.py
+      #- name: Publish to crates.io
+      #  run: python scripts/publish-to-crates-io.py
 
       - name: Create release notes
-        run: sed -n "/^## ${{ github.ref_name }}/,/^## v/{ /## v/d; p; }" CHANGELOG.md | awk 'NF {print $0}' | tee body.md
+        run: sed -n '/^## ${{ github.ref_name }}/,/^## v/{/^## ${{ github.ref_name }}/p; /^## v/!p;}' CHANGELOG.md | awk 'NF {print $0}' | tee body.md
 
       - name: Create release
         uses: softprops/action-gh-release@v1
@@ -35,25 +35,32 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
   upload-binaries:
-    name: Upload binaries
     strategy:
       matrix:
-        os:
-            - ubuntu-latest
-            - macos-latest
-            - windows-latest
-    runs-on: ${{ matrix.os }}
+        include:
+          - { o: macos-latest,   t: x86_64-apple-darwin                              }
+          - { o: macos-latest,   t: x86_64h-apple-darwin                             }
+          - { o: macos-latest,   t: aarch64-apple-darwin                             }
+          - { o: ubuntu-latest,  t: x86_64-unknown-linux-gnu                         }
+          - { o: ubuntu-latest,  t: aarch64-unknown-linux-gnu                        }
+          - { o: ubuntu-latest,  t: x86_64-unknown-linux-musl                        }
+          - { o: ubuntu-latest,  t: aarch64-unknown-linux-musl                       }
+          - { o: windows-latest, t: x86_64-pc-windows-msvc                           }
+          - { o: windows-latest, t: aarch64-pc-windows-msvc                          }
+    name: ${{ matrix.t }}
+    runs-on: ${{ matrix.o }}
     needs: release
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Build and publish
         uses: taiki-e/upload-rust-binary-action@v1
         with:
+          toolchain: ${{ matrix.t }}
           manifest_path: apps/cargo-scout-audit/Cargo.toml
           bin: cargo-scout-audit
-          archive: cargo-scout-audit-${{ github.ref_name }}-${{ matrix.os }}
+          archive: cargo-scout-audit-${{ github.ref_name }}-${{ matrix.t }}-${{ matrix.o }}
           tar: unix
           zip: windows
           token: ${{ secrets.GITHUB_TOKEN }}
