@@ -1,12 +1,16 @@
 #![feature(rustc_private)]
-#![warn(unused_extern_crates)]
-
+#![feature(let_chains)]
+extern crate rustc_ast;
 extern crate rustc_hir;
+extern crate rustc_span;
 
-use clippy_utils::higher;
-use if_chain::if_chain;
-use rustc_hir::{Expr, ExprKind, QPath};
+use rustc_ast::LitKind;
+use rustc_hir::{
+    intravisit::{walk_expr, FnKind, Visitor},
+    ExprKind, LangItem, MatchSource, QPath,
+};
 use rustc_lint::{LateContext, LateLintPass};
+use rustc_span::{def_id::LocalDefId, Span};
 use scout_audit_internal::Detector;
 
 dylint_linting::declare_late_lint! {
@@ -37,66 +41,62 @@ dylint_linting::declare_late_lint! {
     Detector::DosUnboundedOperation.get_lint_message()
 }
 
-fn is_self_field(field: &Expr<'_>) -> bool {
-    if_chain! {
-        if let ExprKind::Field(base, _) = field.kind; // self.field_name <- base: self, field_name: ident
-        if let ExprKind::Path(path) = &base.kind;
-        if let QPath::Resolved(None, path) = *path;
-        if path.segments.last().unwrap().ident.as_str().contains("self");
-        then {
-            return true;
-        }
-    }
-    false
+struct ForLoopVisitor {
+    span_constant: Vec<Span>,
 }
+impl<'tcx> Visitor<'tcx> for ForLoopVisitor {
+    fn visit_expr(&mut self, expr: &'tcx rustc_hir::Expr<'tcx>) {
+        if let ExprKind::Match(match_expr, _arms, source) = expr.kind &&
+            source == MatchSource::ForLoopDesugar &&
+            let ExprKind::Call(func, args) = match_expr.kind &&
+            let ExprKind::Path(qpath) = &func.kind &&
+            let QPath::LangItem(item, _span, _id) = qpath &&
+            item == &LangItem::IntoIterIntoIter {
 
-/**
- * This function checks if a field is a function parameter.
- * To achieve this, the function obtains the Hirid of the field and iterates through its parent nodes
- * searching for function names that match the given field name
- */
-fn is_func_parameter<'tcx>(cx: &LateContext<'tcx>, field: &'tcx Expr<'_>) -> bool {
-    if_chain! {
-        if let ExprKind::Path(path) = &field.kind;
-        if let QPath::Resolved(None, path) = *path;
-        then {
-            let mut parent_iter = cx.tcx.hir().parent_iter(field.hir_id);
-            for node in  &mut parent_iter {
-                let body = cx.tcx.hir().maybe_body_owned_by(node.0.owner.def_id);
-                if let Some(body_id) = body {
-                    for param in cx.tcx.hir().body(body_id).params {
-                        if let rustc_hir::PatKind::Binding(_, _, param, _) = &param.pat.kind {
-                            if path.segments.last().unwrap().ident.as_str().contains(param.name.as_str()) {
-                                return true;
-                            }
-                        }
-                    }
-                    return false;
-                }
+            if args.first().is_some() &&
+                let ExprKind::Struct(qpath, fields, _) = args.first().unwrap().kind &&
+                let QPath::LangItem(langitem, _span, _id) = qpath &&
+                (
+                    LangItem::Range == *langitem ||
+                    LangItem::RangeInclusiveStruct == *langitem ||
+                    LangItem::RangeInclusiveNew == *langitem
+                ) &&
+                fields.last().is_some() &&
+                let ExprKind::Lit(lit) = &fields.last().unwrap().expr.kind &&
+                let LitKind::Int(_v, _typ) = lit.node {
+
+                walk_expr(self, expr);
+            } else {
+                self.span_constant.push(expr.span);
             }
         }
+        walk_expr(self, expr);
     }
-    false
 }
-
 impl<'tcx> LateLintPass<'tcx> for DosUnboundedOperation {
-    fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx Expr<'_>) {
-        let mut warn = false;
-        if_chain! {
-            if let Some(higher::ForLoop { pat: _, arg, body: _, .. }) = higher::ForLoop::hir(expr);
-            if let ExprKind::Struct(_, field, _) = arg.kind;
-            if is_self_field(field[1].expr) || is_func_parameter(cx, field[1].expr);
-            then {
-                warn = true;
+    fn check_fn(
+        &mut self,
+        cx: &LateContext<'tcx>,
+        kind: rustc_hir::intravisit::FnKind<'tcx>,
+        _: &'tcx rustc_hir::FnDecl<'tcx>,
+        body: &'tcx rustc_hir::Body<'tcx>,
+        _: Span,
+        _: LocalDefId,
+    ) {
+        if let FnKind::Method(_ident, _sig) = kind {
+            let mut visitor = ForLoopVisitor {
+                span_constant: vec![],
+            };
+            walk_expr(&mut visitor, body.value);
+
+            for span in visitor.span_constant {
+                Detector::DosUnboundedOperation.span_lint_and_help(
+                    cx,
+                    DOS_UNBOUNDED_OPERATION,
+                    span,
+                    "This loop seems to do not have a fixed number of iterations",
+                );
             }
-        }
-        if warn {
-            Detector::DosUnboundedOperation.span_lint_and_help(
-                cx,
-                DOS_UNBOUNDED_OPERATION,
-                expr.span,
-                "This loop seems to do not have a fixed number of iterations",
-            );
         }
     }
 }
