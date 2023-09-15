@@ -24,7 +24,7 @@ def is_package_published(package_name, package_version, package_path):
         if (package_path / "rust-toolchain").exists():
             shutil.copy(package_path / "rust-toolchain", Path(tmpdirname) / "rust-toolchain")
         with open(Path(tmpdirname) / "Cargo.toml", "a") as f:
-            f.write(f'{package_name} = "{package_version}"')
+            f.write(f'{package_name} = "={package_version}"')
         print(f"Checking if {package_name} {package_version} is published...")
         try:
             subprocess.check_output(["cargo", "check"], cwd=tmpdirname)
