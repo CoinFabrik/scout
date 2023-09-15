@@ -143,7 +143,7 @@ impl<'a> DetectorBuilder<'a> {
         for path in detector_paths {
             let detector_name = path.file_name().unwrap().to_str().unwrap().to_string();
 
-            #[cfg(windows)]
+            #[cfg(not(windows))]
             let detector_name = detector_name.split("lib").collect::<Vec<_>>()[1];
 
             let detector_name = detector_name.split('@').collect::<Vec<_>>()[0]
