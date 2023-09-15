@@ -321,6 +321,7 @@ dependencies = [
  "clap",
  "colored",
  "config",
+ "dunce",
  "dylint",
  "env_logger",
  "home",

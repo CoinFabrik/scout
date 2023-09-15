@@ -47,7 +47,7 @@ jobs:
           - { o: ubuntu-latest,  t: aarch64-unknown-linux-musl                       }
           - { o: windows-latest, t: x86_64-pc-windows-msvc                           }
           - { o: windows-latest, t: aarch64-pc-windows-msvc                          }
-    name: ${{ matrix.t }}
+    name: Upload binaries
     runs-on: ${{ matrix.o }}
     needs: release
     steps:

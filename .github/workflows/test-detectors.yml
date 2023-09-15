@@ -24,27 +24,40 @@ env:
 jobs:
   check-config:
     name: Check config
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Install python dependencies
+        run: pip3 install pyyaml
+
       - name: Check test matrix is complete
-        run: python scripts/check-ci-detectors-to-test.py .github/workflows/test-detectors.yml detectors
+        run: python3 scripts/check-ci-detectors-to-test.py .github/workflows/test-detectors.yml detectors
 
       - name: Check detectors for repeated names
-        run: python scripts/check-detectors-repeated-names.py detectors
+        run: python3 scripts/check-detectors-repeated-names.py detectors
 
       - name: Check detector names with underscore
-        run: python scripts/check-detectors-underscore-names.py detectors
+        run: python3 scripts/check-detectors-underscore-names.py detectors
 
       - name: Check detector names different than their folders
-        run: python scripts/check-detectors-names-match-folder.py detectors
+        run: python3 scripts/check-detectors-names-match-folder.py detectors
 
   build:
     name: Build
     needs: check-config
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -76,10 +89,12 @@ jobs:
 
   test:
     name: Test
-    runs-on: ubuntu-latest
     needs: build
     strategy:
       matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
         test:
           [
             "assert-violation",
@@ -107,6 +122,7 @@ jobs:
             "unused-return-enum",
             "zero-or-test-address",
           ]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -125,4 +141,6 @@ jobs:
 
       - name: Run tests
         working-directory: apps/cargo-scout-audit
-        run: INTEGRATION_TESTS_TO_RUN=${{ matrix.test }} cargo test -- --nocapture
+        env:
+          INTEGRATION_TESTS_TO_RUN: ${{ matrix.test }}
+        run: cargo test -- --nocapture
