@@ -37,9 +37,10 @@ def publish_package(package_path):
 if __name__ == "__main__":
     ROOT_PATH = Path(__file__).parent.parent
     CARGO_SCOUT_AUDIT_PATH = ROOT_PATH / "apps" / "cargo-scout-audit"
+    SCOUT_AUDIT_CLIPPY_UTILS = ROOT_PATH / "scout-audit-clippy-utils"
     SCOUT_AUDIT_INTERNAL_PATH = ROOT_PATH / "scout-audit-internal"
 
-    packages_paths = [SCOUT_AUDIT_INTERNAL_PATH, CARGO_SCOUT_AUDIT_PATH]
+    packages_paths = [SCOUT_AUDIT_CLIPPY_UTILS, SCOUT_AUDIT_INTERNAL_PATH, CARGO_SCOUT_AUDIT_PATH]
 
     for path in packages_paths:
         package_name = get_package_name(path / "Cargo.toml")

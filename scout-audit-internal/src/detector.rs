@@ -9,15 +9,15 @@ extern crate rustc_span;
 
 mod lint_message;
 
-#[cfg(feature = "lint_helper")]
-use clippy_utils::diagnostics::{
-    span_lint as span_lint_clippy, span_lint_and_help as span_lint_and_help_clippy,
-};
 use lint_message::*;
 #[cfg(feature = "lint_helper")]
 use rustc_lint::{Lint, LintContext};
 #[cfg(feature = "lint_helper")]
 use rustc_span::Span;
+#[cfg(feature = "lint_helper")]
+use scout_audit_clippy_utils::diagnostics::{
+    span_lint as span_lint_clippy, span_lint_and_help as span_lint_and_help_clippy,
+};
 #[cfg(feature = "lint_helper")]
 use serde_json::json;
 use strum::{Display, EnumIter};
