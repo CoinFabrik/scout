@@ -112,8 +112,8 @@ pub fn driver(toolchain: &str, driver: &Path) -> Result<Command> {
     {
         // MinerSebas: To succesfully determine the dylint driver Version on Windows,
         // it is neccesary to add some Libraries to the Path.
-        let rustup_home = crate::env::var(crate::env::RUSTUP_HOME)?;
-        let old_path = crate::env::var(crate::env::PATH)?;
+        let rustup_home = std::env::var("RUSTUP_HOME")?;
+        let old_path = std::env::var("PATH")?;
         let new_path = std::env::join_paths(
             std::iter::once(
                 Path::new(&rustup_home)
@@ -123,7 +123,7 @@ pub fn driver(toolchain: &str, driver: &Path) -> Result<Command> {
             )
             .chain(std::env::split_paths(&old_path)),
         )?;
-        command.envs(vec![(crate::env::PATH, new_path)]);
+        command.envs(vec![("PATH", new_path)]);
     }
     Ok(command)
 }

@@ -3,7 +3,6 @@ use std::path::PathBuf;
 use anyhow::{bail, ensure, Context, Ok, Result};
 use cargo::Config;
 use cargo_metadata::Metadata;
-use glob::glob;
 use itertools::Itertools;
 
 use super::{configuration::DetectorConfiguration, library::Library, source::download_git_repo};
@@ -13,6 +12,7 @@ pub struct DetectorBuilder<'a> {
     cargo_config: &'a Config,
     detectors_config: DetectorConfiguration,
     root_metadata: Metadata,
+    verbose: bool,
 }
 
 impl<'a> DetectorBuilder<'a> {
@@ -21,38 +21,38 @@ impl<'a> DetectorBuilder<'a> {
         cargo_config: &'a Config,
         detectors_config: DetectorConfiguration,
         root_metadata: Metadata,
+        verbose: bool,
     ) -> Self {
         Self {
             cargo_config,
             detectors_config,
             root_metadata,
+            verbose,
         }
     }
 
     /// Compiles detector library and returns its path.
     pub fn build(self, used_detectors: Vec<String>) -> Result<Vec<PathBuf>> {
         let detector_root = self.download_detector()?;
-        let all_paths = self.parse_library_patterns(&detector_root)?;
-        let filtered_paths = self.filter_library_paths(all_paths, used_detectors)?;
-        let packages = self.get_packages(filtered_paths)?;
-        let library_paths = self.build_packages(packages)?;
+        let workspace_path = self.parse_library_path(&detector_root)?;
+        let library = self.get_library(workspace_path)?;
+        let library_paths = self.build_detectors(library)?;
+        let filtered_paths = self.filter_detectors(library_paths, used_detectors)?;
 
-        Ok(library_paths)
+        Ok(filtered_paths)
     }
 
+    /// Returns list of detector names.
     pub fn get_detector_names(self) -> Result<Vec<String>> {
         let detector_root = self.download_detector()?;
-        let paths = self.parse_library_patterns(&detector_root)?;
-        let detector_names = paths
+        let workspace_path = self.parse_library_path(&detector_root)?;
+        let library = self.get_library(workspace_path)?;
+        let detector_names = library
+            .metadata
+            .packages
             .into_iter()
-            .map(|path| {
-                path.file_name()
-                    .and_then(|file_name| file_name.to_str())
-                    .expect("Error getting path")
-                    .to_string()
-            })
+            .map(|p| p.name)
             .collect_vec();
-
         Ok(detector_names)
     }
 
@@ -77,45 +77,29 @@ impl<'a> DetectorBuilder<'a> {
         }
     }
 
-    /// Parse dependency root with given library pattern.
-    fn parse_library_patterns(&self, dependency_root: &PathBuf) -> Result<Vec<PathBuf>> {
-        let pattern = match &self.detectors_config.pattern {
-            Some(pattern) => dependency_root.join(pattern),
+    /// Parse dependency root with given library path.
+    fn parse_library_path(&self, dependency_root: &PathBuf) -> Result<PathBuf> {
+        let path = match &self.detectors_config.path {
+            Some(path) => dependency_root.join(path),
             None => dependency_root.clone(),
         };
-
-        let entries = glob(&pattern.to_string_lossy())?;
-
-        let paths = entries
-            .map(|entry| {
-                entry.map_err(Into::into).and_then(|path| {
-                    if let Some(pattern) = &self.detectors_config.pattern {
-                        let path_buf = path
-                            .canonicalize()
-                            .with_context(|| format!("Could not canonicalize {path:?}"))?;
-                        // Dylint annotation
-                        // smoelius: On Windows, the dependency root must be canonicalized to ensure it
-                        // has a path prefix.
-                        let dependency_root =
-                            dependency_root.canonicalize().with_context(|| {
-                                format!("Could not canonicalize {dependency_root:?}")
-                            })?;
-                        ensure!(
-                            path_buf.starts_with(&dependency_root),
-                            "Pattern `{pattern}` could refer to `{}`, which is outside of `{}`",
-                            path_buf.to_string_lossy(),
-                            dependency_root.to_string_lossy()
-                        );
-                    }
-                    Ok(path)
-                })
-            })
-            .collect::<Result<Vec<_>, _>>()?;
-        Ok(paths)
+        let path = path
+            .canonicalize()
+            .with_context(|| format!("Could not canonicalize {path:?}"))?;
+        let dependency_root = dependency_root
+            .canonicalize()
+            .with_context(|| format!("Could not canonicalize {dependency_root:?}"))?;
+        ensure!(
+            path.starts_with(&dependency_root),
+            "Path could refer to `{}`, which is outside of `{}`",
+            path.to_string_lossy(),
+            dependency_root.to_string_lossy()
+        );
+        Ok(path)
     }
 
-    /// Parse library paths into packages.
-    fn get_packages(&self, paths: Vec<PathBuf>) -> Result<Vec<Library>> {
+    /// Parse workspace path into library.
+    fn get_library(&self, workspace_path: PathBuf) -> Result<Library> {
         // Dylint annotation
         // smoelius: Collecting the package ids before building reveals missing/unparsable `Cargo.toml`
         // files sooner.
@@ -125,59 +109,53 @@ impl<'a> DetectorBuilder<'a> {
         // different compiler versions. And we have to work around the fact that "all projects within a
         // workspace are intended to be built with the same version of the compiler"
         // (https://github.com/rust-lang/rustup/issues/1399#issuecomment-383376082).
-        let packages = paths
-            .into_iter()
-            .map(|path| {
-                if path.is_dir() {
-                    let package_metadata = cargo_package::package_metadata(&path)?;
-                    let package_id = cargo_package::package_id(
-                        self.detectors_config.dependency.source_id(),
-                        &package_metadata,
-                        &path,
-                    )?;
-                    let lib_name = cargo_package::package_library_name(&package_metadata, &path)?;
-                    let toolchain = rustup::active_toolchain(&path)?;
-                    Ok(Some(Library::new(
-                        path,
-                        package_id,
-                        lib_name,
-                        toolchain,
-                        self.root_metadata
-                            .target_directory
-                            .clone()
-                            .into_std_path_buf(),
-                    )))
-                } else {
-                    Ok(None)
-                }
-            })
-            .collect::<Result<Vec<_>>>()?;
-        let packages: Vec<Library> = packages.into_iter().flatten().collect();
-        Ok(packages)
+        ensure!(
+            workspace_path.is_dir(),
+            "Not a directory: {}",
+            workspace_path.to_string_lossy()
+        );
+
+        let package_metadata = cargo_package::package_metadata(&workspace_path)?;
+        let toolchain = rustup::active_toolchain(&workspace_path)?;
+        let library = Library::new(
+            workspace_path,
+            toolchain,
+            self.root_metadata
+                .target_directory
+                .clone()
+                .into_std_path_buf(),
+            package_metadata,
+        );
+        Ok(library)
     }
 
-    /// Builds packages returning library paths
-    fn build_packages(&self, libraries: Vec<Library>) -> Result<Vec<PathBuf>> {
-        let library_paths = libraries
-            .into_iter()
-            .map(|library| library.build())
-            .collect::<Result<Vec<_>>>()?;
-
+    /// Builds detectors returning their compiled paths.
+    fn build_detectors(&self, library: Library) -> Result<Vec<PathBuf>> {
+        let library_paths = library.build(self.verbose)?;
         Ok(library_paths)
     }
 
-    fn filter_library_paths(
+    fn filter_detectors(
         &self,
-        mut all_paths: Vec<PathBuf>,
+        detector_paths: Vec<PathBuf>,
         used_detectors: Vec<String>,
     ) -> Result<Vec<PathBuf>> {
-        all_paths.retain(|path| {
-            let file_name = path
-                .file_name()
-                .and_then(|file_name| file_name.to_str())
-                .expect("Error getting path");
-            used_detectors.contains(&file_name.to_string())
-        });
-        Ok(all_paths)
+        let mut filtered_paths = Vec::new();
+
+        for path in detector_paths {
+            let detector_name = path.file_name().unwrap().to_str().unwrap().to_string();
+            let detector_name = detector_name.split("lib").collect::<Vec<_>>()[1]
+                .split('@')
+                .collect::<Vec<_>>()[0]
+                .to_string()
+                .replace('_', "-");
+            if used_detectors.contains(&detector_name) {
+                filtered_paths.push(path)
+            } else {
+                std::fs::remove_file(path)?;
+            }
+        }
+
+        Ok(filtered_paths)
     }
 }

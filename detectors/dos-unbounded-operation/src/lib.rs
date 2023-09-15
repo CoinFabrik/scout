@@ -1,14 +1,16 @@
 #![feature(rustc_private)]
 #![feature(let_chains)]
-extern crate rustc_hir;
 extern crate rustc_ast;
+extern crate rustc_hir;
 extern crate rustc_span;
 
-use clippy_utils::diagnostics::span_lint_and_help;
 use rustc_ast::LitKind;
-use rustc_hir::{intravisit::{walk_expr, FnKind, Visitor}, ExprKind, MatchSource, QPath, LangItem};
-use rustc_lint::LateLintPass;
-use rustc_span::{Span, def_id::LocalDefId};
+use rustc_hir::{
+    intravisit::{walk_expr, FnKind, Visitor},
+    ExprKind, LangItem, MatchSource, QPath,
+};
+use rustc_lint::{LateContext, LateLintPass};
+use rustc_span::{def_id::LocalDefId, Span};
 use scout_audit_internal::Detector;
 
 dylint_linting::declare_late_lint! {
@@ -62,7 +64,7 @@ impl<'tcx> Visitor<'tcx> for ForLoopVisitor {
                 fields.last().is_some() &&
                 let ExprKind::Lit(lit) = &fields.last().unwrap().expr.kind &&
                 let LitKind::Int(_v, _typ) = lit.node {
-                
+
                 walk_expr(self, expr);
             } else {
                 self.span_constant.push(expr.span);
@@ -74,24 +76,24 @@ impl<'tcx> Visitor<'tcx> for ForLoopVisitor {
 impl<'tcx> LateLintPass<'tcx> for DosUnboundedOperation {
     fn check_fn(
         &mut self,
-        cx: &rustc_lint::LateContext<'tcx>,
+        cx: &LateContext<'tcx>,
         kind: rustc_hir::intravisit::FnKind<'tcx>,
         _: &'tcx rustc_hir::FnDecl<'tcx>,
         body: &'tcx rustc_hir::Body<'tcx>,
         _: Span,
-        _: LocalDefId
+        _: LocalDefId,
     ) {
         if let FnKind::Method(_ident, _sig) = kind {
-            let mut visitor = ForLoopVisitor { span_constant: vec![] };
+            let mut visitor = ForLoopVisitor {
+                span_constant: vec![],
+            };
             walk_expr(&mut visitor, body.value);
 
             for span in visitor.span_constant {
-                span_lint_and_help(
+                Detector::DosUnboundedOperation.span_lint_and_help(
                     cx,
                     DOS_UNBOUNDED_OPERATION,
                     span,
-                    Detector::DosUnboundedOperation.get_lint_message(),
-                    None,
                     "This loop seems to do not have a fixed number of iterations",
                 );
             }

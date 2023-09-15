@@ -6,7 +6,6 @@ extern crate rustc_hir;
 extern crate rustc_middle;
 extern crate rustc_span;
 
-use clippy_utils::diagnostics::span_lint;
 use if_chain::if_chain;
 use rustc_ast::{ast::UintTy, LitIntType, LitKind};
 use rustc_hir::def::Res;
@@ -174,11 +173,10 @@ impl<'tcx> LateLintPass<'tcx> for UnrestrictedTransferFrom {
         walk_expr(&mut utf_storage, body.value);
 
         if utf_storage.from_ref {
-            span_lint(
+            Detector::UnrestrictedTransferFrom.span_lint(
                 cx,
                 UNRESTRICTED_TRANSFER_FROM,
                 utf_storage.span.unwrap(),
-                Detector::UnrestrictedTransferFrom.get_lint_message(),
             );
         }
 
@@ -257,7 +255,7 @@ impl<'tcx> LateLintPass<'tcx> for UnrestrictedTransferFrom {
                                 if utf_storage.pusharg_def_id.is_some_and(|id|id==*def) {
                                     for arg in args {
                                         if arg.place().map_or(false, |place|tainted_locals.iter().any(|l|l == &place.local)) {
-                                            span_lint(cx, UNRESTRICTED_TRANSFER_FROM, *fn_span, "This argument comes from a user-supplied argument");
+                                            Detector::UnrestrictedTransferFrom.span_lint(cx, UNRESTRICTED_TRANSFER_FROM, *fn_span);
                                         }
                                     }
                                 }

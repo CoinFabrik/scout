@@ -50,15 +50,19 @@ cargo scout-audit
 
 In the table below, we specify all the option available for the CLI.
 
-| Command/Option | Explanation |
-| --- | --- |
-| `cargo scout-audit` | The command to run the static analyzer on the current directory |
-| `cargo scout-audit --manifest-path <PATH_TO_CARGO_TOML>` | This option is used to specify the path to the Cargo.toml file that you want to analyze. |
-| `cargo scout-audit --filter <DETECTOR_LIST_SEPARATED_BY_COMAS>` | This option allows you to analyze code using specific detectors. Provide a comma-separated list of detectors for this purpose. |
+| Command/Option                                                   | Explanation                                                                                                                                       |
+|------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| `cargo scout-audit`                                              | Runs the static analyzer on the current directory                                                                                                 |
+| `cargo scout-audit --help`                                       | Provides a brief explanation of all the available commands and their usage.                                                                       |
+| `cargo scout-audit --manifest-path <PATH_TO_CARGO_TOML>`         | This option is used to specify the path to the Cargo.toml file that you want to analyze.                                                          |
+| `cargo scout-audit --filter <DETECTOR_LIST_SEPARATED_BY_COMAS>`  | This option allows you to analyze code using specific detectors. Provide a comma-separated list of detectors for this purpose.                    |
 | `cargo scout-audit --exclude <DETECTOR_LIST_SEPARATED_BY_COMAS>` | With this command, you can exclude specific detectors from the analysis. You need to give a comma-separated list of the detectors to be excluded. |
-| `cargo scout-audit --list-detectors` | Use this option to display a list of all available detectors. |
-| `cargo scout-audit --help` | This command provides a brief explanation of all the available commands and their usage. |
-| `cargo scout-audit --version` | This command displays the current version of the static analyzer. |
+| `cargo scout-audit --list-detectors`                             | Display a list of all available detectors.                                                                                                        |
+| `cargo scout-audit --version`                                    | Displays the current version of the static analyzer.                                                                                              |
+| `cargo scout-audit --verbose`                                    | Print additional information on run                                                                                                               |
+| `cargo scout-audit --local-detectors <PATH_TO_FOLDER>`           | Uses the detectors of a local folder. This considers the sub-folders as detectors.                                                                |
+| `cargo scout-audit --output-format [text\|json\|html\|sarif]`    | Sets the output format. Selecting `json`, `html` or `sarif` will create a file with the output                                                    |
+| `cargo scout-audit --output-path <PATH_TO_OUTPUT_FILE>`          | Sets the output path. If a format was selected, this will replace the default file with the given one                                             |
 
 
 ## VSCode Extension

@@ -8,7 +8,6 @@ extern crate rustc_span;
 
 use std::collections::HashSet;
 
-use clippy_utils::diagnostics::span_lint;
 use rustc_hir::QPath;
 use rustc_hir::{
     intravisit::{walk_expr, Visitor},
@@ -157,11 +156,10 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
                 &mut HashSet::<BasicBlock>::default(),
             );
             for place in unchecked_places {
-                span_lint(
+                Detector::UnprotectedMappingOperation.span_lint(
                     cx,
                     UNPROTECTED_MAPPING_OPERATION,
                     place.1,
-                    Detector::UnprotectedMappingOperation.get_lint_message(),
                 );
             }
         }
