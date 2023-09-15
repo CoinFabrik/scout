@@ -77,6 +77,7 @@ struct DefIdFinder<'tcx, 'tcx_ref> {
     cx: &'tcx_ref LateContext<'tcx>,
     checked_div: Option<DefId>,
     checked_mul: Option<DefId>,
+    saturating_div: Option<DefId>,
     saturating_mul: Option<DefId>,
 }
 
@@ -85,13 +86,22 @@ impl Visitor<'_> for DefIdFinder<'_, '_> {
         if let ExprKind::MethodCall(path, ..) = expr.kind {
             let defid = self.cx.typeck_results().type_dependent_def_id(expr.hir_id);
 
-            if path.ident.name.to_string() == "checked_div" {
-                self.checked_div = defid;
-            } else if path.ident.name.to_string() == "checked_mul" {
-                self.checked_mul = defid;
-            } else if path.ident.name.to_string() == "saturating_mul" {
-                self.saturating_mul = defid;
-            };
+            match path.ident.name.as_str() {
+                "checked_div" => {
+                    self.checked_div = defid;
+                },
+                "checked_mul" => {
+                    self.checked_mul = defid;
+                },
+                "saturating_mul" => {
+                    self.saturating_mul = defid;
+                },
+                "saturating_div" => {
+                    self.saturating_div = defid;
+                },
+                _=>{}
+                
+            }
         }
         walk_expr(self, expr);
     }
@@ -170,7 +180,8 @@ fn navigate_trough_basicblocks<'tcx>(
                 if let Operand::Constant(cst) = func &&
                     let ConstantKind::Val(_, ty) = cst.literal && 
                     let TyKind::FnDef(id, _) = ty.kind() {
-                    if def_ids.checked_div.is_some_and(|f|f == *id){
+                    if def_ids.checked_div.is_some_and(|f|f == *id) ||
+                        def_ids.saturating_div.is_some_and(|f|f == *id) {
                         tainted_places.push(*destination);
                     } else {
                         for arg in args {
@@ -258,6 +269,7 @@ impl<'tcx> LateLintPass<'tcx> for DivideBeforeMultiply {
         let mut visitor = DefIdFinder {
             checked_div: None,
             checked_mul: None,
+            saturating_div: None,
             saturating_mul: None,
             cx,
         };
