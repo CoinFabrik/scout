@@ -35,7 +35,7 @@ def is_package_published(package_name, package_version, package_path):
             raise
 
 def publish_package(package_path):
-    subprocess.call(["cargo", "publish"], cwd=package_path)
+    subprocess.check_output(["cargo", "publish"], cwd=package_path)
 
 if __name__ == "__main__":
     ROOT_PATH = Path(__file__).parent.parent
@@ -52,7 +52,7 @@ if __name__ == "__main__":
 
         if not is_package_published(package_name, package_version, path):
             publish_package(path)
-            while not is_package_published(package_name, package_version):
+            while not is_package_published(package_name, package_version, path):
                 print(f"{package_name} {package_version} is not published yet, waiting 10 seconds...")
                 time.sleep(10)
             print(f"{package_name} {package_version} is published")
