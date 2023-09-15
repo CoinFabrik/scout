@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use anyhow::Result;
 use cargo::{
     core::{Dependency, GitReference, SourceId},
@@ -7,14 +9,14 @@ use cargo::{
 #[derive(Debug, Clone)]
 pub struct DetectorConfiguration {
     pub dependency: Dependency,
-    pub pattern: Option<String>,
+    pub path: Option<String>,
 }
 
-pub type DetectorsConfigurationList = [DetectorConfiguration; 1];
+pub type DetectorsConfigurationList = Vec<DetectorConfiguration>;
 
-/// Returns list of detectors
+/// Returns list of detectors.
 pub fn get_detectors_configuration() -> Result<DetectorsConfigurationList> {
-    let detectors = [DetectorConfiguration {
+    let detectors = vec![DetectorConfiguration {
         dependency: Dependency::parse(
             "library",
             None,
@@ -23,7 +25,17 @@ pub fn get_detectors_configuration() -> Result<DetectorsConfigurationList> {
                 GitReference::DefaultBranch,
             )?,
         )?,
-        pattern: Some("detectors/*".into()),
+        path: Some("detectors".into()),
+    }];
+
+    Ok(detectors)
+}
+
+/// Returns local detectors configuration from custom path.
+pub fn get_local_detectors_configuration(path: &Path) -> Result<DetectorsConfigurationList> {
+    let detectors = vec![DetectorConfiguration {
+        dependency: Dependency::parse("library", None, SourceId::for_path(path)?)?,
+        path: None,
     }];
 
     Ok(detectors)

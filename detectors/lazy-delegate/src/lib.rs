@@ -4,7 +4,6 @@
 extern crate rustc_ast;
 extern crate rustc_span;
 
-use clippy_utils::diagnostics::span_lint_and_help;
 use if_chain::if_chain;
 use rustc_ast::ast::GenericArgs;
 use rustc_ast::{
@@ -13,6 +12,7 @@ use rustc_ast::{
 };
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::Span;
+use scout_audit_internal::Detector;
 
 dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does
@@ -37,10 +37,9 @@ dylint_linting::impl_pre_expansion_lint! {
     /// - https://github.com/paritytech/ink/issues/1825
     /// - https://github.com/paritytech/ink/issues/1826
     ///```
-
     pub LAZY_DELEGATE,
     Warn,
-    "Use of delegate call with non-lazy, non-mapping storage won't modify the storage of the contract.",
+    Detector::LazyDelegate.get_lint_message(),
     LazyDelegate::default()
 }
 
@@ -75,22 +74,18 @@ impl EarlyLintPass for LazyDelegate {
         }
 
         if !self.delegate_uses.is_empty() && !self.non_lazy_manual_storage_spans.is_empty() {
-            span_lint_and_help(
+            Detector::LazyDelegate.span_lint_and_help(
                 cx,
                 LAZY_DELEGATE,
                 id.span,
-                "Delegate call with non-lazy, non-mapping storage",
-                None,
                 "Use lazy storage with manual keys",
             );
 
             for span in &self.non_lazy_manual_storage_spans {
-                span_lint_and_help(
+                Detector::LazyDelegate.span_lint_and_help(
                     cx,
                     LAZY_DELEGATE,
                     *span,
-                    "Non-lazy non-mapping storage",
-                    None,
                     "Use lazy storage with manual keys. \nMore info in https://github.com/paritytech/ink/issues/1826 and https://github.com/paritytech/ink/issues/1825",
                 );
             }

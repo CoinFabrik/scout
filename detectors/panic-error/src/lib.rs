@@ -4,7 +4,7 @@
 extern crate rustc_ast;
 extern crate rustc_span;
 
-use clippy_utils::{diagnostics::span_lint_and_help, sym};
+use clippy_utils::sym;
 use if_chain::if_chain;
 use rustc_ast::{
     ptr::P,
@@ -14,6 +14,7 @@ use rustc_ast::{
 };
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::{sym, Span};
+use scout_audit_internal::Detector;
 
 dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does
@@ -47,7 +48,7 @@ dylint_linting::impl_pre_expansion_lint! {
     /// ```
     pub PANIC_ERROR,
     Warn,
-    "`panic!` is useful for testing and prototyping, but should be avoided in production code",
+    Detector::PanicError.get_lint_message(),
     PanicError::default()
 }
 
@@ -108,12 +109,10 @@ fn check_macro_call(cx: &EarlyContext, span: Span, mac: &P<MacCall>) {
         if let TokenKind::Literal(lit) = token.kind;
         if lit.kind == LitKind::Str;
         then {
-            span_lint_and_help(
+            Detector::PanicError.span_lint_and_help(
                 cx,
                 PANIC_ERROR,
                 span,
-                "The panic! macro is used to stop execution when a condition is not met. This is useful for testing and prototyping, but should be avoided in production code",
-                None,
                 &format!("You could use instead an Error enum and then 'return Err(Error::{})'", capitalize_err_msg(lit.symbol.as_str()).replace(' ', "")),
             );
         }

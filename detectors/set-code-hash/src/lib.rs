@@ -6,7 +6,6 @@ extern crate rustc_hir;
 extern crate rustc_middle;
 extern crate rustc_span;
 
-use clippy_utils::diagnostics::span_lint;
 use rustc_hir::QPath;
 use rustc_hir::{
     def,
@@ -21,11 +20,12 @@ use rustc_middle::mir::{
 use rustc_middle::ty::TyKind;
 use rustc_span::def_id::DefId;
 use rustc_span::Span;
+use scout_audit_internal::Detector;
 
 dylint_linting::impl_late_lint! {
     pub UNPROTECTED_SET_CODE_HASH,
     Warn,
-    "Don't call terminate_contract without checking the caller authority",
+    Detector::SetCodeHash.get_lint_message(),
     UnprotectedSetCodeHash::default()
 }
 
@@ -147,12 +147,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSetCodeHash {
             if caller_and_terminate.callers.is_empty() {
                 for terminate in caller_and_terminate.terminates {
                     if let TerminatorKind::Call { fn_span, .. } = terminate.0.terminator().kind {
-                        span_lint(
-                            cx,
-                            UNPROTECTED_SET_CODE_HASH,
-                            fn_span,
-                            "This set_code_hash is called without access control",
-                        );
+                        Detector::SetCodeHash.span_lint(cx, UNPROTECTED_SET_CODE_HASH, fn_span);
                     }
                 }
             } else {
@@ -164,12 +159,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSetCodeHash {
                     &mut vec![],
                 );
                 for place in unchecked_places {
-                    span_lint(
-                        cx,
-                        UNPROTECTED_SET_CODE_HASH,
-                        place.1,
-                        "This set_code_hash is called without access control",
-                    );
+                    Detector::SetCodeHash.span_lint(cx, UNPROTECTED_SET_CODE_HASH, place.1);
                 }
             }
         }

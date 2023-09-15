@@ -56,14 +56,8 @@ jobs:
       - name: Update Rust
         run: rustup update
 
-      - name: Install Rust nightly-2023-01-27
-        run: rustup install nightly-2023-01-27 --profile minimal
-
       - name: Install Rust nightly-2023-04-23
         run: rustup install nightly-2023-04-23 --profile minimal
-
-      - name: Install Clippy nightly-2023-01-27
-        run: rustup component add clippy --toolchain nightly-2023-01-27
 
       - name: Install Clippy nightly-2023-04-23
         run: rustup component add clippy --toolchain nightly-2023-04-23

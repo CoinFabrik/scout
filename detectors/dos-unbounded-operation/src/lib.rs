@@ -3,11 +3,11 @@
 
 extern crate rustc_hir;
 
-use clippy_utils::diagnostics::span_lint_and_help;
 use clippy_utils::higher;
 use if_chain::if_chain;
 use rustc_hir::{Expr, ExprKind, QPath};
 use rustc_lint::{LateContext, LateLintPass};
+use scout_audit_internal::Detector;
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -34,7 +34,7 @@ dylint_linting::declare_late_lint! {
     /// ```
     pub DOS_UNBOUNDED_OPERATION,
     Warn,
-    "description goes here"
+    Detector::DosUnboundedOperation.get_lint_message()
 }
 
 fn is_self_field(field: &Expr<'_>) -> bool {
@@ -91,12 +91,10 @@ impl<'tcx> LateLintPass<'tcx> for DosUnboundedOperation {
             }
         }
         if warn {
-            span_lint_and_help(
+            Detector::DosUnboundedOperation.span_lint_and_help(
                 cx,
                 DOS_UNBOUNDED_OPERATION,
                 expr.span,
-                "In order to prevent a single transaction from consuming all the gas in a block, unbounded operations must be avoided",
-                None,
                 "This loop seems to do not have a fixed number of iterations",
             );
         }

@@ -9,7 +9,6 @@ extern crate rustc_type_ir;
 
 use std::collections::{HashMap, HashSet};
 
-use clippy_utils::diagnostics::span_lint_and_help;
 use if_chain::if_chain;
 use rustc_abi::VariantIdx;
 use rustc_ast::ast::LitKind;
@@ -22,6 +21,7 @@ use rustc_lint::{LateContext, LateLintPass};
 use rustc_middle::ty::TyKind;
 use rustc_span::def_id::LocalDefId;
 use rustc_span::{Span, Symbol};
+use scout_audit_internal::Detector;
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -85,9 +85,9 @@ dylint_linting::declare_late_lint! {
     ///     return caller_balance;
     /// }
     /// ```
-    pub REENTRANCY,
+    pub REENTRANCY_2,
     Warn,
-    "Reentrancy vulnerability"
+    Detector::Reentrancy2.get_lint_message()
 }
 
 const SET_ALLOW_REENTRY: &str = "set_allow_reentry";
@@ -97,7 +97,7 @@ const MAPPING: &str = "Mapping";
 const ACCOUNT_ID: &str = "AccountId";
 const U128: &str = "u128";
 
-impl<'tcx> LateLintPass<'tcx> for Reentrancy {
+impl<'tcx> LateLintPass<'tcx> for Reentrancy2 {
     fn check_fn(
         &mut self,
         cx: &LateContext<'tcx>,
@@ -271,12 +271,10 @@ impl<'tcx> LateLintPass<'tcx> for Reentrancy {
         // Iterate over all potential reentrancy spans and emit a warning for each.
         if reentrancy_visitor.has_insert_operation {
             reentrancy_visitor.reentrancy_spans.into_iter().for_each(|span| {
-                span_lint_and_help(
+                Detector::Reentrancy2.span_lint_and_help(
                     cx,
-                    REENTRANCY,
+                    REENTRANCY_2,
                     span,
-                    "External calls could open the opportunity for a malicious contract to execute any arbitrary code",
-                    None,
                     "This statement seems to call another contract after the flag set_allow_reentry was enabled [todo: check state changes after this statement]",
                 );
             })

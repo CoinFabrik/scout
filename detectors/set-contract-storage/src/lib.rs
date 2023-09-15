@@ -4,15 +4,16 @@
 extern crate rustc_hir;
 extern crate rustc_span;
 
-use clippy_utils::diagnostics::span_lint_and_help;
 use if_chain::if_chain;
+use rustc_hir::def_id::LocalDefId;
 use rustc_hir::intravisit::Visitor;
 use rustc_hir::intravisit::{walk_expr, FnKind};
 use rustc_hir::QPath;
-use rustc_hir::{Body, FnDecl, HirId};
+use rustc_hir::{Body, FnDecl};
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::Span;
+use scout_audit_internal::Detector;
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -52,7 +53,7 @@ dylint_linting::declare_late_lint! {
     /// ```
     pub SET_STORAGE_WARN,
     Warn,
-    "set_contract_storage only must be used with proper access control or input sanitation"
+    Detector::SetContractStorage.get_lint_message()
 }
 
 fn expr_check_owner(expr: &Expr) -> bool {
@@ -80,7 +81,7 @@ impl<'tcx> LateLintPass<'tcx> for SetStorageWarn {
         _: &'tcx FnDecl<'_>,
         body: &'tcx Body<'_>,
         _: Span,
-        _: HirId,
+        _: LocalDefId,
     ) {
         struct SetContractStorage {
             span: Option<Span>,
@@ -135,13 +136,11 @@ impl<'tcx> LateLintPass<'tcx> for SetStorageWarn {
         walk_expr(&mut reentrant_storage, body.value);
 
         if reentrant_storage.has_set_contract && reentrant_storage.unprotected {
-            span_lint_and_help(
+            Detector::SetContractStorage.span_lint_and_help(
                 cx,
                 SET_STORAGE_WARN,
                 // body.value.span,
                 reentrant_storage.span.unwrap(),
-                "Abitrary users should not have control over keys because it implies writing any value of left mapping, lazy variable, or the main struct of the contract located in position 0 of the storage",
-                None,
                 "Set access control and proper authorization validation for the set_contract_storage() function",
             );
         }

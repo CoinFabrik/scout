@@ -6,7 +6,6 @@ extern crate rustc_hir;
 extern crate rustc_middle;
 extern crate rustc_span;
 
-use clippy_utils::diagnostics::span_lint;
 use if_chain::if_chain;
 use rustc_ast::{ast::UintTy, LitIntType, LitKind};
 use rustc_hir::def::Res;
@@ -18,11 +17,12 @@ use rustc_hir::{PatKind, QPath};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_middle::mir::{BasicBlock, BasicBlocks, Local, Operand, StatementKind, TerminatorKind};
 use rustc_span::Span;
+use scout_audit_internal::Detector;
 
 dylint_linting::impl_late_lint! {
     pub UNRESTRICTED_TRANSFER_FROM,
     Warn,
-    "Don't use user-supplied arguments as 'from' field in transfer_from",
+    Detector::UnrestrictedTransferFrom.get_lint_message(),
     UnrestrictedTransferFrom::default()
 }
 
@@ -88,7 +88,8 @@ impl<'tcx> LateLintPass<'tcx> for UnrestrictedTransferFrom {
                         if_chain! {
                             if let ExprKind::Path(qpath) = &path.kind;
                             if let rustc_hir::QPath::TypeRelative(ty, path_segment) = qpath;
-                            if path_segment.ident.name.to_string() == "transfer_from";
+                            if path_segment.ident.name.to_string() == "transfer_from"
+                            || path_segment.ident.name.to_string() == "transfer_from_builder";
                             if let rustc_hir::TyKind::Path(qpath_2) = &ty.kind;
                             if let rustc_hir::QPath::Resolved(_, path_2) = qpath_2;
                             if path_2.segments.iter().any(|s|s.ident.name.to_string() == "PSP22Ref");
@@ -172,11 +173,10 @@ impl<'tcx> LateLintPass<'tcx> for UnrestrictedTransferFrom {
         walk_expr(&mut utf_storage, body.value);
 
         if utf_storage.from_ref {
-            span_lint(
+            Detector::UnrestrictedTransferFrom.span_lint(
                 cx,
                 UNRESTRICTED_TRANSFER_FROM,
                 utf_storage.span.unwrap(),
-                "This argument comes from a user-supplied argument",
             );
         }
 
@@ -255,7 +255,7 @@ impl<'tcx> LateLintPass<'tcx> for UnrestrictedTransferFrom {
                                 if utf_storage.pusharg_def_id.is_some_and(|id|id==*def) {
                                     for arg in args {
                                         if arg.place().map_or(false, |place|tainted_locals.iter().any(|l|l == &place.local)) {
-                                            span_lint(cx, UNRESTRICTED_TRANSFER_FROM, *fn_span, "This argument comes from a user-supplied argument");
+                                            Detector::UnrestrictedTransferFrom.span_lint(cx, UNRESTRICTED_TRANSFER_FROM, *fn_span);
                                         }
                                     }
                                 }

@@ -4,14 +4,15 @@
 extern crate rustc_hir;
 extern crate rustc_span;
 
-use clippy_utils::diagnostics::span_lint_and_help;
 use if_chain::if_chain;
+use rustc_hir::def_id::LocalDefId;
 use rustc_hir::intravisit::{walk_expr, FnKind};
 use rustc_hir::intravisit::{walk_stmt, Visitor};
-use rustc_hir::{Body, FnDecl, HirId, Stmt};
+use rustc_hir::{Body, FnDecl, Stmt};
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::Span;
+use scout_audit_internal::Detector;
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -75,12 +76,12 @@ dylint_linting::declare_late_lint! {
     ///     return caller_balance;
     /// }
     /// ```
-    pub REENTRANCY,
+    pub REENTRANCY_1,
     Warn,
-    "description goes here"
+    Detector::Reentrancy1.get_lint_message()
 }
 
-impl<'tcx> LateLintPass<'tcx> for Reentrancy {
+impl<'tcx> LateLintPass<'tcx> for Reentrancy1 {
     fn check_fn(
         &mut self,
         cx: &LateContext<'tcx>,
@@ -88,7 +89,7 @@ impl<'tcx> LateLintPass<'tcx> for Reentrancy {
         _: &'tcx FnDecl<'_>,
         body: &'tcx Body<'_>,
         _: Span,
-        _: HirId,
+        _: LocalDefId,
     ) {
         struct ReentrantStorage {
             span: Option<Span>,
@@ -197,13 +198,10 @@ impl<'tcx> LateLintPass<'tcx> for Reentrancy {
             && reentrant_storage.allow_reentrancy_flag
             && reentrant_storage.state_change
         {
-            span_lint_and_help(
+            Detector::Reentrancy1.span_lint_and_help(
                 cx,
-                REENTRANCY,
-                // body.value.span,
+                REENTRANCY_1,
                 reentrant_storage.span.unwrap(),
-                "External calls could open the opportunity for a malicious contract to execute any arbitrary code",
-                None,
                 "This statement seems to call another contract after the flag set_allow_reentry was enabled [todo: check state changes after this statement]",
             );
         }

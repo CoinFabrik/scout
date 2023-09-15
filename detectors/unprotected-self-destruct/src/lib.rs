@@ -6,7 +6,6 @@ extern crate rustc_hir;
 extern crate rustc_middle;
 extern crate rustc_span;
 
-use clippy_utils::diagnostics::span_lint;
 use rustc_hir::QPath;
 use rustc_hir::{
     intravisit::{walk_expr, Visitor},
@@ -20,11 +19,12 @@ use rustc_middle::mir::{
 use rustc_middle::ty::TyKind;
 use rustc_span::def_id::DefId;
 use rustc_span::Span;
+use scout_audit_internal::Detector;
 
 dylint_linting::impl_late_lint! {
     pub UNPROTECTED_SELF_DESTRUCT,
     Warn,
-    "Don't call terminate_contract without checking the caller authority",
+    Detector::UnprotectedSelfDestruct.get_lint_message(),
     UnprotectedSelfDestruct::default()
 }
 
@@ -129,11 +129,10 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
             if caller_and_terminate.callers.is_empty() {
                 for terminate in caller_and_terminate.terminates {
                     if let TerminatorKind::Call { fn_span, .. } = terminate.0.terminator().kind {
-                        span_lint(
+                        Detector::UnprotectedSelfDestruct.span_lint(
                             cx,
                             UNPROTECTED_SELF_DESTRUCT,
                             fn_span,
-                            "This terminate_contract is called without access control",
                         );
                     }
                 }
@@ -146,11 +145,10 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
                     &mut vec![],
                 );
                 for place in unchecked_places {
-                    span_lint(
+                    Detector::UnprotectedSelfDestruct.span_lint(
                         cx,
                         UNPROTECTED_SELF_DESTRUCT,
                         place.1,
-                        "This terminate_contract is called without access control",
                     );
                 }
             }

@@ -4,13 +4,13 @@ extern crate rustc_ast;
 extern crate rustc_hir;
 extern crate rustc_span;
 
-use clippy_utils::diagnostics::span_lint_and_help;
 use rustc_hir::{
     intravisit::{walk_expr, Visitor},
     Expr, ExprKind,
 };
 use rustc_lint::LateLintPass;
 use rustc_span::{Span, Symbol};
+use scout_audit_internal::Detector;
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -45,7 +45,7 @@ dylint_linting::declare_late_lint! {
     /// ```
     pub UNSAFE_EXPECT,
     Warn,
-    "Using the expression `expect` might panic if the result value is an error or `None`"
+    Detector::UnsafeExpect.get_lint_message()
 }
 
 impl<'tcx> LateLintPass<'tcx> for UnsafeExpect {
@@ -56,7 +56,7 @@ impl<'tcx> LateLintPass<'tcx> for UnsafeExpect {
         _: &'tcx rustc_hir::FnDecl<'tcx>,
         body: &'tcx rustc_hir::Body<'tcx>,
         _: rustc_span::Span,
-        _: rustc_hir::HirId,
+        _: rustc_hir::def_id::LocalDefId,
     ) {
         struct UnsafeExpectVisitor {
             has_expect: bool,
@@ -85,24 +85,14 @@ impl<'tcx> LateLintPass<'tcx> for UnsafeExpect {
         if visitor.has_expect {
             visitor.has_expect_span.iter().for_each(|span| {
                 if let Some(span) = span {
-                    span_lint_and_help(
+                    Detector::UnsafeExpect.span_lint_and_help(
                         cx,
                         UNSAFE_EXPECT,
                         *span,
-                        "Unsafe usage of `expect`",
-                        None,
                         "Please, use a custom error instead of `expect`",
                     );
                 }
             });
         }
     }
-}
-
-#[test]
-fn ui() {
-    dylint_testing::ui_test(
-        env!("CARGO_PKG_NAME"),
-        &std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("ui"),
-    );
 }

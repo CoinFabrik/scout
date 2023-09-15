@@ -6,8 +6,8 @@ extern crate rustc_span;
 
 use std::fs;
 
-use clippy_utils::diagnostics::span_lint_and_help;
 use rustc_lint::EarlyLintPass;
+use scout_audit_internal::Detector;
 use semver::*;
 
 dylint_linting::declare_early_lint! {
@@ -16,16 +16,14 @@ dylint_linting::declare_early_lint! {
     /// ### Why is this bad?
     /// Using an outdated version of ink! could lead to security vulnerabilities, bugs, and other issues.
     ///```
-
     pub CHECK_INK_VERSION,
     Warn,
-    "Use the latest version of ink!"
+    Detector::InkVersion.get_lint_message()
 }
 
 impl EarlyLintPass for CheckInkVersion {
     fn check_crate(&mut self, cx: &rustc_lint::EarlyContext<'_>, _: &rustc_ast::Crate) {
-        let latest_version =
-            get_version().expect("Failed to get latest version of ink! from crates.io");
+        let latest_version = get_version();
 
         let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
 
@@ -47,31 +45,28 @@ impl EarlyLintPass for CheckInkVersion {
         let ink_version = VersionReq::parse(&ink_version.replace('\"', "")).unwrap();
 
         if !ink_version.matches(&req) {
-            span_lint_and_help(
+            Detector::InkVersion.span_lint_and_help(
                 cx,
                 CHECK_INK_VERSION,
                 rustc_span::DUMMY_SP,
                 &format!("The latest ink! version is {latest_version}, and your version is {ink_version}"),
-                None,
-                &format!("Please, use version {latest_version} of ink! in your Cargo.toml"),
             );
         }
     }
 }
 
-fn get_version() -> Result<String, reqwest::Error> {
-    let client = reqwest::blocking::Client::builder()
-        .user_agent("Scout/1.0")
-        .build()?;
-    let resp: serde_json::Value = client
-        .get("https://crates.io/api/v1/crates/ink")
-        .send()?
-        .json()?;
+fn get_version() -> String {
+    let resp: serde_json::Value = ureq::get("https://crates.io/api/v1/crates/ink")
+        .set("User-Agent", "Scout/1.0")
+        .call()
+        .expect("Failed to get ink! version from crates.io")
+        .into_json()
+        .expect("Failed to parse ink! version from crates.io");
     let version = resp
         .get("crate")
         .unwrap()
-        .get("max_version")
+        .get("max_stable_version")
         .unwrap()
         .to_string();
-    Ok(version)
+    version
 }

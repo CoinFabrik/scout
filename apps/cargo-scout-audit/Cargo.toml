@@ -1,6 +1,6 @@
 [package]
 name = "cargo-scout-audit"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 authors = [
     "Agustin Aon <agustin.aon@coinfabrik.com>",
@@ -19,21 +19,29 @@ readme = "../../README.md"
 keywords = ["auditor", "rust", "security", "ink", "smart-contracts"]
 categories = ["development-tools", "command-line-utilities"]
 
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+path = "src/main.rs"
+name = "cargo-scout-audit"
+
 [dependencies]
 ansi_term = "0.12.1"
 anyhow = "1"
 cargo = "0.72.2"
 cargo_metadata = "0.17"
 clap = { version = "4.3.0", features = ["derive"] }
-dylint = { git = "https://github.com/CoinFabrik/dylint-scout"}
+dylint = { version = "2.3.0"}
 env_logger = "0.10"
-glob = { version = "0.3" }
+home = { version = "0.5.5" }
 itertools = "0.11"
 log = "0.4"
 tempfile = "3.8"
 regex = { version = "1.5", features = ["unicode"] }
 serde_json = "1.0"
 
+scout-audit-internal = { version = "=0.2.0", path = "../../scout-audit-internal", features = ["detector"] }
 
 [dev-dependencies]
 colored = "2.0.0"

@@ -8,7 +8,6 @@ extern crate rustc_span;
 
 use std::collections::HashSet;
 
-use clippy_utils::diagnostics::span_lint_and_help;
 use if_chain::if_chain;
 use rustc_ast::LitKind;
 use rustc_hir::def::Res;
@@ -20,6 +19,7 @@ use rustc_lint::{LateContext, LateLintPass};
 use rustc_middle::ty::TyCtxt;
 use rustc_span::def_id::LocalDefId;
 use rustc_span::Span;
+use scout_audit_internal::Detector;
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -51,7 +51,7 @@ dylint_linting::declare_late_lint! {
     /// ```
     pub ZERO_OR_TEST_ADDRESS,
     Warn,
-    "Check if AccountId parameters are compared with a zero address"
+    Detector::ZeroOrTestAddress.get_lint_message()
 }
 
 impl<'tcx> LateLintPass<'tcx> for ZeroOrTestAddress {
@@ -181,23 +181,13 @@ impl<'tcx> LateLintPass<'tcx> for ZeroOrTestAddress {
 
         for param in zerocheck_storage.acc_id_params {
             if !zerocheck_storage.checked_params.contains(&param.hir_id) {
-                span_lint_and_help(
+                Detector::ZeroOrTestAddress.span_lint_and_help(
                     cx,
                     ZERO_OR_TEST_ADDRESS,
                     param.span,
-                    "Not checking for a zero-address could lead to a locked contract",
-                    None,
                     "This function should check if the AccountId passed is zero and revert if it is",
                 );
             }
         }
     }
-}
-
-#[test]
-fn ui() {
-    dylint_testing::ui_test(
-        env!("CARGO_PKG_NAME"),
-        &std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("ui"),
-    );
 }
