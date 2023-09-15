@@ -85,7 +85,7 @@ impl<'a> DetectorBuilder<'a> {
         };
         let path = dunce::canonicalize(&path)
             .with_context(|| format!("Could not canonicalize {path:?}"))?;
-        let dependency_root = dunce::canonicalize(&dependency_root)
+        let dependency_root = dunce::canonicalize(dependency_root)
             .with_context(|| format!("Could not canonicalize {dependency_root:?}"))?;
         ensure!(
             path.starts_with(&dependency_root),
