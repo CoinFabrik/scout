@@ -4,7 +4,6 @@
 extern crate rustc_hir;
 extern crate rustc_span;
 
-use clippy_utils::diagnostics::span_lint_and_help;
 use if_chain::if_chain;
 use rustc_hir::def_id::LocalDefId;
 use rustc_hir::intravisit::Visitor;
@@ -137,13 +136,11 @@ impl<'tcx> LateLintPass<'tcx> for SetStorageWarn {
         walk_expr(&mut reentrant_storage, body.value);
 
         if reentrant_storage.has_set_contract && reentrant_storage.unprotected {
-            span_lint_and_help(
+            Detector::SetContractStorage.span_lint_and_help(
                 cx,
                 SET_STORAGE_WARN,
                 // body.value.span,
                 reentrant_storage.span.unwrap(),
-                Detector::SetContractStorage.get_lint_message(),
-                None,
                 "Set access control and proper authorization validation for the set_contract_storage() function",
             );
         }

@@ -4,7 +4,6 @@
 extern crate rustc_hir;
 extern crate rustc_span;
 
-use clippy_utils::diagnostics::span_lint_and_help;
 use if_chain::if_chain;
 use rustc_hir::def::Res;
 use rustc_hir::def_id::LocalDefId;
@@ -148,12 +147,10 @@ impl<'tcx> LateLintPass<'tcx> for DelegateCall {
         walk_expr(&mut delegate_storage, body.value);
 
         if delegate_storage.has_vulnerable_delegate {
-            span_lint_and_help(
+            Detector::DelegateCall.span_lint_and_help(
                 cx,
                 DELEGATE_CALL,
                 delegate_storage.span.unwrap(),
-                Detector::DelegateCall.get_lint_message(),
-                None,
                 "Consider using a memory value (self.target) as the target of the delegate call.",
             );
         }

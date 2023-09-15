@@ -22,6 +22,7 @@ pub struct Detectors {
     cargo_config: Config,
     detectors_configs: DetectorsConfigurationList,
     metadata: Metadata,
+    verbose: bool,
 }
 
 impl Detectors {
@@ -30,11 +31,13 @@ impl Detectors {
         cargo_config: Config,
         detectors_configs: DetectorsConfigurationList,
         metadata: Metadata,
+        verbose: bool,
     ) -> Self {
         Self {
             cargo_config,
             detectors_configs,
             metadata,
+            verbose,
         }
     }
 
@@ -61,6 +64,7 @@ impl Detectors {
                     &self.cargo_config,
                     detectors_config.clone(),
                     self.metadata.clone(),
+                    self.verbose,
                 );
                 builder.get_detector_names()
             })
@@ -75,8 +79,12 @@ impl Detectors {
         detectors_config: DetectorConfiguration,
         used_detectors: Vec<String>,
     ) -> Result<Vec<PathBuf>> {
-        let builder =
-            DetectorBuilder::new(&self.cargo_config, detectors_config, self.metadata.clone());
+        let builder = DetectorBuilder::new(
+            &self.cargo_config,
+            detectors_config,
+            self.metadata.clone(),
+            self.verbose,
+        );
         builder.build(used_detectors)
     }
 }
