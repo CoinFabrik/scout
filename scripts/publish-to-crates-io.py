@@ -1,4 +1,5 @@
 from pathlib import Path
+import shutil
 import subprocess
 import tempfile
 import time
@@ -17,9 +18,11 @@ def get_package_version(file_path):
                 return line.split("=")[1].strip().strip('"')
     raise Exception("Could not find package version in Cargo.toml")
 
-def is_package_published(package_name, package_version):
+def is_package_published(package_name, package_version, package_path):
     with tempfile.TemporaryDirectory() as tmpdirname:
         subprocess.call(["cargo", "init"], cwd=tmpdirname)
+        if (package_path / "rust-toolchain").exists():
+            shutil.copy(package_path / "rust-toolchain", Path(tmpdirname) / "rust-toolchain")
         with open(Path(tmpdirname) / "Cargo.toml", "a") as f:
             f.write(f'{package_name} = "{package_version}"')
         print(f"Checking if {package_name} {package_version} is published...")
@@ -47,7 +50,7 @@ if __name__ == "__main__":
         package_version = get_package_version(path / "Cargo.toml")
         print(f"Publishing {package_name} {package_version}...")
 
-        if not is_package_published(package_name, package_version):
+        if not is_package_published(package_name, package_version, path):
             publish_package(path)
             while not is_package_published(package_name, package_version):
                 print(f"{package_name} {package_version} is not published yet, waiting 10 seconds...")
