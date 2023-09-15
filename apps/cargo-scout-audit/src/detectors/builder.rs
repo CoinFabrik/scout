@@ -83,11 +83,9 @@ impl<'a> DetectorBuilder<'a> {
             Some(path) => dependency_root.join(path),
             None => dependency_root.clone(),
         };
-        let path = path
-            .canonicalize()
+        let path = dunce::canonicalize(&path)
             .with_context(|| format!("Could not canonicalize {path:?}"))?;
-        let dependency_root = dependency_root
-            .canonicalize()
+        let dependency_root = dunce::canonicalize(&dependency_root)
             .with_context(|| format!("Could not canonicalize {dependency_root:?}"))?;
         ensure!(
             path.starts_with(&dependency_root),
@@ -144,9 +142,11 @@ impl<'a> DetectorBuilder<'a> {
 
         for path in detector_paths {
             let detector_name = path.file_name().unwrap().to_str().unwrap().to_string();
-            let detector_name = detector_name.split("lib").collect::<Vec<_>>()[1]
-                .split('@')
-                .collect::<Vec<_>>()[0]
+
+            #[cfg(windows)]
+            let detector_name = detector_name.split("lib").collect::<Vec<_>>()[1];
+
+            let detector_name = detector_name.split('@').collect::<Vec<_>>()[0]
                 .to_string()
                 .replace('_', "-");
             if used_detectors.contains(&detector_name) {
