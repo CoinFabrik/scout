@@ -4,7 +4,6 @@ extern crate rustc_hir;
 extern crate rustc_span;
 
 use clippy_utils::consts::constant_simple;
-use clippy_utils::diagnostics::span_lint_and_help;
 use clippy_utils::is_integer_literal;
 use rustc_hir::{self as hir, Body, Expr, ExprKind, UnOp};
 use rustc_lint::LateContext;
@@ -131,36 +130,30 @@ impl ArithmeticContext {
                     hir::ExprKind::Lit(_lit) => (),
                     hir::ExprKind::Unary(hir::UnOp::Neg, expr) => {
                         if is_integer_literal(expr, 1) {
-                            span_lint_and_help(
+                            Detector::IntegerOverflowOrUnderflow.span_lint_and_help(
                                 cx,
                                 INTEGER_OVERFLOW_UNDERFLOW,
                                 expr.span,
-                                Detector::IntegerOverflowOrUnderflow.get_lint_message(),
-                                None,
                                 "Potential for integer arithmetic overflow/underflow in unary operation with negative expression. Consider checked, wrapping or saturating arithmetic.",
                             );
                             self.expr_id = Some(expr.hir_id);
                         }
                     }
                     _ => {
-                        span_lint_and_help(
+                        Detector::IntegerOverflowOrUnderflow.span_lint_and_help(
                             cx,
                             INTEGER_OVERFLOW_UNDERFLOW,
                             expr.span,
-                            Detector::IntegerOverflowOrUnderflow.get_lint_message(),
-                            None,
                             &format!("Potential for integer arithmetic overflow/underflow in operation '{}'. Consider checked, wrapping or saturating arithmetic.", op.as_str()),
                         );
                         self.expr_id = Some(expr.hir_id);
                     }
                 },
                 _ => {
-                    span_lint_and_help(
+                    Detector::IntegerOverflowOrUnderflow.span_lint_and_help(
                         cx,
                         INTEGER_OVERFLOW_UNDERFLOW,
                         expr.span,
-                        Detector::IntegerOverflowOrUnderflow.get_lint_message(),
-                        None,
                         &format!("Potential for integer arithmetic overflow/underflow in operation '{}'. Consider checked, wrapping or saturating arithmetic.", op.as_str()),
                     );
                     self.expr_id = Some(expr.hir_id);
@@ -180,12 +173,10 @@ impl ArithmeticContext {
         }
         let ty = cx.typeck_results().expr_ty(arg);
         if constant_simple(cx, cx.typeck_results(), expr).is_none() && ty.is_integral() {
-            span_lint_and_help(
+            Detector::IntegerOverflowOrUnderflow.span_lint_and_help(
                 cx,
                 INTEGER_OVERFLOW_UNDERFLOW,
                 expr.span,
-                Detector::IntegerOverflowOrUnderflow.get_lint_message(),
-                None,
                 "Potential for integer arithmetic overflow/underflow. Consider checked, wrapping or saturating arithmetic.",
             );
             self.expr_id = Some(expr.hir_id);

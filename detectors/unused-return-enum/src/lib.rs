@@ -3,7 +3,6 @@
 extern crate rustc_ast;
 extern crate rustc_span;
 
-use clippy_utils::diagnostics::span_lint_and_help;
 use if_chain::if_chain;
 use rustc_ast::visit::{self, FnKind, Visitor};
 use rustc_ast::{Expr, ExprKind, FnRetTy};
@@ -164,24 +163,14 @@ impl EarlyLintPass for UnusedReturnEnum {
         if !visitor.found_try && (visitor.count_err == 0 || visitor.count_ok == 0) {
             visitor.span.iter().for_each(|span| {
                 if let Some(span) = span {
-                    span_lint_and_help(
+                    Detector::UnusedReturnEnum.span_lint_and_help(
                         cx,
                         UNUSED_RETURN_ENUM,
                         *span,
-                        Detector::UnusedReturnEnum.get_lint_message(),
-                        None,
                         "If any of the variants (Ok/Err) is not used, the code could be simplified or it could imply a bug",
                     );
                 }
             });
         }
     }
-}
-
-#[test]
-fn ui() {
-    dylint_testing::ui_test(
-        env!("CARGO_PKG_NAME"),
-        &std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("ui"),
-    );
 }

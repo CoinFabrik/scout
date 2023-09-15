@@ -36,4 +36,5 @@ node_modules
 
 # Editors
 .vscode/
+.idea/
 !/.vscode/

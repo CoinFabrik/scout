@@ -13,8 +13,10 @@ def get_recursive_package_names(root_path):
                 lines = f.readlines()
                 found_package_name = False
                 for line in lines:
+                    if line.strip() == "[workspace]":
+                        found_package_name = True
+                        break
                     if "name =" in line:
-                        # Extract the package name
                         package_name = line.split("=")[1].strip().replace('"', "")
                         results.append((file_path, package_name))
                         found_package_name = True

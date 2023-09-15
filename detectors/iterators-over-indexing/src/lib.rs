@@ -4,7 +4,6 @@ extern crate rustc_hir;
 extern crate rustc_ast;
 extern crate rustc_span;
 
-use clippy_utils::diagnostics::span_lint_and_help;
 use rustc_ast::LitKind;
 use rustc_hir::{intravisit::{walk_expr, FnKind, Visitor}, ExprKind, MatchSource, QPath, LangItem, Expr, LoopSource, StmtKind, PatKind, HirId, def::Res};
 use rustc_lint::LateLintPass;
@@ -109,12 +108,10 @@ impl<'tcx> LateLintPass<'tcx> for IteratorOverIndexing {
             walk_expr(&mut visitor, body.value);
 
             for span in visitor.span_constant {
-                span_lint_and_help(
+                Detector::IteratorsOverIndexing.span_lint_and_help(
                     cx,
                     ITERATOR_OVER_INDEXING,
                     span,
-                    Detector::IteratorsOverIndexing.get_lint_message(),
-                    None,
                     "Instead, use an iterator or index to `.len()`.",
                 );
             }
