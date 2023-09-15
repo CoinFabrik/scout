@@ -22,14 +22,14 @@ def is_package_published(package_name, package_version):
         subprocess.call(["cargo", "init"], cwd=tmpdirname)
         with open(Path(tmpdirname) / "Cargo.toml", "a") as f:
             f.write(f'{package_name} = "{package_version}"')
-            print(f"Checking if {package_name} {package_version} is published...")
-            try:
-                subprocess.check_output(["cargo", "check"], cwd=tmpdirname)
-                return True
-            except subprocess.CalledProcessError:
-                return False
-            except:
-                raise
+        print(f"Checking if {package_name} {package_version} is published...")
+        try:
+            subprocess.check_output(["cargo", "check"], cwd=tmpdirname)
+            return True
+        except subprocess.CalledProcessError:
+            return False
+        except:
+            raise
 
 def publish_package(package_path):
     subprocess.call(["cargo", "publish"], cwd=package_path)
