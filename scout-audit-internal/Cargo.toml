@@ -15,7 +15,7 @@ license = "MIT"
 description = "Scout is an extensible open-source tool intended to assist ink! smart contract developers and auditors detect common security issues and deviations from best practices."
 homepage = "https://coinfabrik.github.io/scout"
 repository = "https://github.com/CoinFabrik/scout"
-readme = "../../README.md"
+readme = "../README.md"
 keywords = ["auditor", "rust", "security", "ink", "smart-contracts"]
 categories = ["development-tools", "command-line-utilities"]
 
