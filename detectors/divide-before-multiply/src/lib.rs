@@ -13,7 +13,10 @@ use rustc_hir::intravisit::Visitor;
 use rustc_hir::BinOpKind;
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
-use rustc_middle::mir::{BasicBlock, BasicBlocks, Place, TerminatorKind, Rvalue, StatementKind, BasicBlockData, BinOp, ConstantKind, Operand};
+use rustc_middle::mir::{
+    BasicBlock, BasicBlockData, BasicBlocks, BinOp, ConstantKind, Operand, Place, Rvalue,
+    StatementKind, TerminatorKind,
+};
 use rustc_middle::ty::TyKind;
 use rustc_span::def_id::DefId;
 use rustc_span::Span;
@@ -88,24 +91,27 @@ impl Visitor<'_> for DefIdFinder<'_, '_> {
             match path.ident.name.as_str() {
                 "checked_div" => {
                     self.checked_div = defid;
-                },
+                }
                 "checked_mul" => {
                     self.checked_mul = defid;
-                },
+                }
                 "saturating_mul" => {
                     self.saturating_mul = defid;
-                },
+                }
                 "saturating_div" => {
                     self.saturating_div = defid;
-                },
-                _=>{}
-                
+                }
+                _ => {}
             }
         }
         walk_expr(self, expr);
     }
 }
-fn check_operand<'tcx>(operand: &Operand, tainted_places: &mut Vec<Place<'tcx>>, place_to_taint: &Place<'tcx>) -> bool{
+fn check_operand<'tcx>(
+    operand: &Operand,
+    tainted_places: &mut Vec<Place<'tcx>>,
+    place_to_taint: &Place<'tcx>,
+) -> bool {
     match &operand {
         Operand::Copy(origplace) | Operand::Move(origplace) => {
             if tainted_places
@@ -119,7 +125,7 @@ fn check_operand<'tcx>(operand: &Operand, tainted_places: &mut Vec<Place<'tcx>>,
                 false
             }
         }
-        _ => { false }
+        _ => false,
     }
 }
 fn navigate_trough_basicblocks<'tcx>(
@@ -128,7 +134,7 @@ fn navigate_trough_basicblocks<'tcx>(
     def_ids: &DefIdFinder,
     tainted_places: &mut Vec<Place<'tcx>>,
     visited_bbs: &mut HashSet<BasicBlock>,
-    spans: &mut Vec<Span>
+    spans: &mut Vec<Span>,
 ) {
     let bbdata: &BasicBlockData<'tcx> = &bbs[bb];
 
@@ -149,14 +155,14 @@ fn navigate_trough_basicblocks<'tcx>(
                 }
                 Rvalue::Use(operand) => {
                     check_operand(operand, tainted_places, &assign.0);
-                },
+                }
                 Rvalue::BinaryOp(op, operands) => {
                     if BinOp::Div == *op {
                         tainted_places.push(assign.0);
                     } else if BinOp::Mul == *op {
-                        if check_operand(&operands.0, tainted_places, &assign.0) ||
-                            check_operand(&operands.1, tainted_places, &assign.0) {
-
+                        if check_operand(&operands.0, tainted_places, &assign.0)
+                            || check_operand(&operands.1, tainted_places, &assign.0)
+                        {
                             spans.push(statement.source_info.span);
                         }
                     };
@@ -177,7 +183,7 @@ fn navigate_trough_basicblocks<'tcx>(
                 ..
             } => {
                 if let Operand::Constant(cst) = func &&
-                    let ConstantKind::Val(_, ty) = cst.literal && 
+                    let ConstantKind::Val(_, ty) = cst.literal &&
                     let TyKind::FnDef(id, _) = ty.kind() {
                     if def_ids.checked_div.is_some_and(|f|f == *id) ||
                         def_ids.saturating_div.is_some_and(|f|f == *id) {
@@ -186,10 +192,10 @@ fn navigate_trough_basicblocks<'tcx>(
                         for arg in args {
                             match arg {
                                 Operand::Copy(place) | Operand::Move(place) => {
-                                    if tainted_places.contains(place) { 
+                                    if tainted_places.contains(place) {
                                         tainted_places.push(*destination);
 
-                                        if def_ids.checked_mul.is_some_and(|f|f == *id) || 
+                                        if def_ids.checked_mul.is_some_and(|f|f == *id) ||
                                         def_ids.saturating_mul.is_some_and(|f|f == *id) {
                                             spans.push(*fn_span);
                                         }
@@ -199,58 +205,111 @@ fn navigate_trough_basicblocks<'tcx>(
                                 _ => {},
                             }
                         }
-                    } 
+                    }
                 }
                 if let Option::Some(next_bb) = target {
-                    navigate_trough_basicblocks(*next_bb, bbs, def_ids, tainted_places, visited_bbs, spans);
+                    navigate_trough_basicblocks(
+                        *next_bb,
+                        bbs,
+                        def_ids,
+                        tainted_places,
+                        visited_bbs,
+                        spans,
+                    );
                 }
             }
             TerminatorKind::SwitchInt { targets, .. } => {
                 for target in targets.all_targets() {
-                    navigate_trough_basicblocks(*target, bbs, def_ids, tainted_places, visited_bbs, spans);
+                    navigate_trough_basicblocks(
+                        *target,
+                        bbs,
+                        def_ids,
+                        tainted_places,
+                        visited_bbs,
+                        spans,
+                    );
                 }
-            },
-            TerminatorKind::Goto { target } |
-            TerminatorKind::Drop { target, .. } |
-            TerminatorKind::Assert { target, ..} => {
-                navigate_trough_basicblocks(*target, bbs, def_ids, tainted_places, visited_bbs, spans);
-            },
-            TerminatorKind::Yield {
-                resume,
-                drop,
-                ..
-            } => {
-                navigate_trough_basicblocks(*resume, bbs, def_ids, tainted_places, visited_bbs, spans);
+            }
+            TerminatorKind::Goto { target }
+            | TerminatorKind::Drop { target, .. }
+            | TerminatorKind::Assert { target, .. } => {
+                navigate_trough_basicblocks(
+                    *target,
+                    bbs,
+                    def_ids,
+                    tainted_places,
+                    visited_bbs,
+                    spans,
+                );
+            }
+            TerminatorKind::Yield { resume, drop, .. } => {
+                navigate_trough_basicblocks(
+                    *resume,
+                    bbs,
+                    def_ids,
+                    tainted_places,
+                    visited_bbs,
+                    spans,
+                );
                 if let Option::Some(drop_target) = drop {
-                    navigate_trough_basicblocks(*drop_target, bbs, def_ids, tainted_places, visited_bbs, spans);
+                    navigate_trough_basicblocks(
+                        *drop_target,
+                        bbs,
+                        def_ids,
+                        tainted_places,
+                        visited_bbs,
+                        spans,
+                    );
                 }
-            },
+            }
             TerminatorKind::FalseEdge {
                 real_target,
                 imaginary_target,
             } => {
-                navigate_trough_basicblocks(*real_target, bbs, def_ids, tainted_places, visited_bbs, spans);
-                navigate_trough_basicblocks(*imaginary_target, bbs, def_ids, tainted_places, visited_bbs, spans);
-            },
-            TerminatorKind::FalseUnwind {
-                real_target,
-                ..
-            } => {
-                navigate_trough_basicblocks(*real_target, bbs, def_ids, tainted_places, visited_bbs, spans);
-            },
-            TerminatorKind::InlineAsm {
-                destination,
-                ..
-            } => {
+                navigate_trough_basicblocks(
+                    *real_target,
+                    bbs,
+                    def_ids,
+                    tainted_places,
+                    visited_bbs,
+                    spans,
+                );
+                navigate_trough_basicblocks(
+                    *imaginary_target,
+                    bbs,
+                    def_ids,
+                    tainted_places,
+                    visited_bbs,
+                    spans,
+                );
+            }
+            TerminatorKind::FalseUnwind { real_target, .. } => {
+                navigate_trough_basicblocks(
+                    *real_target,
+                    bbs,
+                    def_ids,
+                    tainted_places,
+                    visited_bbs,
+                    spans,
+                );
+            }
+            TerminatorKind::InlineAsm { destination, .. } => {
                 if let Option::Some(dest) = destination {
-                    navigate_trough_basicblocks(*dest, bbs, def_ids, tainted_places, visited_bbs, spans);
+                    navigate_trough_basicblocks(
+                        *dest,
+                        bbs,
+                        def_ids,
+                        tainted_places,
+                        visited_bbs,
+                        spans,
+                    );
                 }
-            },
-            TerminatorKind::GeneratorDrop |
-            TerminatorKind::Resume |
-            TerminatorKind::Terminate |
-            TerminatorKind::Return |
-            TerminatorKind::Unreachable => {}
+            }
+            TerminatorKind::GeneratorDrop
+            | TerminatorKind::Resume
+            | TerminatorKind::Terminate
+            | TerminatorKind::Return
+            | TerminatorKind::Unreachable => {}
         }
     }
 }
@@ -287,7 +346,7 @@ impl<'tcx> LateLintPass<'tcx> for DivideBeforeMultiply {
                 &visitor,
                 &mut vec![],
                 &mut HashSet::<BasicBlock>::default(),
-                &mut spans
+                &mut spans,
             );
 
             for span in spans {
