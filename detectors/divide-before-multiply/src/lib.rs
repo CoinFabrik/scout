@@ -136,7 +136,7 @@ fn navigate_trough_basicblocks<'tcx>(
     visited_bbs: &mut HashSet<BasicBlock>,
     spans: &mut Vec<Span>,
 ) {
-    if visited_bbs.contains(&bb){
+    if visited_bbs.contains(&bb) {
         return;
     }
     visited_bbs.insert(bb);
@@ -163,7 +163,10 @@ fn navigate_trough_basicblocks<'tcx>(
                 Rvalue::BinaryOp(op, operands) => {
                     if BinOp::Div == *op {
                         tainted_places.push(assign.0);
-                    } else if BinOp::Mul == *op && (check_operand(&operands.0, tainted_places, &assign.0) || check_operand(&operands.1, tainted_places, &assign.0)) {
+                    } else if BinOp::Mul == *op
+                        && (check_operand(&operands.0, tainted_places, &assign.0)
+                            || check_operand(&operands.1, tainted_places, &assign.0))
+                    {
                         spans.push(statement.source_info.span);
                     };
                 }
