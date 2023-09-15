@@ -147,4 +147,5 @@ jobs:
         working-directory: apps/cargo-scout-audit
         env:
           INTEGRATION_TESTS_TO_RUN: ${{ matrix.test }}
+          CARGO_NET_GIT_FETCH_WITH_CLI: true
         run: cargo test -- --nocapture
