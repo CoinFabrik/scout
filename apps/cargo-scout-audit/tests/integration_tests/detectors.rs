@@ -111,7 +111,7 @@ fn execute_and_validate_testcase(
     let scout_config = Scout {
         output_format: OutputFormat::Text,
         output_path: Some(PathBuf::from(tempfile.path())),
-        local_detectors: Some(PathBuf::from(get_detectors_path())),
+        local_detectors: Some(get_detectors_path()),
         manifest_path: Some(PathBuf::from(path.to_string())),
         filter: Some(detector_name.to_string()),
         verbose: true,
@@ -145,10 +145,8 @@ fn execute_and_validate_testcase(
     );
 }
 
-fn get_detectors_path() -> String {
+fn get_detectors_path() -> PathBuf {
     utils::get_repository_root_path()
         .expect("Failed to get detectors path")
         .join("detectors")
-        .to_string_lossy()
-        .to_string()
 }
