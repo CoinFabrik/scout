@@ -8,13 +8,13 @@ use regex::RegexBuilder;
 use scout_audit_internal::{Detector, IntoEnumIterator};
 use serde_json::{json, Value};
 
-pub fn format_into_json(scout_output: File) -> anyhow::Result<String> {
-    let json_errors = jsonify(scout_output)?;
+pub fn format_into_json(scout_output: File, internals: File) -> anyhow::Result<String> {
+    let json_errors = jsonify(scout_output, internals)?;
     Ok(serde_json::to_string_pretty(&json_errors)?)
 }
 
-fn jsonify(scout_output: File) -> anyhow::Result<serde_json::Value> {
-    let json_errors: serde_json::Value = get_errors_from_output(scout_output, None)?
+fn jsonify(scout_output: File, internals: File) -> anyhow::Result<serde_json::Value> {
+    let json_errors: serde_json::Value = get_errors_from_output(scout_output, internals)?
         .iter()
         .filter(|(_, (spans, _))| !spans.is_empty())
         .map(|(name, (spans, error))| {
@@ -33,7 +33,7 @@ fn jsonify(scout_output: File) -> anyhow::Result<serde_json::Value> {
 
 fn get_errors_from_output(
     mut scout_output: File,
-    scout_internals: Option<File>,
+    mut scout_internals: File,
 ) -> anyhow::Result<HashMap<String, (Vec<String>, String)>> {
     let regex = RegexBuilder::new(r"warning:.*")
         .multi_line(true)
@@ -43,19 +43,12 @@ fn get_errors_from_output(
     let mut stderr_string = String::new();
     std::io::Read::read_to_string(&mut scout_output, &mut stderr_string)?;
 
-    for line in std::io::BufReader::new(&mut scout_output).lines() {
-        let line = line?;
-        println!("{}", line)
-    }
-
     let mut scout_internals_spans: Vec<String> = vec![];
 
-    if let Some(mut scout_internals) = scout_internals {
-        for line in std::io::BufReader::new(&mut scout_internals).lines() {
-            let line = line?;
-            let span = line.split('@').collect::<Vec<&str>>()[1];
-            scout_internals_spans.push(span.to_string());
-        }
+    for line in std::io::BufReader::new(&mut scout_internals).lines() {
+        let line = line?;
+        let span = line.split('@').collect::<Vec<&str>>()[1];
+        scout_internals_spans.push(span.to_string());
     }
 
     let msg_to_name: HashMap<String, String> = Detector::iter()
@@ -85,8 +78,8 @@ fn get_errors_from_output(
     Ok(errors)
 }
 
-pub fn format_into_html(scout_output: File) -> anyhow::Result<String> {
-    let json = jsonify(scout_output)?;
+pub fn format_into_html(scout_output: File, internals: File) -> anyhow::Result<String> {
+    let json = jsonify(scout_output, internals)?;
     let mut html = String::new();
     html.push_str(
         r#"
@@ -144,7 +137,7 @@ pub fn format_into_html(scout_output: File) -> anyhow::Result<String> {
 
 fn serify(scout_output: File, scout_internals: File) -> anyhow::Result<serde_json::Value> {
     let errors: HashMap<String, (Vec<String>, String)> =
-        get_errors_from_output(scout_output, Some(scout_internals))?;
+        get_errors_from_output(scout_output, scout_internals)?;
 
     let sarif_output = json!({
         "$schema": "https://json.schemastore.org/sarif-2.1.0",

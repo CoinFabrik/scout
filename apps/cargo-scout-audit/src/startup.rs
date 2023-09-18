@@ -203,14 +203,20 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> Result<()> {
                 Some(path) => fs::File::create(path)?,
                 None => fs::File::create("report.json")?,
             };
-            std::io::Write::write_all(&mut json_file, format_into_json(stderr_file)?.as_bytes())?;
+            std::io::Write::write_all(
+                &mut json_file,
+                format_into_json(stderr_file, stdout_file)?.as_bytes(),
+            )?;
         }
         OutputFormat::Html => {
             let mut html_file = match &opts.output_path {
                 Some(path) => fs::File::create(path)?,
                 None => fs::File::create("report.html")?,
             };
-            std::io::Write::write_all(&mut html_file, format_into_html(stderr_file)?.as_bytes())?;
+            std::io::Write::write_all(
+                &mut html_file,
+                format_into_html(stderr_file, stdout_file)?.as_bytes(),
+            )?;
         }
         OutputFormat::Text => {
             // If the output path is not set, dylint prints the report to stdout
