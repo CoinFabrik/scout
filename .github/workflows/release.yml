@@ -15,24 +15,24 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Login to crates.io
-        run: echo ${{ secrets.CRATES_TOKEN }} | cargo login
+      #- name: Login to crates.io
+      #  run: echo ${{ secrets.CRATES_TOKEN }} | cargo login
 
-      - name: Publish to crates.io
-        run: python scripts/publish-to-crates-io.py
+      #- name: Publish to crates.io
+      #  run: python scripts/publish-to-crates-io.py
 
-      - name: Create release notes
-        run: sed -n '/^## ${{ github.ref_name }}/,/^## v/{/^## ${{ github.ref_name }}/p; /^## v/!p;}' CHANGELOG.md | awk 'NF {print $0}' | tee body.md
+      #- name: Create release notes
+      #  run: sed -n '/^## ${{ github.ref_name }}/,/^## v/{/^## ${{ github.ref_name }}/p; /^## v/!p;}' CHANGELOG.md | awk 'NF {print $0}' | tee body.md
 
-      - name: Create release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ github.ref }}
-          name: ${{ github.ref_name }}
-          body_path: body.md
-          draft: false
-          prerelease: ${{ contains(github.ref, 'pre') || contains(github.ref, 'rc') }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+      #- name: Create release
+      #  uses: softprops/action-gh-release@v1
+      #  with:
+      #    tag_name: ${{ github.ref }}
+      #    name: ${{ github.ref_name }}
+      #    body_path: body.md
+      #    draft: false
+      #    prerelease: ${{ contains(github.ref, 'pre') || contains(github.ref, 'rc') }}
+      #    token: ${{ secrets.GITHUB_TOKEN }}
 
   upload-binaries:
     strategy:
