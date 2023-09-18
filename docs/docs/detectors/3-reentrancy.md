@@ -72,4 +72,4 @@ if amount <= caller_balance {
 
 ### Implementation
 
-The detector's implementation can be found at [this link](https://github.com/CoinFabrik/scout/tree/main/detectors/reentrancy).
+The detector's implementation can be found at these links [link1](https://github.com/CoinFabrik/scout/tree/main/detectors/reentrancy-1), [link2](https://github.com/CoinFabrik/scout/tree/main/detectors/reentrancy-2).
