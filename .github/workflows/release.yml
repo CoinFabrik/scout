@@ -58,7 +58,7 @@ jobs:
       - name: Build and publish
         uses: taiki-e/upload-rust-binary-action@v1
         with:
-          toolchain: ${{ matrix.t }}
+          target: ${{ matrix.t }}
           manifest_path: apps/cargo-scout-audit/Cargo.toml
           bin: cargo-scout-audit
           archive: cargo-scout-audit-${{ github.ref_name }}-${{ matrix.t }}-${{ matrix.o }}

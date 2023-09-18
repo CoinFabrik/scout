@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.2.1 (2023-09-18)
+
+- Fixed HTML and JSON output panic.
+
 ## v0.2.0 (2023-09-15)
 
 - Added flags:
