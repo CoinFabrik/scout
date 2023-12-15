@@ -41,6 +41,7 @@ For more information on installation and usage, please refer to the [Getting Sta
 - [Vulnerabilities](https://coinfabrik.github.io/scout/docs/vulnerabilities)
 - [Detectors](https://coinfabrik.github.io/scout/docs/detectors)
 - [Contribute](https://coinfabrik.github.io/scout/docs/contribute)
+- [Architecture](https://coinfabrik.github.io/scout/docs/architecture)
 - [Blog](https://blog.coinfabrik.com/)
 
 Visit [Scout's website](https://coinfabrik.github.io/scout/) to view the full documentation.
