@@ -18,7 +18,7 @@ If the owner validation is performed in an auxiliary function, the warning will 
 if self.votes.contains(candidate) {
     Err(Errors::CandidateAlreadyAdded)
 } else {
-    self.candidates.push(candidate);
+    self.candidates.push(candidate); // Where candidates: Vec<AccountId>
     self.votes.insert(candidate, &0);
     Ok(())
 }
@@ -30,7 +30,7 @@ Use instead:
 if self.votes.contains(candidate) {
     Err(Errors::CandidateAlreadyAdded)
 } else {
-    self.candidates.insert(self.total_candidates, &candidate);
+    self.candidates.insert(self.total_candidates, &candidate); // Where candidates: Mapping<u64, AccountId>
     self.total_candidates += 1;
     self.votes.insert(candidate, &0);
     Ok(())
