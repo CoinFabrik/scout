@@ -62,8 +62,10 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
 
                     let mapping_type = self.cx.typeck_results().expr_ty_adjusted(receiver);
 
-                    if mapping_type.to_string().contains("ink::storage::Mapping<ink::ink_primitives::AccountId") {
-
+                    if mapping_type
+                        .to_string()
+                        .contains("ink::storage::Mapping<ink::ink_primitives::AccountId")
+                    {
                         if path.ident.name.to_string() == "insert" {
                             self.insert_def_id = defid;
                         } else if path.ident.name.to_string() == "remove" {
@@ -71,14 +73,17 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
                         } else if path.ident.name.to_string() == "take" {
                             self.take_def_id = defid;
                         }
-                    } else if let ExprKind::MethodCall(rec_path, reciever2, ..) = receiver.kind &&
-                        rec_path.ident.name.to_string() == "env" &&
-                        let ExprKind::Path(rec2_qpath) = &reciever2.kind &&
-                        let QPath::Resolved(qualifier, rec2_path) = rec2_qpath &&
-                        rec2_path.segments.first().map_or(false, |seg|seg.ident.to_string() == "self" &&
-                        qualifier.is_none()) &&
-                        path.ident.name.to_string() == "caller" {
-                        self.caller_def_id = self.cx.typeck_results().type_dependent_def_id(expr.hir_id);
+                    } else if let ExprKind::MethodCall(rec_path, reciever2, ..) = receiver.kind
+                        && rec_path.ident.name.to_string() == "env"
+                        && let ExprKind::Path(rec2_qpath) = &reciever2.kind
+                        && let QPath::Resolved(qualifier, rec2_path) = rec2_qpath
+                        && rec2_path.segments.first().map_or(false, |seg| {
+                            seg.ident.to_string() == "self" && qualifier.is_none()
+                        })
+                        && path.ident.name.to_string() == "caller"
+                    {
+                        self.caller_def_id =
+                            self.cx.typeck_results().type_dependent_def_id(expr.hir_id);
                     }
                 }
                 walk_expr(self, expr);
@@ -116,20 +121,23 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
                 }
                 let terminator = bb_data.terminator.clone().unwrap();
                 if let TerminatorKind::Call { func, .. } = terminator.kind {
-                    if let Operand::Constant(fn_const) = func &&
-                        let ConstantKind::Val(_const_val, ty) = fn_const.literal &&
-                        let TyKind::FnDef(def, _subs) = ty.kind() {
-
-
-                            if caller_def_id.is_some_and(|d: DefId|d==*def) {
-                                callers_vec.callers.push((bb_data, BasicBlock::from_usize(bb)));
-                            } else {
-                                for op in &map_ops {
-                                    if op.is_some_and(|d|d==*def) {
-                                        callers_vec.map_ops.push((bb_data, BasicBlock::from_usize(bb)));
-                                    }
+                    if let Operand::Constant(fn_const) = func
+                        && let ConstantKind::Val(_const_val, ty) = fn_const.literal
+                        && let TyKind::FnDef(def, _subs) = ty.kind()
+                    {
+                        if caller_def_id.is_some_and(|d: DefId| d == *def) {
+                            callers_vec
+                                .callers
+                                .push((bb_data, BasicBlock::from_usize(bb)));
+                        } else {
+                            for op in &map_ops {
+                                if op.is_some_and(|d| d == *def) {
+                                    callers_vec
+                                        .map_ops
+                                        .push((bb_data, BasicBlock::from_usize(bb)));
                                 }
                             }
+                        }
                     }
                 }
             }

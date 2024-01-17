@@ -185,11 +185,13 @@ fn navigate_trough_basicblocks<'tcx>(
                 fn_span,
                 ..
             } => {
-                if let Operand::Constant(cst) = func &&
-                    let ConstantKind::Val(_, ty) = cst.literal &&
-                    let TyKind::FnDef(id, _) = ty.kind() {
-                    if def_ids.checked_div.is_some_and(|f|f == *id) ||
-                        def_ids.saturating_div.is_some_and(|f|f == *id) {
+                if let Operand::Constant(cst) = func
+                    && let ConstantKind::Val(_, ty) = cst.literal
+                    && let TyKind::FnDef(id, _) = ty.kind()
+                {
+                    if def_ids.checked_div.is_some_and(|f| f == *id)
+                        || def_ids.saturating_div.is_some_and(|f| f == *id)
+                    {
                         tainted_places.push(*destination);
                     } else {
                         for arg in args {
@@ -198,14 +200,14 @@ fn navigate_trough_basicblocks<'tcx>(
                                     if tainted_places.contains(place) {
                                         tainted_places.push(*destination);
 
-                                        if def_ids.checked_mul.is_some_and(|f|f == *id) ||
-                                        def_ids.saturating_mul.is_some_and(|f|f == *id) {
+                                        if def_ids.checked_mul.is_some_and(|f| f == *id)
+                                            || def_ids.saturating_mul.is_some_and(|f| f == *id)
+                                        {
                                             spans.push(*fn_span);
                                         }
                                     }
-
-                                },
-                                _ => {},
+                                }
+                                _ => {}
                             }
                         }
                     }

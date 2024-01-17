@@ -88,24 +88,47 @@ impl<'tcx> LateLintPass<'tcx> for UnexpectedRevertWarn {
                         if path.ident.name.to_string() == "push" {
                             self.push_def_id = defid;
                         }
-                    } else if let ExprKind::MethodCall(rec_path, receiver2, ..) = receiver.kind &&
-                        rec_path.ident.name.to_string() == "env" &&
-                        let ExprKind::Path(rec2_qpath) = &receiver2.kind &&
-                        let QPath::Resolved(qualifier, rec2_path) = rec2_qpath &&
-                        rec2_path.segments.first().map_or(false, |seg|seg.ident.to_string() == "self" &&
-                        qualifier.is_none()) &&
-                        path.ident.name.to_string() == "caller" {
-
-                            if self.cx.typeck_results().type_dependent_def_id(expr.hir_id).is_some() {
-                                self.callers_def_id.insert(self.cx.typeck_results().type_dependent_def_id(expr.hir_id).unwrap());
-                            }
-                    } else if let ExprKind::Call(receiver2, ..) = receiver.kind &&
-                        let ExprKind::Path(rec2_qpath) = &receiver2.kind &&
-                        let QPath::TypeRelative(ty2, rec2_path) = rec2_qpath &&
-                        rec2_path.ident.name.to_string() == "env" &&
-                        let rustc_hir::TyKind::Path(rec3_qpath) = &ty2.kind &&
-                        let QPath::Resolved(_, rec3_path) = rec3_qpath && rec3_path.segments[0].ident.to_string() == "Self" && self.cx.typeck_results().type_dependent_def_id(expr.hir_id).is_some() {
-                        self.callers_def_id.insert(self.cx.typeck_results().type_dependent_def_id(expr.hir_id).unwrap());
+                    } else if let ExprKind::MethodCall(rec_path, receiver2, ..) = receiver.kind
+                        && rec_path.ident.name.to_string() == "env"
+                        && let ExprKind::Path(rec2_qpath) = &receiver2.kind
+                        && let QPath::Resolved(qualifier, rec2_path) = rec2_qpath
+                        && rec2_path.segments.first().map_or(false, |seg| {
+                            seg.ident.to_string() == "self" && qualifier.is_none()
+                        })
+                        && path.ident.name.to_string() == "caller"
+                    {
+                        if self
+                            .cx
+                            .typeck_results()
+                            .type_dependent_def_id(expr.hir_id)
+                            .is_some()
+                        {
+                            self.callers_def_id.insert(
+                                self.cx
+                                    .typeck_results()
+                                    .type_dependent_def_id(expr.hir_id)
+                                    .unwrap(),
+                            );
+                        }
+                    } else if let ExprKind::Call(receiver2, ..) = receiver.kind
+                        && let ExprKind::Path(rec2_qpath) = &receiver2.kind
+                        && let QPath::TypeRelative(ty2, rec2_path) = rec2_qpath
+                        && rec2_path.ident.name.to_string() == "env"
+                        && let rustc_hir::TyKind::Path(rec3_qpath) = &ty2.kind
+                        && let QPath::Resolved(_, rec3_path) = rec3_qpath
+                        && rec3_path.segments[0].ident.to_string() == "Self"
+                        && self
+                            .cx
+                            .typeck_results()
+                            .type_dependent_def_id(expr.hir_id)
+                            .is_some()
+                    {
+                        self.callers_def_id.insert(
+                            self.cx
+                                .typeck_results()
+                                .type_dependent_def_id(expr.hir_id)
+                                .unwrap(),
+                        );
                     }
                 }
                 walk_expr(self, expr);
@@ -142,22 +165,27 @@ impl<'tcx> LateLintPass<'tcx> for UnexpectedRevertWarn {
                 }
                 let terminator = bb_data.terminator.clone().unwrap();
                 if let TerminatorKind::Call { func, .. } = terminator.kind {
-                    if let Operand::Constant(fn_const) = func &&
-                        let ConstantKind::Val(_const_val, ty) = fn_const.literal &&
-                        let TyKind::FnDef(def, _subs) = ty.kind() {
-                            if !callers_def_id.is_empty() {
-                                for caller in &callers_def_id{
-                                    if caller == def {
-                                        callers_vec.callers.push((bb_data, BasicBlock::from_usize(bb)));
-                                    }
-                                }
-                            } else {
-                                for op in &push_def_id {
-                                    if op == def {
-                                        callers_vec.vec_ops.push((bb_data, BasicBlock::from_usize(bb)));
-                                    }
+                    if let Operand::Constant(fn_const) = func
+                        && let ConstantKind::Val(_const_val, ty) = fn_const.literal
+                        && let TyKind::FnDef(def, _subs) = ty.kind()
+                    {
+                        if !callers_def_id.is_empty() {
+                            for caller in &callers_def_id {
+                                if caller == def {
+                                    callers_vec
+                                        .callers
+                                        .push((bb_data, BasicBlock::from_usize(bb)));
                                 }
                             }
+                        } else {
+                            for op in &push_def_id {
+                                if op == def {
+                                    callers_vec
+                                        .vec_ops
+                                        .push((bb_data, BasicBlock::from_usize(bb)));
+                                }
+                            }
+                        }
                     }
                 }
             }
