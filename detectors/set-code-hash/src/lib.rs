@@ -57,35 +57,49 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSetCodeHash {
         impl<'tcx> Visitor<'tcx> for UnprotectedSetCodeHashFinder<'tcx, '_> {
             fn visit_expr(&mut self, expr: &'tcx Expr<'_>) {
                 if let ExprKind::MethodCall(path, receiver, ..) = expr.kind {
-                    if let ExprKind::MethodCall(rec_path, reciever2, ..) = receiver.kind &&
-                        rec_path.ident.name.to_string() == "env" &&
-                        let ExprKind::Path(rec2_qpath) = &reciever2.kind &&
-                        let QPath::Resolved(qualifier, rec2_path) = rec2_qpath &&
-                        rec2_path.segments.first().map_or_else(||false, |seg|seg.ident.to_string() == "self" &&
-                        qualifier.is_none()) &&
-                        path.ident.name.to_string() == "caller" {
-                        self.caller_def_id = self.cx.typeck_results().type_dependent_def_id(expr.hir_id);
-                    } else if let ExprKind::Call(receiver2, ..) = receiver.kind &&
-                        let ExprKind::Path(rec2_qpath) = &receiver2.kind &&
-                        let QPath::TypeRelative(ty2, rec2_path) = rec2_qpath &&
-                        rec2_path.ident.name.to_string() == "env" &&
-                        let rustc_hir::TyKind::Path(rec3_qpath) = &ty2.kind &&
-                        let QPath::Resolved(_, rec3_path) = rec3_qpath &&
-                        rec3_path.segments[0].ident.to_string() == "Self" &&
-                        self.cx.typeck_results().type_dependent_def_id(expr.hir_id).is_some() {
-                        self.caller_def_id = self.cx.typeck_results().type_dependent_def_id(expr.hir_id);
+                    if let ExprKind::MethodCall(rec_path, reciever2, ..) = receiver.kind
+                        && rec_path.ident.name.to_string() == "env"
+                        && let ExprKind::Path(rec2_qpath) = &reciever2.kind
+                        && let QPath::Resolved(qualifier, rec2_path) = rec2_qpath
+                        && rec2_path.segments.first().map_or_else(
+                            || false,
+                            |seg| seg.ident.to_string() == "self" && qualifier.is_none(),
+                        )
+                        && path.ident.name.to_string() == "caller"
+                    {
+                        self.caller_def_id =
+                            self.cx.typeck_results().type_dependent_def_id(expr.hir_id);
+                    } else if let ExprKind::Call(receiver2, ..) = receiver.kind
+                        && let ExprKind::Path(rec2_qpath) = &receiver2.kind
+                        && let QPath::TypeRelative(ty2, rec2_path) = rec2_qpath
+                        && rec2_path.ident.name.to_string() == "env"
+                        && let rustc_hir::TyKind::Path(rec3_qpath) = &ty2.kind
+                        && let QPath::Resolved(_, rec3_path) = rec3_qpath
+                        && rec3_path.segments[0].ident.to_string() == "Self"
+                        && self
+                            .cx
+                            .typeck_results()
+                            .type_dependent_def_id(expr.hir_id)
+                            .is_some()
+                    {
+                        self.caller_def_id =
+                            self.cx.typeck_results().type_dependent_def_id(expr.hir_id);
                     }
                 }
 
-                if let ExprKind::Call(path, _) = expr.kind &&
-                    let ExprKind::Path(pth) = &path.kind &&
-                    let QPath::Resolved(_, path) = pth &&
-                    path.segments.iter().any(|seg|seg.ident.to_string() == "set_code_hash"){
-                        self.terminate_contract_span = Some(expr.span);
+                if let ExprKind::Call(path, _) = expr.kind
+                    && let ExprKind::Path(pth) = &path.kind
+                    && let QPath::Resolved(_, path) = pth
+                    && path
+                        .segments
+                        .iter()
+                        .any(|seg| seg.ident.to_string() == "set_code_hash")
+                {
+                    self.terminate_contract_span = Some(expr.span);
 
-                        if let def::Res::Def(_, id) = path.res {
-                            self.terminate_contract_def_id = Some(id);
-                        };
+                    if let def::Res::Def(_, id) = path.res {
+                        self.terminate_contract_def_id = Some(id);
+                    };
                 }
 
                 walk_expr(self, expr);
@@ -122,15 +136,19 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSetCodeHash {
                 }
                 let terminator = bb_data.terminator.clone().unwrap();
                 if let TerminatorKind::Call { func, .. } = terminator.kind {
-                    if let Operand::Constant(fn_const) = func &&
-                        let ConstantKind::Val(_const_val, ty) = fn_const.literal &&
-                        let TyKind::FnDef(def, _subs) = ty.kind()
-                        {
-                            if caller_def_id.is_some_and(|d|d==*def) {
-                                callers_vec.callers.push((bb_data, BasicBlock::from_usize(bb)));
-                            } else if terminate_def_id.is_some_and(|d|d==*def) {
-                                callers_vec.terminates.push((bb_data, BasicBlock::from_usize(bb)));
-                            }
+                    if let Operand::Constant(fn_const) = func
+                        && let ConstantKind::Val(_const_val, ty) = fn_const.literal
+                        && let TyKind::FnDef(def, _subs) = ty.kind()
+                    {
+                        if caller_def_id.is_some_and(|d| d == *def) {
+                            callers_vec
+                                .callers
+                                .push((bb_data, BasicBlock::from_usize(bb)));
+                        } else if terminate_def_id.is_some_and(|d| d == *def) {
+                            callers_vec
+                                .terminates
+                                .push((bb_data, BasicBlock::from_usize(bb)));
+                        }
                     }
                 }
             }

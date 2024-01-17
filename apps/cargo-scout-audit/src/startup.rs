@@ -169,9 +169,10 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> Result<()> {
     let stdout_temp_file = tempfile::NamedTempFile::new()?;
 
     let is_output_stdout = opts.output_format == OutputFormat::Text && opts.output_path.is_none();
+    let is_output_stdout_json = opts.args.contains(&"--message-format=json".to_string());
 
     let pipe_stdout = Some(stdout_temp_file.path().to_string_lossy().to_string());
-    let pipe_stderr = if is_output_stdout {
+    let pipe_stderr = if is_output_stdout && !is_output_stdout_json {
         None
     } else {
         Some(stderr_temp_file.path().to_string_lossy().to_string())
@@ -190,12 +191,12 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> Result<()> {
     dylint::run(&options)?;
 
     // Format output and write to file (if necessary)
-    if is_output_stdout {
+    if is_output_stdout && !is_output_stdout_json {
         return Ok(());
     }
 
     let mut stderr_file = fs::File::open(stderr_temp_file.path())?;
-    let stdout_file = fs::File::open(stdout_temp_file.path())?;
+    let mut stdout_file = fs::File::open(stdout_temp_file.path())?;
 
     match opts.output_format {
         OutputFormat::Json => {
@@ -223,6 +224,11 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> Result<()> {
             if let Some(output_file) = opts.output_path {
                 let mut txt_file = fs::File::create(output_file)?;
                 std::io::copy(&mut stderr_file, &mut txt_file)?;
+            } else {
+                let stdout = std::io::stdout();
+                let mut handle = stdout.lock();
+                std::io::copy(&mut stdout_file, &mut handle)
+                    .expect("Error writing dylint result to stdout");
             }
         }
         OutputFormat::Sarif => {

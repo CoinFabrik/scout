@@ -46,25 +46,23 @@ struct ForLoopVisitor {
 }
 impl<'tcx> Visitor<'tcx> for ForLoopVisitor {
     fn visit_expr(&mut self, expr: &'tcx rustc_hir::Expr<'tcx>) {
-        if let ExprKind::Match(match_expr, _arms, source) = expr.kind &&
-            source == MatchSource::ForLoopDesugar &&
-            let ExprKind::Call(func, args) = match_expr.kind &&
-            let ExprKind::Path(qpath) = &func.kind &&
-            let QPath::LangItem(item, _span, _id) = qpath &&
-            item == &LangItem::IntoIterIntoIter {
-
-            if args.first().is_some() &&
-                let ExprKind::Struct(qpath, fields, _) = args.first().unwrap().kind &&
-                let QPath::LangItem(langitem, _span, _id) = qpath &&
-                (
-                    LangItem::Range == *langitem ||
-                    LangItem::RangeInclusiveStruct == *langitem ||
-                    LangItem::RangeInclusiveNew == *langitem
-                ) &&
-                fields.last().is_some() &&
-                let ExprKind::Lit(lit) = &fields.last().unwrap().expr.kind &&
-                let LitKind::Int(_v, _typ) = lit.node {
-
+        if let ExprKind::Match(match_expr, _arms, source) = expr.kind
+            && source == MatchSource::ForLoopDesugar
+            && let ExprKind::Call(func, args) = match_expr.kind
+            && let ExprKind::Path(qpath) = &func.kind
+            && let QPath::LangItem(item, _span, _id) = qpath
+            && item == &LangItem::IntoIterIntoIter
+        {
+            if args.first().is_some()
+                && let ExprKind::Struct(qpath, fields, _) = args.first().unwrap().kind
+                && let QPath::LangItem(langitem, _span, _id) = qpath
+                && (LangItem::Range == *langitem
+                    || LangItem::RangeInclusiveStruct == *langitem
+                    || LangItem::RangeInclusiveNew == *langitem)
+                && fields.last().is_some()
+                && let ExprKind::Lit(lit) = &fields.last().unwrap().expr.kind
+                && let LitKind::Int(_v, _typ) = lit.node
+            {
                 walk_expr(self, expr);
             } else {
                 self.span_constant.push(expr.span);

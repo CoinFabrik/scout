@@ -55,19 +55,23 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
 
         impl<'tcx> Visitor<'tcx> for UnprotectedSelfDestructFinder<'tcx, '_> {
             fn visit_expr(&mut self, expr: &'tcx Expr<'_>) {
-                if let ExprKind::MethodCall(path, receiver, ..) = expr.kind &&
-                    let ExprKind::MethodCall(rec_path, reciever2, ..) = receiver.kind &&
-                    rec_path.ident.name.to_string() == "env" &&
-                    let ExprKind::Path(rec2_qpath) = &reciever2.kind &&
-                    let QPath::Resolved(qualifier, rec2_path) = rec2_qpath &&
-                    rec2_path.segments.first().map_or_else(||false, |seg|seg.ident.to_string() == "self" &&
-                    qualifier.is_none()) {
-
+                if let ExprKind::MethodCall(path, receiver, ..) = expr.kind
+                    && let ExprKind::MethodCall(rec_path, reciever2, ..) = receiver.kind
+                    && rec_path.ident.name.to_string() == "env"
+                    && let ExprKind::Path(rec2_qpath) = &reciever2.kind
+                    && let QPath::Resolved(qualifier, rec2_path) = rec2_qpath
+                    && rec2_path.segments.first().map_or_else(
+                        || false,
+                        |seg| seg.ident.to_string() == "self" && qualifier.is_none(),
+                    )
+                {
                     if path.ident.name.to_string() == "terminate_contract" {
                         self.terminate_contract_span = Some(expr.span);
-                        self.terminate_contract_def_id =  self.cx.typeck_results().type_dependent_def_id(expr.hir_id);
+                        self.terminate_contract_def_id =
+                            self.cx.typeck_results().type_dependent_def_id(expr.hir_id);
                     } else if path.ident.name.to_string() == "caller" {
-                        self.caller_def_id = self.cx.typeck_results().type_dependent_def_id(expr.hir_id);
+                        self.caller_def_id =
+                            self.cx.typeck_results().type_dependent_def_id(expr.hir_id);
                     }
                 }
 
@@ -105,14 +109,19 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
                 }
                 let terminator = bb_data.terminator.clone().unwrap();
                 if let TerminatorKind::Call { func, .. } = terminator.kind {
-                    if let Operand::Constant(fn_const) = func &&
-                        let ConstantKind::Val(_const_val, ty) = fn_const.literal &&
-                        let TyKind::FnDef(def, _subs) = ty.kind() {
-                            if caller_def_id.is_some_and(|d|d==*def) {
-                                callers_vec.callers.push((bb_data, BasicBlock::from_usize(bb)));
-                            } else if terminate_def_id.is_some_and(|d|d==*def) {
-                                callers_vec.terminates.push((bb_data, BasicBlock::from_usize(bb)));
-                            }
+                    if let Operand::Constant(fn_const) = func
+                        && let ConstantKind::Val(_const_val, ty) = fn_const.literal
+                        && let TyKind::FnDef(def, _subs) = ty.kind()
+                    {
+                        if caller_def_id.is_some_and(|d| d == *def) {
+                            callers_vec
+                                .callers
+                                .push((bb_data, BasicBlock::from_usize(bb)));
+                        } else if terminate_def_id.is_some_and(|d| d == *def) {
+                            callers_vec
+                                .terminates
+                                .push((bb_data, BasicBlock::from_usize(bb)));
+                        }
                     }
                 }
             }

@@ -76,11 +76,11 @@ struct CounterVisitor {
 
 impl<'tcx> Visitor<'tcx> for CounterVisitor {
     fn visit_expr(&mut self, expr: &'tcx Expr) {
-        if let ExprKind::Call(func, _args) = expr.kind &&
-            let ExprKind::Path(qpath) = &func.kind &&
-            let QPath::Resolved(_ty, path) = qpath {
-
-            let vec: Vec<String> = path.segments.iter().map(|f|f.ident.to_string()).collect();
+        if let ExprKind::Call(func, _args) = expr.kind
+            && let ExprKind::Path(qpath) = &func.kind
+            && let QPath::Resolved(_ty, path) = qpath
+        {
+            let vec: Vec<String> = path.segments.iter().map(|f| f.ident.to_string()).collect();
             let fun_path = vec.join("::");
             if fun_path.ends_with("Ok") {
                 self.count_ok += 1;
@@ -92,14 +92,14 @@ impl<'tcx> Visitor<'tcx> for CounterVisitor {
         }
         match expr.kind {
             ExprKind::Ret(retval) => {
-                if retval.is_some() &&
-                    let ExprKind::Call(func, _args) = retval.unwrap().kind &&
-                    let ExprKind::Path(qpath) = &func.kind &&
-                    let QPath::Resolved(_, path) = qpath &&
-                    let Some(last_segment) = path.segments.last() {
-
+                if retval.is_some()
+                    && let ExprKind::Call(func, _args) = retval.unwrap().kind
+                    && let ExprKind::Path(qpath) = &func.kind
+                    && let QPath::Resolved(_, path) = qpath
+                    && let Some(last_segment) = path.segments.last()
+                {
                     match last_segment.ident.as_str() {
-                        "Err" | "Ok" =>{},
+                        "Err" | "Ok" => {}
                         _ => {
                             self.found_return = true;
                         }
@@ -134,15 +134,15 @@ impl<'tcx> LateLintPass<'tcx> for UnusedReturnEnum {
         let mut expression_return: bool = false;
         //if the function uses expression return (not using ; at the end),
         //the base expression of the function is a block and the return value is stored in block.expr
-        if let ExprKind::Block(block, _label) = body.value.kind &&
-            block.expr.is_some() &&
-            let ExprKind::Call(func, _args) = block.expr.unwrap().kind &&
-            let ExprKind::Path(qpath) = &func.kind &&
-            let QPath::Resolved(_, path) = qpath {
-
+        if let ExprKind::Block(block, _label) = body.value.kind
+            && block.expr.is_some()
+            && let ExprKind::Call(func, _args) = block.expr.unwrap().kind
+            && let ExprKind::Path(qpath) = &func.kind
+            && let QPath::Resolved(_, path) = qpath
+        {
             if let Some(last_segment) = path.segments.last() {
                 match last_segment.ident.as_str() {
-                    "Err" | "Ok" =>{},
+                    "Err" | "Ok" => {}
                     _ => {
                         expression_return = true;
                     }
@@ -150,19 +150,24 @@ impl<'tcx> LateLintPass<'tcx> for UnusedReturnEnum {
             }
             //if to ignore some automatically generated functions.
             // this is provisional i will improve it when i know how
-            if let Some(first) = path.segments.first() &&
-                first.ident.as_str() == "{{root}}"{
+            if let Some(first) = path.segments.first()
+                && first.ident.as_str() == "{{root}}"
+            {
                 expression_return = true;
             }
         }
 
         match decl.output {
             rustc_hir::FnRetTy::Return(ret) => {
-                if let TyKind::Path(qpath) = &ret.kind &&
-                    let QPath::Resolved(_ty, path) = qpath {
-
+                if let TyKind::Path(qpath) = &ret.kind
+                    && let QPath::Resolved(_ty, path) = qpath
+                {
                     //ignore function if not returns a Result type
-                    if path.segments.last().is_some_and(|f|f.ident.to_string() != "Result") {
+                    if path
+                        .segments
+                        .last()
+                        .is_some_and(|f| f.ident.to_string() != "Result")
+                    {
                         return;
                     }
                 };

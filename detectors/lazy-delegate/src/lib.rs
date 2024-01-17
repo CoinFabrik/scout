@@ -52,17 +52,21 @@ pub struct LazyDelegate {
 impl EarlyLintPass for LazyDelegate {
     fn check_item(&mut self, _: &EarlyContext<'_>, item: &Item) {
         if is_storage_item(item)
-        && let ItemKind::Struct(strt, _) = &item.kind
+            && let ItemKind::Struct(strt, _) = &item.kind
         {
             for field in strt.fields() {
                 if let Some(_) = field.ident
-                && let TyKind::Path(_, path) = &field.ty.kind
-                && path.segments.len() == 1
-                && (path.segments[0].ident.name.to_string() == *"Lazy" || path.segments[0].ident.name.to_string() == "Mapping")
-                && let Some(arg) = &path.segments[0].args
-                && let GenericArgs::AngleBracketed(AngleBracketedArgs { args, .. }) = arg.clone().into_inner()
-                && args.len() > 1 {} else if !self.non_lazy_manual_storage_spans.contains(&item.span){
-                        self.non_lazy_manual_storage_spans.push(item.span);
+                    && let TyKind::Path(_, path) = &field.ty.kind
+                    && path.segments.len() == 1
+                    && (path.segments[0].ident.name.to_string() == *"Lazy"
+                        || path.segments[0].ident.name.to_string() == "Mapping")
+                    && let Some(arg) = &path.segments[0].args
+                    && let GenericArgs::AngleBracketed(AngleBracketedArgs { args, .. }) =
+                        arg.clone().into_inner()
+                    && args.len() > 1
+                {
+                } else if !self.non_lazy_manual_storage_spans.contains(&item.span) {
+                    self.non_lazy_manual_storage_spans.push(item.span);
                 }
             }
         }
