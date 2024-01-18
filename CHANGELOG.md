@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.2.2 (2024-01-18)
+
+- Fixed `--message-format=json` argument for VSCode extension.
+
 ## v0.2.1 (2023-09-18)
 
 - Fixed HTML and JSON output panic.
