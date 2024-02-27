@@ -35,7 +35,7 @@ The team discusses the creation of the list in this
 | Best practices                 | Conventions and best practices for improved code quality and vulnerability prevention.            |
 | Block attributes               | Appropriate usage of block attributes, especially when used as a source of randomness.            |
 | Centralization                 | Analysis of centralization and single points of failure.                                          |
-| Denial of Service              | Denial of service. attacks.                                                                       |
+| Denial of Service              | Denial of service attacks.                                                                       |
 | Gas Usage                      | Performance issues, enhancements and vulnerabilities related to use of gas.                       |
 | Known Bugs                     | Known issues that remain unresolved.                                                              |
 | MEV                            | Patterns that could lead to the exploitation of Maximal Extractable Value.                        |
@@ -109,7 +109,7 @@ operations imply (external) calls where control flow is passed to the called
 contract until the execution of the called code is over, then the control is
 delivered back to the caller. A _reentrancy_ vulnerability may happen when a
 user calls a function, this function calls a malicious contract which again
-calls this same function, and this 'reentrancy' has unexpected reprecussions
+calls this same function, and this 'reentrancy' has unexpected repercussions
 to the contract.
 
 This kind of attack was used in Ethereum for
@@ -219,7 +219,7 @@ In our example, we see an exploit scenario involving a contract using the `expec
 
 Check the following [documentation](8-unsafe-expect.md) for a more detailed explanation of this vulnerability class.
 
-### 9 - Unsafe unrwap
+### 9 - Unsafe unwrap
 
 This vulnerability class pertains to the inappropriate usage of the `unwrap` method in Rust, which is commonly employed for error handling. The `unwrap` method retrieves the inner value of an `Option` or `Result`, but if an error or `None` occurs, it triggers a panic and crashes the program.
 
