@@ -6,4 +6,4 @@ This crate is used to allow publishing `scout-audit-internal` to crates.io given
 
 ## Version
 
-Commit `f16bfa478f131b2ec2ad9742f88dc6a9beea52b7`.
+Commit `7671c283a50b5d1168841f3014b14000f01dd204`.
