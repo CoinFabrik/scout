@@ -18,6 +18,7 @@ use rustc_middle::mir::{
     TerminatorKind,
 };
 use rustc_middle::ty::TyKind;
+use rustc_middle::mir::Const;
 use rustc_span::def_id::DefId;
 use rustc_span::Span;
 use scout_audit_internal::Detector;
@@ -137,14 +138,14 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSetCodeHash {
                 let terminator = bb_data.terminator.clone().unwrap();
                 if let TerminatorKind::Call { func, .. } = terminator.kind {
                     if let Operand::Constant(fn_const) = func
-                        && let ConstantKind::Val(_const_val, ty) = fn_const.literal
+                        && let Const::Val(_const_val, ty) = fn_const.const_
                         && let TyKind::FnDef(def, _subs) = ty.kind()
                     {
-                        if caller_def_id.is_some_and(|d| d == def) {
+                        if caller_def_id.is_some_and(|d| &d == def) {
                             callers_vec
                                 .callers
                                 .push((bb_data, BasicBlock::from_usize(bb)));
-                        } else if terminate_def_id.is_some_and(|d| d == def) {
+                        } else if terminate_def_id.is_some_and(|d| &d == def) {
                             callers_vec
                                 .terminates
                                 .push((bb_data, BasicBlock::from_usize(bb)));
@@ -336,11 +337,11 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSetCodeHash {
                         ));
                     }
                 }
-                TerminatorKind::Resume
-                | TerminatorKind::Terminate
-                | TerminatorKind::Return
+                TerminatorKind::Return
                 | TerminatorKind::Unreachable
-                | TerminatorKind::GeneratorDrop => {}
+                | TerminatorKind::GeneratorDrop
+                | TerminatorKind::UnwindResume
+                | TerminatorKind::UnwindTerminate(_)=> {}
             }
             ret_vec
         }

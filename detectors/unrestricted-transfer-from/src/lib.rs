@@ -236,9 +236,9 @@ impl<'tcx> LateLintPass<'tcx> for UnrestrictedTransferFrom {
             } = &bb.terminator().kind
             {
                 if let Operand::Constant(cont) = func
-                    && let rustc_middle::mir::ConstantKind::Val(_, val_type) = &cont.literal
+                    && let rustc_middle::mir::Const::Val(_, val_type) = &cont.const_
                     && let rustc_middle::ty::TyKind::FnDef(def, _) = val_type.kind()
-                    && utf_storage.def_id.is_some_and(|id| id == def)
+                    && utf_storage.def_id.is_some_and(|id| &id == def)
                     && target.is_some()
                 {
                     //here the terminator is the call to new, the destination has the place with the selector
@@ -255,16 +255,15 @@ impl<'tcx> LateLintPass<'tcx> for UnrestrictedTransferFrom {
                         if let TerminatorKind::Call {
                             func,
                             args,
-                            destination: _,
+                            fn_span,
                             target,
-                            unwind: _,
-                            fn_span, ..
+                            ..
                         } = &bbs[*bb].terminator().kind
-                            && let Operand::Constant(cont) = func
-                            && let rustc_middle::mir::ConstantKind::Val(_, val_type) = &cont.literal
+                            && let Operand::Constant(cst) = func
+                            && let rustc_middle::mir::Const::Val(_, val_type) = &cst.const_
                             && let rustc_middle::ty::TyKind::FnDef(def, _) = val_type.kind()
                         {
-                            if utf_storage.pusharg_def_id.is_some_and(|id| id == def) {
+                            if utf_storage.pusharg_def_id.is_some_and(|id| &id == def) {
                                 for arg in args {
                                     if arg.place().map_or(false, |place| {
                                         tainted_locals.iter().any(|l| l == &place.local)

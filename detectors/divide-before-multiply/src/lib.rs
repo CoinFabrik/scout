@@ -14,13 +14,14 @@ use rustc_hir::BinOpKind;
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_middle::mir::{
-    BasicBlock, BasicBlockData, BasicBlocks, BinOp, ConstantKind, Operand, Place, Rvalue,
+    BasicBlock, BasicBlockData, BasicBlocks, BinOp, Operand, Place, Rvalue,
     StatementKind, TerminatorKind,
 };
 use rustc_middle::ty::TyKind;
 use rustc_span::def_id::DefId;
 use rustc_span::Span;
 use scout_audit_internal::Detector;
+use rustc_middle::mir::Const;
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -189,8 +190,8 @@ fn navigate_trough_basicblocks<'tcx>(
                     && let Const::Val(_, ty) = cst.const_
                     && let TyKind::FnDef(id, _) = ty.kind()
                 {
-                    if def_ids.checked_div.is_some_and(|f| f == id)
-                        || def_ids.saturating_div.is_some_and(|f| f == id)
+                    if def_ids.checked_div.is_some_and(|f| &f == id)
+                        || def_ids.saturating_div.is_some_and(|f| &f == id)
                     {
                         tainted_places.push(*destination);
                     } else {
@@ -200,8 +201,8 @@ fn navigate_trough_basicblocks<'tcx>(
                                     if tainted_places.contains(place) {
                                         tainted_places.push(*destination);
 
-                                        if def_ids.checked_mul.is_some_and(|f| f == id)
-                                            || def_ids.saturating_mul.is_some_and(|f| f == id)
+                                        if def_ids.checked_mul.is_some_and(|f| &f == id)
+                                            || def_ids.saturating_mul.is_some_and(|f| &f == id)
                                         {
                                             spans.push(*fn_span);
                                         }

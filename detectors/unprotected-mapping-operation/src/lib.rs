@@ -15,9 +15,10 @@ use rustc_hir::{
 };
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_middle::mir::{
-    BasicBlock, BasicBlockData, BasicBlocks, ConstantKind, Operand, Place, StatementKind,
+    BasicBlock, BasicBlockData, BasicBlocks, Operand, Place, StatementKind,
     TerminatorKind,
 };
+use rustc_middle::mir::Const;
 use rustc_middle::ty::TyKind;
 use rustc_span::def_id::DefId;
 use rustc_span::Span;
@@ -125,13 +126,13 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
                         && let Const::Val(_const_val, ty) = fn_const.const_
                         && let TyKind::FnDef(def, _subs) = ty.kind()
                     {
-                        if caller_def_id.is_some_and(|d: DefId| d == def) {
+                        if caller_def_id.is_some_and(|d: DefId| &d == def) {
                             callers_vec
                                 .callers
                                 .push((bb_data, BasicBlock::from_usize(bb)));
                         } else {
                             for op in &map_ops {
-                                if op.is_some_and(|d| d == def) {
+                                if op.is_some_and(|d| &d == def) {
                                     callers_vec
                                         .map_ops
                                         .push((bb_data, BasicBlock::from_usize(bb)));
@@ -335,11 +336,11 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
                         ));
                     }
                 }
-                TerminatorKind::Resume
-                | TerminatorKind::Terminate
-                | TerminatorKind::Return
+                TerminatorKind::Return
                 | TerminatorKind::Unreachable
-                | TerminatorKind::GeneratorDrop => {}
+                | TerminatorKind::GeneratorDrop
+                | TerminatorKind::UnwindResume
+                | TerminatorKind::UnwindTerminate(_) => {}
             }
             ret_vec
         }

@@ -4,7 +4,7 @@
 extern crate rustc_ast;
 extern crate rustc_span;
 
-use scout_audit_clippy_utils::sym;
+use scout_auditgi_clippy_utils::sym;
 use if_chain::if_chain;
 use rustc_ast::{
     ptr::P,
@@ -99,13 +99,7 @@ impl EarlyLintPass for PanicError {
 fn check_macro_call(cx: &EarlyContext, span: Span, mac: &P<MacCall>) {
     if_chain! {
         if mac.path == sym!(panic);
-        if let [TokenTree::Token(token, _)] = mac
-            .args
-            .tokens
-            .clone()
-            .into_trees()
-            .collect::<Vec<_>>()
-            .as_slice();
+        if let [TokenTree::Token(token, _)] = mac.args.tokens.trees().collect::<Vec<_>>().as_slice();
         if let TokenKind::Literal(lit) = token.kind;
         if lit.kind == LitKind::Str;
         then {

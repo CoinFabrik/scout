@@ -14,10 +14,11 @@ use rustc_hir::QPath;
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_middle::mir::{
-    BasicBlock, BasicBlockData, BasicBlocks, ConstantKind, Operand, Place, StatementKind,
+    BasicBlock, BasicBlockData, BasicBlocks, Operand, Place, StatementKind,
     TerminatorKind,
 };
-use rustc_middle::ty::TyKind;
+use rustc_middle::mir::Const;
+use rustc_middle::ty::{TyKind, Ty};
 use rustc_span::def_id::DefId;
 use rustc_span::Span;
 use scout_audit_internal::Detector;
@@ -83,7 +84,7 @@ impl<'tcx> LateLintPass<'tcx> for UnexpectedRevertWarn {
             fn visit_expr(&mut self, expr: &'tcx Expr<'_>) {
                 if let ExprKind::MethodCall(path, receiver, ..) = expr.kind {
                     let defid = self.cx.typeck_results().type_dependent_def_id(expr.hir_id);
-                    let ty = self.cx.tcx.mk_foreign(defid.unwrap());
+                    let ty = Ty::new_foreign(self.cx.tcx, defid.unwrap());
                     if ty.to_string().contains("std::vec::Vec") {
                         if path.ident.name.to_string() == "push" {
                             self.push_def_id = defid;
@@ -171,7 +172,7 @@ impl<'tcx> LateLintPass<'tcx> for UnexpectedRevertWarn {
                     {
                         if !callers_def_id.is_empty() {
                             for caller in &callers_def_id {
-                                if caller == &def {
+                                if caller == def {
                                     callers_vec
                                         .callers
                                         .push((bb_data, BasicBlock::from_usize(bb)));
@@ -179,7 +180,7 @@ impl<'tcx> LateLintPass<'tcx> for UnexpectedRevertWarn {
                             }
                         } else {
                             for op in &push_def_id {
-                                if op == &def {
+                                if op == def {
                                     callers_vec
                                         .vec_ops
                                         .push((bb_data, BasicBlock::from_usize(bb)));
