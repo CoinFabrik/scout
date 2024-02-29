@@ -3,7 +3,7 @@
 extern crate rustc_hir;
 extern crate rustc_span;
 
-use clippy_utils::diagnostics::span_lint_and_help;
+use scout_audit_clippy_utils::diagnostics::span_lint_and_help;
 use rustc_hir::intravisit::{self, FnKind, Visitor};
 use rustc_hir::*;
 use rustc_lint::{LateContext, LateLintPass};

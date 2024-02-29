@@ -125,13 +125,13 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
                         && let ConstantKind::Val(_const_val, ty) = fn_const.literal
                         && let TyKind::FnDef(def, _subs) = ty.kind()
                     {
-                        if caller_def_id.is_some_and(|d: DefId| d == *def) {
+                        if caller_def_id.is_some_and(|d: DefId| d == def) {
                             callers_vec
                                 .callers
                                 .push((bb_data, BasicBlock::from_usize(bb)));
                         } else {
                             for op in &map_ops {
-                                if op.is_some_and(|d| d == *def) {
+                                if op.is_some_and(|d| d == def) {
                                     callers_vec
                                         .map_ops
                                         .push((bb_data, BasicBlock::from_usize(bb)));

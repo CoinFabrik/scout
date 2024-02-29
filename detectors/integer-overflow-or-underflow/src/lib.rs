@@ -3,8 +3,8 @@
 extern crate rustc_hir;
 extern crate rustc_span;
 
-use clippy_utils::consts::constant_simple;
-use clippy_utils::is_integer_literal;
+use scout_audit_clippy_utils::consts::constant_simple;
+use scout_audit_clippy_utils::is_integer_literal;
 use rustc_hir::{self as hir, Body, Expr, ExprKind, UnOp};
 use rustc_lint::LateContext;
 use rustc_lint::LateLintPass;

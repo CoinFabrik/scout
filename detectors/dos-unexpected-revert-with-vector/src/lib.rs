@@ -171,7 +171,7 @@ impl<'tcx> LateLintPass<'tcx> for UnexpectedRevertWarn {
                     {
                         if !callers_def_id.is_empty() {
                             for caller in &callers_def_id {
-                                if caller == def {
+                                if caller == &def {
                                     callers_vec
                                         .callers
                                         .push((bb_data, BasicBlock::from_usize(bb)));

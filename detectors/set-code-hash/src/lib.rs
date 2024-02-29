@@ -14,7 +14,7 @@ use rustc_hir::{
 };
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_middle::mir::{
-    BasicBlock, BasicBlockData, BasicBlocks, ConstantKind, Operand, Place, StatementKind,
+    BasicBlock, BasicBlockData, BasicBlocks, Operand, Place, StatementKind,
     TerminatorKind,
 };
 use rustc_middle::ty::TyKind;

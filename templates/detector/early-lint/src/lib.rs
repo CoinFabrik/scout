@@ -3,7 +3,7 @@
 extern crate rustc_ast;
 extern crate rustc_span;
 
-use clippy_utils::diagnostics::span_lint_and_help;
+use scout_audit_clippy_utils::diagnostics::span_lint_and_help;
 use rustc_ast::visit::{FnKind, Visitor};
 use rustc_ast::{Expr, ExprKind};
 use rustc_lint::{EarlyContext, EarlyLintPass};

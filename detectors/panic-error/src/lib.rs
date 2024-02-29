@@ -4,7 +4,7 @@
 extern crate rustc_ast;
 extern crate rustc_span;
 
-use clippy_utils::sym;
+use scout_audit_clippy_utils::sym;
 use if_chain::if_chain;
 use rustc_ast::{
     ptr::P,
