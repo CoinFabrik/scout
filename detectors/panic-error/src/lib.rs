@@ -13,8 +13,8 @@ use rustc_ast::{
 };
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::{sym, Span};
-use scout_audit_internal::Detector;
 use scout_audit_clippy_utils::sym;
+use scout_audit_internal::Detector;
 
 dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does
