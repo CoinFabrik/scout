@@ -3,7 +3,6 @@
 extern crate rustc_ast;
 extern crate rustc_span;
 
-use scout_audit_clippy_utils::sym;
 use if_chain::if_chain;
 use rustc_ast::{
     ptr::P,
@@ -12,6 +11,7 @@ use rustc_ast::{
 };
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::{sym, Span};
+use scout_audit_clippy_utils::sym;
 use scout_audit_internal::Detector;
 
 dylint_linting::impl_pre_expansion_lint! {

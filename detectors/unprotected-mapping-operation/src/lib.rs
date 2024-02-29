@@ -14,11 +14,10 @@ use rustc_hir::{
     Expr, ExprKind,
 };
 use rustc_lint::{LateContext, LateLintPass};
-use rustc_middle::mir::{
-    BasicBlock, BasicBlockData, BasicBlocks, Operand, Place, StatementKind,
-    TerminatorKind,
-};
 use rustc_middle::mir::Const;
+use rustc_middle::mir::{
+    BasicBlock, BasicBlockData, BasicBlocks, Operand, Place, StatementKind, TerminatorKind,
+};
 use rustc_middle::ty::TyKind;
 use rustc_span::def_id::DefId;
 use rustc_span::Span;

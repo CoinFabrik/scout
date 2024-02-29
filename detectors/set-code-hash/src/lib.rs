@@ -13,12 +13,11 @@ use rustc_hir::{
     Expr, ExprKind,
 };
 use rustc_lint::{LateContext, LateLintPass};
+use rustc_middle::mir::Const;
 use rustc_middle::mir::{
-    BasicBlock, BasicBlockData, BasicBlocks, Operand, Place, StatementKind,
-    TerminatorKind,
+    BasicBlock, BasicBlockData, BasicBlocks, Operand, Place, StatementKind, TerminatorKind,
 };
 use rustc_middle::ty::TyKind;
-use rustc_middle::mir::Const;
 use rustc_span::def_id::DefId;
 use rustc_span::Span;
 use scout_audit_internal::Detector;
@@ -341,7 +340,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSetCodeHash {
                 | TerminatorKind::Unreachable
                 | TerminatorKind::GeneratorDrop
                 | TerminatorKind::UnwindResume
-                | TerminatorKind::UnwindTerminate(_)=> {}
+                | TerminatorKind::UnwindTerminate(_) => {}
             }
             ret_vec
         }

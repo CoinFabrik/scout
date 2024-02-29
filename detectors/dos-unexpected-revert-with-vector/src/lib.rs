@@ -13,12 +13,11 @@ use rustc_hir::intravisit::Visitor;
 use rustc_hir::QPath;
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
-use rustc_middle::mir::{
-    BasicBlock, BasicBlockData, BasicBlocks, Operand, Place, StatementKind,
-    TerminatorKind,
-};
 use rustc_middle::mir::Const;
-use rustc_middle::ty::{TyKind, Ty};
+use rustc_middle::mir::{
+    BasicBlock, BasicBlockData, BasicBlocks, Operand, Place, StatementKind, TerminatorKind,
+};
+use rustc_middle::ty::{Ty, TyKind};
 use rustc_span::def_id::DefId;
 use rustc_span::Span;
 use scout_audit_internal::Detector;

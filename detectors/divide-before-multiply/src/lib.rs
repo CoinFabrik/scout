@@ -13,15 +13,15 @@ use rustc_hir::intravisit::Visitor;
 use rustc_hir::BinOpKind;
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
+use rustc_middle::mir::Const;
 use rustc_middle::mir::{
-    BasicBlock, BasicBlockData, BasicBlocks, BinOp, Operand, Place, Rvalue,
-    StatementKind, TerminatorKind,
+    BasicBlock, BasicBlockData, BasicBlocks, BinOp, Operand, Place, Rvalue, StatementKind,
+    TerminatorKind,
 };
 use rustc_middle::ty::TyKind;
 use rustc_span::def_id::DefId;
 use rustc_span::Span;
 use scout_audit_internal::Detector;
-use rustc_middle::mir::Const;
 
 dylint_linting::declare_late_lint! {
     /// ### What it does

@@ -4,7 +4,6 @@
 extern crate rustc_ast;
 extern crate rustc_span;
 
-use scout_auditgi_clippy_utils::sym;
 use if_chain::if_chain;
 use rustc_ast::{
     ptr::P,
@@ -15,6 +14,7 @@ use rustc_ast::{
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::{sym, Span};
 use scout_audit_internal::Detector;
+use scout_auditgi_clippy_utils::sym;
 
 dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does
