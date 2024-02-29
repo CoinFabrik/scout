@@ -186,7 +186,7 @@ fn navigate_trough_basicblocks<'tcx>(
                 ..
             } => {
                 if let Operand::Constant(cst) = func
-                    && let ConstantKind::Val(_, ty) = cst.literal
+                    && let Const::Val(_, ty) = cst.const_
                     && let TyKind::FnDef(id, _) = ty.kind()
                 {
                     if def_ids.checked_div.is_some_and(|f| f == id)
@@ -311,8 +311,8 @@ fn navigate_trough_basicblocks<'tcx>(
                 }
             }
             TerminatorKind::GeneratorDrop
-            | TerminatorKind::Resume
-            | TerminatorKind::Terminate
+            | TerminatorKind::UnwindResume
+            | TerminatorKind::UnwindTerminate(_)
             | TerminatorKind::Return
             | TerminatorKind::Unreachable => {}
         }

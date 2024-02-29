@@ -166,7 +166,7 @@ impl<'tcx> LateLintPass<'tcx> for UnexpectedRevertWarn {
                 let terminator = bb_data.terminator.clone().unwrap();
                 if let TerminatorKind::Call { func, .. } = terminator.kind {
                     if let Operand::Constant(fn_const) = func
-                        && let ConstantKind::Val(_const_val, ty) = fn_const.literal
+                        && let Const::Val(_const_val, ty) = fn_const.const_
                         && let TyKind::FnDef(def, _subs) = ty.kind()
                     {
                         if !callers_def_id.is_empty() {

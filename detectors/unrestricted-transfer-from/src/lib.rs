@@ -231,7 +231,6 @@ impl<'tcx> LateLintPass<'tcx> for UnrestrictedTransferFrom {
                 destination,
                 target,
                 unwind: _,
-                from_hir_call: _,
                 fn_span: _,
                 ..
             } = &bb.terminator().kind
@@ -259,7 +258,6 @@ impl<'tcx> LateLintPass<'tcx> for UnrestrictedTransferFrom {
                             destination: _,
                             target,
                             unwind: _,
-                            from_hir_call: _,
                             fn_span, ..
                         } = &bbs[*bb].terminator().kind
                             && let Operand::Constant(cont) = func

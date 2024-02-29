@@ -122,7 +122,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
                 let terminator = bb_data.terminator.clone().unwrap();
                 if let TerminatorKind::Call { func, .. } = terminator.kind {
                     if let Operand::Constant(fn_const) = func
-                        && let ConstantKind::Val(_const_val, ty) = fn_const.literal
+                        && let Const::Val(_const_val, ty) = fn_const.const_
                         && let TyKind::FnDef(def, _subs) = ty.kind()
                     {
                         if caller_def_id.is_some_and(|d: DefId| d == def) {
