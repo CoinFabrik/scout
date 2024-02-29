@@ -179,7 +179,7 @@ impl<'tcx> LateLintPass<'tcx> for UnexpectedRevertWarn {
                             }
                         } else {
                             for op in &push_def_id {
-                                if op == def {
+                                if op == &def {
                                     callers_vec
                                         .vec_ops
                                         .push((bb_data, BasicBlock::from_usize(bb)));
@@ -379,8 +379,8 @@ impl<'tcx> LateLintPass<'tcx> for UnexpectedRevertWarn {
                         ));
                     }
                 }
-                TerminatorKind::Resume
-                | TerminatorKind::Terminate
+                TerminatorKind::UnwindResume
+                | TerminatorKind::UnwindTerminate(_)
                 | TerminatorKind::Return
                 | TerminatorKind::Unreachable
                 | TerminatorKind::GeneratorDrop => {}
