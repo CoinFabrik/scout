@@ -106,10 +106,8 @@ impl<'tcx> Visitor<'tcx> for CounterVisitor {
                     }
                 }
             }
-            ExprKind::Match(_expr, _arms, source) => {
-                if let rustc_hir::MatchSource::TryDesugar(_) = source {
-                    self.found_try = true;
-                }
+            ExprKind::Match(_expr, _arms, rustc_hir::MatchSource::TryDesugar(_)) => {
+                self.found_try = true;
             }
             _ => {}
         }

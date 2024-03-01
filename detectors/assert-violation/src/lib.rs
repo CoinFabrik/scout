@@ -101,7 +101,7 @@ impl EarlyLintPass for AssertViolation {
 }
 
 fn check_macro_call(cx: &EarlyContext, span: Span, mac: &P<MacCall>) {
-    if vec![
+    if [
         sym!(assert),
         sym!(assert_eq),
         sym!(assert_ne),
