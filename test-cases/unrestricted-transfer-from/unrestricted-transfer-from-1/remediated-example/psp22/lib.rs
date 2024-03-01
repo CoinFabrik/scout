@@ -4,12 +4,11 @@
 #[ink::contract]
 pub mod psp22 {
 
+    use ink::env::DefaultEnvironment;
+    use ink::prelude::vec::Vec;
     use openbrush::contracts::psp22::*;
     use openbrush::traits::Storage;
-    use ink::env::DefaultEnvironment;
     use PSP22Error;
-    use ink::prelude::vec::Vec;
-
 
     #[ink(storage)]
     #[derive(Default, Storage)]
@@ -73,7 +72,7 @@ pub mod psp22 {
         #[ink(constructor)]
         pub fn new(initial_supply: Balance) -> Self {
             let mut _instance = Self::default();
-        _instance
+            _instance
         }
 
         #[ink(message)]
