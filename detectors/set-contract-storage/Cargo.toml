@@ -7,7 +7,7 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-clippy_utils = { workspace = true }
+scout-audit-clippy-utils = { workspace = true }
 dylint_linting = { workspace = true }
 if_chain = { workspace = true }
 

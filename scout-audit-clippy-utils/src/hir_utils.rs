@@ -1,20 +1,22 @@
 use crate::consts::constant_simple;
 use crate::macros::macro_backtrace;
-use crate::source::snippet_opt;
+use crate::source::{get_source_text, snippet_opt, walk_span_to_context, SpanRange};
+use crate::tokenize_with_text;
 use rustc_ast::ast::InlineAsmTemplatePiece;
 use rustc_data_structures::fx::FxHasher;
 use rustc_hir::def::Res;
-use rustc_hir::HirIdMap;
+use rustc_hir::MatchSource::TryDesugar;
 use rustc_hir::{
     ArrayLen, BinOpKind, BindingAnnotation, Block, BodyId, Closure, Expr, ExprField, ExprKind, FnRetTy, GenericArg,
-    GenericArgs, Guard, HirId, InlineAsmOperand, Let, Lifetime, LifetimeName, Pat, PatField, PatKind, Path,
+    GenericArgs, Guard, HirId, HirIdMap, InlineAsmOperand, Let, Lifetime, LifetimeName, Pat, PatField, PatKind, Path,
     PathSegment, PrimTy, QPath, Stmt, StmtKind, Ty, TyKind, TypeBinding,
 };
 use rustc_lexer::{tokenize, TokenKind};
 use rustc_lint::LateContext;
 use rustc_middle::ty::TypeckResults;
-use rustc_span::{sym, Symbol};
+use rustc_span::{sym, BytePos, ExpnKind, MacroKind, Symbol, SyntaxContext};
 use std::hash::{Hash, Hasher};
+use std::ops::Range;
 
 /// Callback that is called when two expressions are not equal in the sense of `SpanlessEq`, but
 /// other conditions would make them equal.
@@ -65,6 +67,8 @@ impl<'a, 'tcx> SpanlessEq<'a, 'tcx> {
     pub fn inter_expr(&mut self) -> HirEqInterExpr<'_, 'a, 'tcx> {
         HirEqInterExpr {
             inner: self,
+            left_ctxt: SyntaxContext::root(),
+            right_ctxt: SyntaxContext::root(),
             locals: HirIdMap::default(),
         }
     }
@@ -92,6 +96,8 @@ impl<'a, 'tcx> SpanlessEq<'a, 'tcx> {
 
 pub struct HirEqInterExpr<'a, 'b, 'tcx> {
     inner: &'a mut SpanlessEq<'b, 'tcx>,
+    left_ctxt: SyntaxContext,
+    right_ctxt: SyntaxContext,
 
     // When binding are declared, the binding ID in the left expression is mapped to the one on the
     // right. For example, when comparing `{ let x = 1; x + 2 }` and `{ let y = 1; y + 2 }`,
@@ -126,52 +132,88 @@ impl HirEqInterExpr<'_, '_, '_> {
     }
 
     /// Checks whether two blocks are the same.
+    #[expect(clippy::similar_names)]
     fn eq_block(&mut self, left: &Block<'_>, right: &Block<'_>) -> bool {
-        match (left.stmts, left.expr, right.stmts, right.expr) {
-            ([], None, [], None) => {
-                // For empty blocks, check to see if the tokens are equal. This will catch the case where a macro
-                // expanded to nothing, or the cfg attribute was used.
-                let (Some(left), Some(right)) = (
-                    snippet_opt(self.inner.cx, left.span),
-                    snippet_opt(self.inner.cx, right.span),
-                ) else { return true };
-                let mut left_pos = 0;
-                let left = tokenize(&left)
-                    .map(|t| {
-                        let end = left_pos + t.len as usize;
-                        let s = &left[left_pos..end];
-                        left_pos = end;
-                        (t, s)
-                    })
-                    .filter(|(t, _)| {
-                        !matches!(
-                            t.kind,
-                            TokenKind::LineComment { .. } | TokenKind::BlockComment { .. } | TokenKind::Whitespace
-                        )
-                    })
-                    .map(|(_, s)| s);
-                let mut right_pos = 0;
-                let right = tokenize(&right)
-                    .map(|t| {
-                        let end = right_pos + t.len as usize;
-                        let s = &right[right_pos..end];
-                        right_pos = end;
-                        (t, s)
-                    })
-                    .filter(|(t, _)| {
-                        !matches!(
-                            t.kind,
-                            TokenKind::LineComment { .. } | TokenKind::BlockComment { .. } | TokenKind::Whitespace
-                        )
-                    })
-                    .map(|(_, s)| s);
-                left.eq(right)
-            },
-            _ => {
-                over(left.stmts, right.stmts, |l, r| self.eq_stmt(l, r))
-                    && both(&left.expr, &right.expr, |l, r| self.eq_expr(l, r))
-            },
+        use TokenKind::{BlockComment, LineComment, Semi, Whitespace};
+        if left.stmts.len() != right.stmts.len() {
+            return false;
         }
+        let lspan = left.span.data();
+        let rspan = right.span.data();
+        if lspan.ctxt != SyntaxContext::root() && rspan.ctxt != SyntaxContext::root() {
+            // Don't try to check in between statements inside macros.
+            return over(left.stmts, right.stmts, |left, right| self.eq_stmt(left, right))
+                && both(&left.expr, &right.expr, |left, right| self.eq_expr(left, right));
+        }
+        if lspan.ctxt != rspan.ctxt {
+            return false;
+        }
+
+        let mut lstart = lspan.lo;
+        let mut rstart = rspan.lo;
+
+        for (left, right) in left.stmts.iter().zip(right.stmts) {
+            if !self.eq_stmt(left, right) {
+                return false;
+            }
+
+            // Try to detect any `cfg`ed statements or empty macro expansions.
+            let Some(lstmt_span) = walk_span_to_context(left.span, lspan.ctxt) else {
+                return false;
+            };
+            let Some(rstmt_span) = walk_span_to_context(right.span, rspan.ctxt) else {
+                return false;
+            };
+            let lstmt_span = lstmt_span.data();
+            let rstmt_span = rstmt_span.data();
+
+            if lstmt_span.lo < lstart && rstmt_span.lo < rstart {
+                // Can happen when macros expand to multiple statements, or rearrange statements.
+                // Nothing in between the statements to check in this case.
+                continue;
+            }
+            if lstmt_span.lo < lstart || rstmt_span.lo < rstart {
+                // Only one of the blocks had a weird macro.
+                return false;
+            }
+            if !eq_span_tokens(self.inner.cx, lstart..lstmt_span.lo, rstart..rstmt_span.lo, |t| {
+                !matches!(t, Whitespace | LineComment { .. } | BlockComment { .. } | Semi)
+            }) {
+                return false;
+            }
+
+            lstart = lstmt_span.hi;
+            rstart = rstmt_span.hi;
+        }
+
+        let (lend, rend) = match (left.expr, right.expr) {
+            (Some(left), Some(right)) => {
+                if !self.eq_expr(left, right) {
+                    return false;
+                }
+                let Some(lexpr_span) = walk_span_to_context(left.span, lspan.ctxt) else {
+                    return false;
+                };
+                let Some(rexpr_span) = walk_span_to_context(right.span, rspan.ctxt) else {
+                    return false;
+                };
+                (lexpr_span.lo(), rexpr_span.lo())
+            },
+            (None, None) => (lspan.hi, rspan.hi),
+            (Some(_), None) | (None, Some(_)) => return false,
+        };
+
+        if lend < lstart && rend < rstart {
+            // Can happen when macros rearrange the input.
+            // Nothing in between the statements to check in this case.
+            return true;
+        } else if lend < lstart || rend < rstart {
+            // Only one of the blocks had a weird macro
+            return false;
+        }
+        eq_span_tokens(self.inner.cx, lstart..lend, rstart..rend, |t| {
+            !matches!(t, Whitespace | LineComment { .. } | BlockComment { .. } | Semi)
+        })
     }
 
     fn should_ignore(&mut self, expr: &Expr<'_>) -> bool {
@@ -207,19 +249,19 @@ impl HirEqInterExpr<'_, '_, '_> {
 
     #[expect(clippy::similar_names)]
     pub fn eq_expr(&mut self, left: &Expr<'_>, right: &Expr<'_>) -> bool {
-        if !self.inner.allow_side_effects && left.span.ctxt() != right.span.ctxt() {
+        if !self.check_ctxt(left.span.ctxt(), right.span.ctxt()) {
             return false;
         }
 
-        if let Some((typeck_lhs, typeck_rhs)) = self.inner.maybe_typeck_results {
-            if let (Some(l), Some(r)) = (
+        if let Some((typeck_lhs, typeck_rhs)) = self.inner.maybe_typeck_results
+            && typeck_lhs.expr_ty(left) == typeck_rhs.expr_ty(right)
+            && let (Some(l), Some(r)) = (
                 constant_simple(self.inner.cx, typeck_lhs, left),
                 constant_simple(self.inner.cx, typeck_rhs, right),
-            ) {
-                if l == r {
-                    return true;
-                }
-            }
+            )
+            && l == r
+        {
+            return true;
         }
 
         let is_eq = match (
@@ -258,7 +300,7 @@ impl HirEqInterExpr<'_, '_, '_> {
             (&ExprKind::Field(l_f_exp, ref l_f_ident), &ExprKind::Field(r_f_exp, ref r_f_ident)) => {
                 l_f_ident.name == r_f_ident.name && self.eq_expr(l_f_exp, r_f_exp)
             },
-            (&ExprKind::Index(la, li), &ExprKind::Index(ra, ri)) => self.eq_expr(la, ra) && self.eq_expr(li, ri),
+            (&ExprKind::Index(la, li, _), &ExprKind::Index(ra, ri, _)) => self.eq_expr(la, ra) && self.eq_expr(li, ri),
             (&ExprKind::If(lc, lt, ref le), &ExprKind::If(rc, rt, ref re)) => {
                 self.eq_expr(lc, rc) && self.eq_expr(lt, rt) && both(le, re, |l, r| self.eq_expr(l, r))
             },
@@ -270,7 +312,7 @@ impl HirEqInterExpr<'_, '_, '_> {
                 lls == rls && self.eq_block(lb, rb) && both(ll, rl, |l, r| l.ident.name == r.ident.name)
             },
             (&ExprKind::Match(le, la, ref ls), &ExprKind::Match(re, ra, ref rs)) => {
-                ls == rs
+                (ls == rs || (matches!((ls, rs), (TryDesugar(_), TryDesugar(_)))))
                     && self.eq_expr(le, re)
                     && over(la, ra, |l, r| {
                         self.eq_pat(l.pat, r.pat)
@@ -439,6 +481,48 @@ impl HirEqInterExpr<'_, '_, '_> {
 
     fn eq_type_binding(&mut self, left: &TypeBinding<'_>, right: &TypeBinding<'_>) -> bool {
         left.ident.name == right.ident.name && self.eq_ty(left.ty(), right.ty())
+    }
+
+    fn check_ctxt(&mut self, left: SyntaxContext, right: SyntaxContext) -> bool {
+        if self.left_ctxt == left && self.right_ctxt == right {
+            return true;
+        } else if self.left_ctxt == left || self.right_ctxt == right {
+            // Only one context has changed. This can only happen if the two nodes are written differently.
+            return false;
+        } else if left != SyntaxContext::root() {
+            let mut left_data = left.outer_expn_data();
+            let mut right_data = right.outer_expn_data();
+            loop {
+                use TokenKind::{BlockComment, LineComment, Whitespace};
+                if left_data.macro_def_id != right_data.macro_def_id
+                    || (matches!(
+                        left_data.kind,
+                        ExpnKind::Macro(MacroKind::Bang, name)
+                        if name == sym::cfg || name == sym::option_env
+                    ) && !eq_span_tokens(self.inner.cx, left_data.call_site, right_data.call_site, |t| {
+                        !matches!(t, Whitespace | LineComment { .. } | BlockComment { .. })
+                    }))
+                {
+                    // Either a different chain of macro calls, or different arguments to the `cfg` macro.
+                    return false;
+                }
+                let left_ctxt = left_data.call_site.ctxt();
+                let right_ctxt = right_data.call_site.ctxt();
+                if left_ctxt == SyntaxContext::root() && right_ctxt == SyntaxContext::root() {
+                    break;
+                }
+                if left_ctxt == SyntaxContext::root() || right_ctxt == SyntaxContext::root() {
+                    // Different lengths for the expansion stack. This can only happen if nodes are written differently,
+                    // or shouldn't be compared to start with.
+                    return false;
+                }
+                left_data = left_ctxt.outer_expn_data();
+                right_data = right_ctxt.outer_expn_data();
+            }
+        }
+        self.left_ctxt = left;
+        self.right_ctxt = right;
+        true
     }
 }
 
@@ -647,7 +731,7 @@ impl<'a, 'tcx> SpanlessHash<'a, 'tcx> {
                 self.hash_expr(e);
                 self.hash_name(f.name);
             },
-            ExprKind::Index(a, i) => {
+            ExprKind::Index(a, i, _) => {
                 self.hash_expr(a);
                 self.hash_expr(i);
             },
@@ -763,6 +847,9 @@ impl<'a, 'tcx> SpanlessHash<'a, 'tcx> {
                 if let Some(e) = *e {
                     self.hash_expr(e);
                 }
+            },
+            ExprKind::Become(f) => {
+                self.hash_expr(f);
             },
             ExprKind::Path(ref qpath) => {
                 self.hash_qpath(qpath);
@@ -1037,4 +1124,35 @@ pub fn hash_expr(cx: &LateContext<'_>, e: &Expr<'_>) -> u64 {
     let mut h = SpanlessHash::new(cx);
     h.hash_expr(e);
     h.finish()
+}
+
+#[expect(clippy::similar_names)]
+fn eq_span_tokens(
+    cx: &LateContext<'_>,
+    left: impl SpanRange,
+    right: impl SpanRange,
+    pred: impl Fn(TokenKind) -> bool,
+) -> bool {
+    fn f(cx: &LateContext<'_>, left: Range<BytePos>, right: Range<BytePos>, pred: impl Fn(TokenKind) -> bool) -> bool {
+        if let Some(lsrc) = get_source_text(cx, left)
+            && let Some(lsrc) = lsrc.as_str()
+            && let Some(rsrc) = get_source_text(cx, right)
+            && let Some(rsrc) = rsrc.as_str()
+        {
+            let pred = |t: &(_, _)| pred(t.0);
+            let map = |(_, x)| x;
+
+            let ltok = tokenize_with_text(lsrc)
+                .filter(pred)
+                .map(map);
+            let rtok = tokenize_with_text(rsrc)
+                .filter(pred)
+                .map(map);
+            ltok.eq(rtok)
+        } else {
+            // Unable to access the source. Conservatively assume the blocks aren't equal.
+            false
+        }
+    }
+    f(cx, left.into_range(), right.into_range(), pred)
 }

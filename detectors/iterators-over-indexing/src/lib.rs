@@ -31,7 +31,7 @@ struct VectorAccessVisitor {
 
 impl<'tcx> Visitor<'tcx> for VectorAccessVisitor {
     fn visit_expr(&mut self, expr: &'tcx Expr<'tcx>) {
-        if let ExprKind::Index(_, id) = expr.kind
+        if let ExprKind::Index(_, id, _) = expr.kind
             && let ExprKind::Path(qpath) = &id.kind
             && let QPath::Resolved(_, path) = qpath
             && let Res::Local(hir_id) = path.res

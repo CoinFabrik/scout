@@ -3,12 +3,12 @@
 extern crate rustc_hir;
 extern crate rustc_span;
 
-use clippy_utils::consts::constant_simple;
-use clippy_utils::is_integer_literal;
 use rustc_hir::{self as hir, Body, Expr, ExprKind, UnOp};
 use rustc_lint::LateContext;
 use rustc_lint::LateLintPass;
 use rustc_span::source_map::Span;
+use scout_audit_clippy_utils::consts::constant_simple;
+use scout_audit_clippy_utils::is_integer_literal;
 use scout_audit_internal::Detector;
 
 dylint_linting::impl_late_lint! {
@@ -194,7 +194,7 @@ impl ArithmeticContext {
         let body_owner_def_id = cx.tcx.hir().body_owner_def_id(body.id());
 
         match cx.tcx.hir().body_owner_kind(body_owner_def_id) {
-            hir::BodyOwnerKind::Static(_) | hir::BodyOwnerKind::Const => {
+            hir::BodyOwnerKind::Static(_) | hir::BodyOwnerKind::Const { .. } => {
                 let body_span = cx.tcx.hir().span_with_body(body_owner);
 
                 if let Some(span) = self.const_span {

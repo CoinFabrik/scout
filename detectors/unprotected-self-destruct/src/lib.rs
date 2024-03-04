@@ -13,8 +13,7 @@ use rustc_hir::{
 };
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_middle::mir::{
-    BasicBlock, BasicBlockData, BasicBlocks, ConstantKind, Operand, Place, StatementKind,
-    TerminatorKind,
+    BasicBlock, BasicBlockData, BasicBlocks, Const, Operand, Place, StatementKind, TerminatorKind,
 };
 use rustc_middle::ty::TyKind;
 use rustc_span::def_id::DefId;
@@ -110,7 +109,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
                 let terminator = bb_data.terminator.clone().unwrap();
                 if let TerminatorKind::Call { func, .. } = terminator.kind {
                     if let Operand::Constant(fn_const) = func
-                        && let ConstantKind::Val(_const_val, ty) = fn_const.literal
+                        && let Const::Val(_const_val, ty) = fn_const.const_
                         && let TyKind::FnDef(def, _subs) = ty.kind()
                     {
                         if caller_def_id.is_some_and(|d| d == *def) {
@@ -317,8 +316,8 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
                         ));
                     }
                 }
-                TerminatorKind::Resume
-                | TerminatorKind::Terminate
+                TerminatorKind::UnwindResume
+                | TerminatorKind::UnwindTerminate(_)
                 | TerminatorKind::Return
                 | TerminatorKind::Unreachable
                 | TerminatorKind::GeneratorDrop => {}

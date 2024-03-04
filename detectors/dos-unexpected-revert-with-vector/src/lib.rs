@@ -13,11 +13,11 @@ use rustc_hir::intravisit::Visitor;
 use rustc_hir::QPath;
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
+use rustc_middle::mir::Const;
 use rustc_middle::mir::{
-    BasicBlock, BasicBlockData, BasicBlocks, ConstantKind, Operand, Place, StatementKind,
-    TerminatorKind,
+    BasicBlock, BasicBlockData, BasicBlocks, Operand, Place, StatementKind, TerminatorKind,
 };
-use rustc_middle::ty::TyKind;
+use rustc_middle::ty::{Ty, TyKind};
 use rustc_span::def_id::DefId;
 use rustc_span::Span;
 use scout_audit_internal::Detector;
@@ -83,7 +83,7 @@ impl<'tcx> LateLintPass<'tcx> for UnexpectedRevertWarn {
             fn visit_expr(&mut self, expr: &'tcx Expr<'_>) {
                 if let ExprKind::MethodCall(path, receiver, ..) = expr.kind {
                     let defid = self.cx.typeck_results().type_dependent_def_id(expr.hir_id);
-                    let ty = self.cx.tcx.mk_foreign(defid.unwrap());
+                    let ty = Ty::new_foreign(self.cx.tcx, defid.unwrap());
                     if ty.to_string().contains("std::vec::Vec") {
                         if path.ident.name.to_string() == "push" {
                             self.push_def_id = defid;
@@ -166,7 +166,7 @@ impl<'tcx> LateLintPass<'tcx> for UnexpectedRevertWarn {
                 let terminator = bb_data.terminator.clone().unwrap();
                 if let TerminatorKind::Call { func, .. } = terminator.kind {
                     if let Operand::Constant(fn_const) = func
-                        && let ConstantKind::Val(_const_val, ty) = fn_const.literal
+                        && let Const::Val(_const_val, ty) = fn_const.const_
                         && let TyKind::FnDef(def, _subs) = ty.kind()
                     {
                         if !callers_def_id.is_empty() {
@@ -379,8 +379,8 @@ impl<'tcx> LateLintPass<'tcx> for UnexpectedRevertWarn {
                         ));
                     }
                 }
-                TerminatorKind::Resume
-                | TerminatorKind::Terminate
+                TerminatorKind::UnwindResume
+                | TerminatorKind::UnwindTerminate(_)
                 | TerminatorKind::Return
                 | TerminatorKind::Unreachable
                 | TerminatorKind::GeneratorDrop => {}

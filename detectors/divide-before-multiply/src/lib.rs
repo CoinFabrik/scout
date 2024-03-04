@@ -13,9 +13,10 @@ use rustc_hir::intravisit::Visitor;
 use rustc_hir::BinOpKind;
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
+use rustc_middle::mir::Const;
 use rustc_middle::mir::{
-    BasicBlock, BasicBlockData, BasicBlocks, BinOp, ConstantKind, Operand, Place, Rvalue,
-    StatementKind, TerminatorKind,
+    BasicBlock, BasicBlockData, BasicBlocks, BinOp, Operand, Place, Rvalue, StatementKind,
+    TerminatorKind,
 };
 use rustc_middle::ty::TyKind;
 use rustc_span::def_id::DefId;
@@ -186,11 +187,11 @@ fn navigate_trough_basicblocks<'tcx>(
                 ..
             } => {
                 if let Operand::Constant(cst) = func
-                    && let ConstantKind::Val(_, ty) = cst.literal
+                    && let Const::Val(_, ty) = cst.const_
                     && let TyKind::FnDef(id, _) = ty.kind()
                 {
-                    if def_ids.checked_div.is_some_and(|f| f == *id)
-                        || def_ids.saturating_div.is_some_and(|f| f == *id)
+                    if def_ids.checked_div.is_some_and(|f| &f == id)
+                        || def_ids.saturating_div.is_some_and(|f| &f == id)
                     {
                         tainted_places.push(*destination);
                     } else {
@@ -200,8 +201,8 @@ fn navigate_trough_basicblocks<'tcx>(
                                     if tainted_places.contains(place) {
                                         tainted_places.push(*destination);
 
-                                        if def_ids.checked_mul.is_some_and(|f| f == *id)
-                                            || def_ids.saturating_mul.is_some_and(|f| f == *id)
+                                        if def_ids.checked_mul.is_some_and(|f| &f == id)
+                                            || def_ids.saturating_mul.is_some_and(|f| &f == id)
                                         {
                                             spans.push(*fn_span);
                                         }
@@ -311,8 +312,8 @@ fn navigate_trough_basicblocks<'tcx>(
                 }
             }
             TerminatorKind::GeneratorDrop
-            | TerminatorKind::Resume
-            | TerminatorKind::Terminate
+            | TerminatorKind::UnwindResume
+            | TerminatorKind::UnwindTerminate(_)
             | TerminatorKind::Return
             | TerminatorKind::Unreachable => {}
         }
