@@ -6,6 +6,7 @@ use cargo::Config;
 use cargo_metadata::MetadataCommand;
 use clap::{Parser, Subcommand, ValueEnum};
 use dylint::Dylint;
+use std::sync::{Arc, Mutex};
 
 use crate::{
     detectors::{get_detectors_configuration, get_local_detectors_configuration, Detectors},
@@ -156,8 +157,8 @@ pub fn run_scout(opts: Scout) -> Result<()> {
 
     Ok(())
 }
-
-fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> Result<()> {
+#[tokio::main]
+async fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> Result<()> {
     // Convert detectors paths to string
     let detectors_paths: Vec<String> = detectors_paths
         .iter()
@@ -187,6 +188,10 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> Result<()> {
         quiet: !opts.verbose,
         ..Default::default()
     };
+
+    let findings: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
+
+    tokio::task::spawn(async { scout_audit_internal::detector_server(findings) });
 
     dylint::run(&options)?;
 

@@ -31,3 +31,8 @@ strum = { version = "0.25", features = ["derive"], optional = true }
 serde_json = { version = "1.0", optional = true }
 scout-audit-clippy-utils = { version = "=0.2.2", path = "../scout-audit-clippy-utils", optional = true }
 serde = { version = "1.0.197", features = ["derive"] }
+tarpc = { version = "0.34", features = ["full"] }
+tokio = { version = "1", features = ["macros", "net", "rt-multi-thread"] }
+anyhow = "1.0"
+futures = "0.3"
+rand = "0.8"
