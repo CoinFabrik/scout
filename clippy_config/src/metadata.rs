@@ -102,7 +102,10 @@ fn parse_config_field_doc(doc_comment: &str) -> Option<(Vec<String>, String)> {
 
         // Format documentation correctly
         // split off leading `.` from lint name list and indent for correct formatting
-        documentation = documentation.trim_start_matches('.').trim().replace("\n ", "\n    ");
+        documentation = documentation
+            .trim_start_matches('.')
+            .trim()
+            .replace("\n ", "\n    ");
 
         Some((lints, documentation))
     } else {

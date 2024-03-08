@@ -1,6 +1,7 @@
+use std::fmt;
+
 use serde::de::{self, Deserializer, Visitor};
 use serde::{ser, Deserialize, Serialize};
-use std::fmt;
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct Rename {
@@ -12,7 +13,10 @@ pub struct Rename {
 #[serde(untagged)]
 pub enum DisallowedPath {
     Simple(String),
-    WithReason { path: String, reason: Option<String> },
+    WithReason {
+        path: String,
+        reason: Option<String>,
+    },
 }
 
 impl DisallowedPath {
@@ -25,7 +29,8 @@ impl DisallowedPath {
     pub fn reason(&self) -> Option<String> {
         match self {
             Self::WithReason {
-                reason: Some(reason), ..
+                reason: Some(reason),
+                ..
             } => Some(format!("{reason} (from clippy.toml)")),
             _ => None,
         }
@@ -77,13 +82,13 @@ impl<'de> Deserialize<'de> for MacroMatcher {
                                 return Err(de::Error::duplicate_field("name"));
                             }
                             name = Some(map.next_value()?);
-                        },
+                        }
                         Field::Brace => {
                             if brace.is_some() {
                                 return Err(de::Error::duplicate_field("brace"));
                             }
                             brace = Some(map.next_value()?);
-                        },
+                        }
                     }
                 }
                 let name = name.ok_or_else(|| de::Error::missing_field("name"))?;
@@ -94,7 +99,11 @@ impl<'de> Deserialize<'de> for MacroMatcher {
                         .into_iter()
                         .find(|b| b.0 == brace)
                         .map(|(o, c)| (o.to_owned(), c.to_owned()))
-                        .ok_or_else(|| de::Error::custom(format!("expected one of `(`, `{{`, `[` found `{brace}`")))?,
+                        .ok_or_else(|| {
+                            de::Error::custom(format!(
+                                "expected one of `(`, `{{`, `[` found `{brace}`"
+                            ))
+                        })?,
                 })
             }
         }

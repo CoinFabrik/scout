@@ -18,11 +18,11 @@ use rustc_span::Span;
 use scout_audit_clippy_utils::diagnostics::{
     span_lint as span_lint_clippy, span_lint_and_help as span_lint_and_help_clippy,
 };
+//import serialize and deserialize from serde
+use serde::{Deserialize, Serialize};
 #[cfg(feature = "lint_helper")]
 use serde_json::json;
 use strum::{Display, EnumIter};
-//import serialize and deserialize from serde
-use serde::{Deserialize, Serialize};
 /// Available detectors.
 #[derive(Debug, Display, Clone, EnumIter, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[strum(serialize_all = "kebab-case")]

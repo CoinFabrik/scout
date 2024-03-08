@@ -1,17 +1,19 @@
-use crate::msrvs::Msrv;
-use crate::types::{DisallowedPath, MacroMatcher, MatchLintBehaviour, Rename};
-use crate::ClippyConfiguration;
-use rustc_data_structures::fx::FxHashSet;
-use rustc_session::Session;
-use rustc_span::{BytePos, Pos, SourceFile, Span, SyntaxContext};
-use serde::de::{IgnoredAny, IntoDeserializer, MapAccess, Visitor};
-use serde::{Deserialize, Deserializer, Serialize};
 use std::fmt::{Debug, Display, Formatter};
 use std::ops::Range;
 use std::path::PathBuf;
 use std::str::FromStr;
 use std::sync::OnceLock;
 use std::{cmp, env, fmt, fs, io};
+
+use rustc_data_structures::fx::FxHashSet;
+use rustc_session::Session;
+use rustc_span::{BytePos, Pos, SourceFile, Span, SyntaxContext};
+use serde::de::{IgnoredAny, IntoDeserializer, MapAccess, Visitor};
+use serde::{Deserialize, Deserializer, Serialize};
+
+use crate::msrvs::Msrv;
+use crate::types::{DisallowedPath, MacroMatcher, MatchLintBehaviour, Rename};
+use crate::ClippyConfiguration;
 
 #[rustfmt::skip]
 const DEFAULT_DOC_VALID_IDENTS: &[&str] = &[
@@ -93,7 +95,9 @@ macro_rules! wrap_option {
 macro_rules! default_text {
     ($value:expr) => {{
         let mut text = String::new();
-        $value.serialize(toml::ser::ValueSerializer::new(&mut text)).unwrap();
+        $value
+            .serialize(toml::ser::ValueSerializer::new(&mut text))
+            .unwrap();
         text
     }};
     ($value:expr, $override:expr) => {
@@ -572,9 +576,9 @@ pub fn lookup_conf_file() -> io::Result<(Option<PathBuf>, Vec<String>)> {
         for config_file_name in &CONFIG_FILE_NAMES {
             if let Ok(config_file) = current.join(config_file_name).canonicalize() {
                 match fs::metadata(&config_file) {
-                    Err(e) if e.kind() == io::ErrorKind::NotFound => {},
+                    Err(e) if e.kind() == io::ErrorKind::NotFound => {}
                     Err(e) => return Err(e),
-                    Ok(md) if md.is_dir() => {},
+                    Ok(md) if md.is_dir() => {}
                     Ok(_) => {
                         // warn if we happen to find two config files #8323
                         if let Some(ref found_config) = found_config {
@@ -586,7 +590,7 @@ pub fn lookup_conf_file() -> io::Result<(Option<PathBuf>, Vec<String>)> {
                         } else {
                             found_config = Some(config_file);
                         }
-                    },
+                    }
                 }
             }
         }
@@ -603,19 +607,32 @@ pub fn lookup_conf_file() -> io::Result<(Option<PathBuf>, Vec<String>)> {
 }
 
 fn deserialize(file: &SourceFile) -> TryConf {
-    match toml::de::Deserializer::new(file.src.as_ref().unwrap()).deserialize_map(ConfVisitor(file)) {
+    match toml::de::Deserializer::new(file.src.as_ref().unwrap()).deserialize_map(ConfVisitor(file))
+    {
         Ok(mut conf) => {
-            extend_vec_if_indicator_present(&mut conf.conf.doc_valid_idents, DEFAULT_DOC_VALID_IDENTS);
-            extend_vec_if_indicator_present(&mut conf.conf.disallowed_names, DEFAULT_DISALLOWED_NAMES);
+            extend_vec_if_indicator_present(
+                &mut conf.conf.doc_valid_idents,
+                DEFAULT_DOC_VALID_IDENTS,
+            );
+            extend_vec_if_indicator_present(
+                &mut conf.conf.disallowed_names,
+                DEFAULT_DISALLOWED_NAMES,
+            );
             // TODO: THIS SHOULD BE TESTED, this comment will be gone soon
-            if conf.conf.allowed_idents_below_min_chars.contains(&"..".to_owned()) {
-                conf.conf
-                    .allowed_idents_below_min_chars
-                    .extend(DEFAULT_ALLOWED_IDENTS_BELOW_MIN_CHARS.iter().map(ToString::to_string));
+            if conf
+                .conf
+                .allowed_idents_below_min_chars
+                .contains(&"..".to_owned())
+            {
+                conf.conf.allowed_idents_below_min_chars.extend(
+                    DEFAULT_ALLOWED_IDENTS_BELOW_MIN_CHARS
+                        .iter()
+                        .map(ToString::to_string),
+                );
             }
 
             conf
-        },
+        }
         Err(e) => TryConf::from_toml_error(file, &e),
     }
 }
@@ -627,7 +644,10 @@ fn extend_vec_if_indicator_present(vec: &mut Vec<String>, default: &[&str]) {
 }
 
 impl Conf {
-    pub fn read(sess: &Session, path: &io::Result<(Option<PathBuf>, Vec<String>)>) -> &'static Conf {
+    pub fn read(
+        sess: &Session,
+        path: &io::Result<(Option<PathBuf>, Vec<String>)>,
+    ) -> &'static Conf {
         static CONF: OnceLock<Conf> = OnceLock::new();
         CONF.get_or_init(|| Conf::read_inner(sess, path))
     }
@@ -638,10 +658,12 @@ impl Conf {
                 for warning in warnings {
                     sess.warn(warning.clone());
                 }
-            },
+            }
             Err(error) => {
-                sess.err(format!("error finding Clippy's configuration file: {error}"));
-            },
+                sess.err(format!(
+                    "error finding Clippy's configuration file: {error}"
+                ));
+            }
         }
 
         let TryConf {
@@ -654,7 +676,7 @@ impl Conf {
                 Err(error) => {
                     sess.err(format!("failed to read `{}`: {error}", path.display()));
                     TryConf::default()
-                },
+                }
             },
             _ => TryConf::default(),
         };
@@ -665,14 +687,20 @@ impl Conf {
         for error in errors {
             sess.span_err(
                 error.span,
-                format!("error reading Clippy's configuration file: {}", error.message),
+                format!(
+                    "error reading Clippy's configuration file: {}",
+                    error.message
+                ),
             );
         }
 
         for warning in warnings {
             sess.span_warn(
                 warning.span,
-                format!("error reading Clippy's configuration file: {}", warning.message),
+                format!(
+                    "error reading Clippy's configuration file: {}",
+                    warning.message
+                ),
             );
         }
 
@@ -755,9 +783,10 @@ fn calculate_dimensions(fields: &[&str]) -> (usize, Vec<usize>) {
 
 #[cfg(test)]
 mod tests {
+    use std::fs;
+
     use rustc_data_structures::fx::{FxHashMap, FxHashSet};
     use serde::de::IgnoredAny;
-    use std::fs;
     use walkdir::WalkDir;
 
     #[test]

@@ -87,8 +87,8 @@ impl Msrv {
                         "the MSRV in `clippy.toml` and `Cargo.toml` differ; using `{clippy_msrv}` from `clippy.toml`"
                     ));
                 }
-            },
-            _ => {},
+            }
+            _ => {}
         }
     }
 
@@ -97,12 +97,15 @@ impl Msrv {
     }
 
     pub fn meets(&self, required: RustcVersion) -> bool {
-        self.current().map_or(true, |version| version.meets(required))
+        self.current()
+            .map_or(true, |version| version.meets(required))
     }
 
     fn parse_attr(sess: &Session, attrs: &[Attribute]) -> Option<RustcVersion> {
         let sym_msrv = Symbol::intern("msrv");
-        let mut msrv_attrs = attrs.iter().filter(|attr| attr.path_matches(&[sym::clippy, sym_msrv]));
+        let mut msrv_attrs = attrs
+            .iter()
+            .filter(|attr| attr.path_matches(&[sym::clippy, sym_msrv]));
 
         if let Some(msrv_attr) = msrv_attrs.next() {
             if let Some(duplicate) = msrv_attrs.last() {
@@ -116,7 +119,10 @@ impl Msrv {
                     return Some(version);
                 }
 
-                sess.span_err(msrv_attr.span, format!("`{msrv}` is not a valid Rust version"));
+                sess.span_err(
+                    msrv_attr.span,
+                    format!("`{msrv}` is not a valid Rust version"),
+                );
             } else {
                 sess.span_err(msrv_attr.span, "bad clippy attribute");
             }
