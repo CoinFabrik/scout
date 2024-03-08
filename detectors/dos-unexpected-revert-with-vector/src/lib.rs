@@ -379,11 +379,7 @@ impl<'tcx> LateLintPass<'tcx> for UnexpectedRevertWarn {
                         ));
                     }
                 }
-                TerminatorKind::UnwindResume
-                | TerminatorKind::UnwindTerminate(_)
-                | TerminatorKind::Return
-                | TerminatorKind::Unreachable
-                | TerminatorKind::GeneratorDrop => {}
+                _ => {}
             }
             ret_vec
         }

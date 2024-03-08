@@ -73,8 +73,8 @@ jobs:
             detectors/Cargo.lock
           key: ${{ runner.os }}-cargo-scout-dependencies-${{ github.run_id }}
 
-      - name: Install Rust nightly-2023-09-29
-        run: rustup install nightly-2023-09-29 --profile minimal
+      - name: Install Rust nightly-2023-12-16
+        run: rustup install nightly-2023-12-16 --profile minimal
 
       - name: Install dylint-link
         run: cargo install dylint-link

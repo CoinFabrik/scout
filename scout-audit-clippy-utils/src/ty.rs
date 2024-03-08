@@ -31,7 +31,7 @@ use rustc_trait_selection::traits::{Obligation, ObligationCause};
 use std::assert_matches::debug_assert_matches;
 use std::iter;
 
-use crate::{match_def_path, path_res, paths};
+use crate::{match_def_path, path_res};
 
 mod type_certainty;
 pub use type_certainty::expr_type_is_certain;
@@ -214,7 +214,17 @@ pub fn implements_trait<'tcx>(
     trait_id: DefId,
     args: &[GenericArg<'tcx>],
 ) -> bool {
-    implements_trait_with_env_from_iter(cx.tcx, cx.param_env, ty, trait_id, args.iter().map(|&x| Some(x)))
+    let callee_id = cx
+        .enclosing_body
+        .map(|body| cx.tcx.hir().body_owner(body).owner.to_def_id());
+    implements_trait_with_env_from_iter(
+        cx.tcx,
+        cx.param_env,
+        ty,
+        trait_id,
+        callee_id,
+        args.iter().map(|&x| Some(x)),
+    )
 }
 
 /// Same as `implements_trait` but allows using a `ParamEnv` different from the lint context.
@@ -223,9 +233,17 @@ pub fn implements_trait_with_env<'tcx>(
     param_env: ParamEnv<'tcx>,
     ty: Ty<'tcx>,
     trait_id: DefId,
+    callee_id: DefId,
     args: &[GenericArg<'tcx>],
 ) -> bool {
-    implements_trait_with_env_from_iter(tcx, param_env, ty, trait_id, args.iter().map(|&x| Some(x)))
+    implements_trait_with_env_from_iter(
+        tcx,
+        param_env,
+        ty,
+        trait_id,
+        Some(callee_id),
+        args.iter().map(|&x| Some(x)),
+    )
 }
 
 /// Same as `implements_trait_from_env` but takes the arguments as an iterator.
@@ -234,6 +252,7 @@ pub fn implements_trait_with_env_from_iter<'tcx>(
     param_env: ParamEnv<'tcx>,
     ty: Ty<'tcx>,
     trait_id: DefId,
+    callee_id: Option<DefId>,
     args: impl IntoIterator<Item = impl Into<Option<GenericArg<'tcx>>>>,
 ) -> bool {
     // Clippy shouldn't have infer types
@@ -245,20 +264,36 @@ pub fn implements_trait_with_env_from_iter<'tcx>(
     }
 
     let infcx = tcx.infer_ctxt().build();
+    let args = args
+        .into_iter()
+        .map(|arg| {
+            arg.into().unwrap_or_else(|| {
+                let orig = TypeVariableOrigin {
+                    kind: TypeVariableOriginKind::MiscVariable,
+                    span: DUMMY_SP,
+                };
+                infcx.next_ty_var(orig).into()
+            })
+        })
+        .collect::<Vec<_>>();
+
+    // If an effect arg was not specified, we need to specify it.
+    let effect_arg = if tcx
+        .generics_of(trait_id)
+        .host_effect_index
+        .is_some_and(|x| args.get(x - 1).is_none())
+    {
+        Some(GenericArg::from(callee_id.map_or(tcx.consts.true_, |def_id| {
+            tcx.expected_host_effect_param_for_body(def_id)
+        })))
+    } else {
+        None
+    };
+
     let trait_ref = TraitRef::new(
         tcx,
         trait_id,
-        Some(GenericArg::from(ty))
-            .into_iter()
-            .chain(args.into_iter().map(|arg| {
-                arg.into().unwrap_or_else(|| {
-                    let orig = TypeVariableOrigin {
-                        kind: TypeVariableOriginKind::MiscVariable,
-                        span: DUMMY_SP,
-                    };
-                    infcx.next_ty_var(orig).into()
-                })
-            })),
+        Some(GenericArg::from(ty)).into_iter().chain(args).chain(effect_arg),
     );
 
     debug_assert_matches!(
@@ -461,10 +496,8 @@ pub fn needs_ordered_drop<'tcx>(cx: &LateContext<'tcx>, ty: Ty<'tcx>) -> bool {
         else if is_type_lang_item(cx, ty, LangItem::OwnedBox)
             || matches!(
                 get_type_diagnostic_name(cx, ty),
-                Some(sym::HashSet | sym::Rc | sym::Arc | sym::cstring_type)
+                Some(sym::HashSet | sym::Rc | sym::Arc | sym::cstring_type | sym::RcWeak | sym::ArcWeak)
             )
-            || match_type(cx, ty, &paths::WEAK_RC)
-            || match_type(cx, ty, &paths::WEAK_ARC)
         {
             // Check all of the generic arguments.
             if let ty::Adt(_, subs) = ty.kind() {
@@ -696,7 +729,7 @@ pub fn ty_sig<'tcx>(cx: &LateContext<'tcx>, ty: Ty<'tcx>) -> Option<ExprFnSig<'t
         ty::Closure(id, subs) => {
             let decl = id
                 .as_local()
-                .and_then(|id| cx.tcx.hir().fn_decl_by_hir_id(cx.tcx.hir().local_def_id_to_hir_id(id)));
+                .and_then(|id| cx.tcx.hir().fn_decl_by_hir_id(cx.tcx.local_def_id_to_hir_id(id)));
             Some(ExprFnSig::Closure(decl, subs.as_closure().sig()))
         },
         ty::FnDef(id, subs) => Some(ExprFnSig::Sig(cx.tcx.fn_sig(id).instantiate(cx.tcx, subs), Some(id))),
@@ -892,7 +925,9 @@ pub fn for_each_top_level_late_bound_region<B>(
     impl<'tcx, B, F: FnMut(BoundRegion) -> ControlFlow<B>> TypeVisitor<TyCtxt<'tcx>> for V<F> {
         type BreakTy = B;
         fn visit_region(&mut self, r: Region<'tcx>) -> ControlFlow<Self::BreakTy> {
-            if let RegionKind::ReLateBound(idx, bound) = r.kind() && idx.as_u32() == self.index {
+            if let RegionKind::ReBound(idx, bound) = r.kind()
+                && idx.as_u32() == self.index
+            {
                 (self.f)(bound)
             } else {
                 ControlFlow::Continue(())
@@ -986,16 +1021,16 @@ pub fn ty_is_fn_once_param<'tcx>(tcx: TyCtxt<'_>, ty: Ty<'tcx>, predicates: &'tc
         .iter()
         .try_fold(false, |found, p| {
             if let ty::ClauseKind::Trait(p) = p.kind().skip_binder()
-            && let ty::Param(self_ty) = p.trait_ref.self_ty().kind()
-            && ty.index == self_ty.index
-        {
-            // This should use `super_traits_of`, but that's a private function.
-            if p.trait_ref.def_id == fn_once_id {
-                return Some(true);
-            } else if p.trait_ref.def_id == fn_mut_id || p.trait_ref.def_id == fn_id {
-                return None;
+                && let ty::Param(self_ty) = p.trait_ref.self_ty().kind()
+                && ty.index == self_ty.index
+            {
+                // This should use `super_traits_of`, but that's a private function.
+                if p.trait_ref.def_id == fn_once_id {
+                    return Some(true);
+                } else if p.trait_ref.def_id == fn_mut_id || p.trait_ref.def_id == fn_id {
+                    return None;
+                }
             }
-        }
             Some(found)
         })
         .unwrap_or(false)
@@ -1135,7 +1170,7 @@ pub fn make_projection<'tcx>(
         #[cfg(debug_assertions)]
         assert_generic_args_match(tcx, assoc_item.def_id, args);
 
-        Some(tcx.mk_alias_ty(assoc_item.def_id, args))
+        Some(ty::AliasTy::new(tcx, assoc_item.def_id, args))
     }
     helper(
         tcx,
@@ -1160,11 +1195,16 @@ pub fn make_normalized_projection<'tcx>(
 ) -> Option<Ty<'tcx>> {
     fn helper<'tcx>(tcx: TyCtxt<'tcx>, param_env: ParamEnv<'tcx>, ty: AliasTy<'tcx>) -> Option<Ty<'tcx>> {
         #[cfg(debug_assertions)]
-        if let Some((i, arg)) = ty.args.iter().enumerate().find(|(_, arg)| arg.has_late_bound_regions()) {
+        if let Some((i, arg)) = ty
+            .args
+            .iter()
+            .enumerate()
+            .find(|(_, arg)| arg.has_escaping_bound_vars())
+        {
             debug_assert!(
                 false,
                 "args contain late-bound region at index `{i}` which can't be normalized.\n\
-                    use `TyCtxt::erase_late_bound_regions`\n\
+                    use `TyCtxt::instantiate_bound_regions_with_erased`\n\
                     note: arg is `{arg:#?}`",
             );
             return None;
@@ -1233,11 +1273,16 @@ pub fn make_normalized_projection_with_regions<'tcx>(
 ) -> Option<Ty<'tcx>> {
     fn helper<'tcx>(tcx: TyCtxt<'tcx>, param_env: ParamEnv<'tcx>, ty: AliasTy<'tcx>) -> Option<Ty<'tcx>> {
         #[cfg(debug_assertions)]
-        if let Some((i, arg)) = ty.args.iter().enumerate().find(|(_, arg)| arg.has_late_bound_regions()) {
+        if let Some((i, arg)) = ty
+            .args
+            .iter()
+            .enumerate()
+            .find(|(_, arg)| arg.has_escaping_bound_vars())
+        {
             debug_assert!(
                 false,
                 "args contain late-bound region at index `{i}` which can't be normalized.\n\
-                    use `TyCtxt::erase_late_bound_regions`\n\
+                    use `TyCtxt::instantiate_bound_regions_with_erased`\n\
                     note: arg is `{arg:#?}`",
             );
             return None;
@@ -1265,4 +1310,9 @@ pub fn normalize_with_regions<'tcx>(tcx: TyCtxt<'tcx>, param_env: ParamEnv<'tcx>
         Ok(ty) => ty.value,
         Err(_) => ty,
     }
+}
+
+/// Checks if the type is `core::mem::ManuallyDrop<_>`
+pub fn is_manually_drop(ty: Ty<'_>) -> bool {
+    ty.ty_adt_def().map_or(false, AdtDef::is_manually_drop)
 }

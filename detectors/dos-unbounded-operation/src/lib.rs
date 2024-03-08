@@ -50,12 +50,12 @@ impl<'tcx> Visitor<'tcx> for ForLoopVisitor {
             && source == MatchSource::ForLoopDesugar
             && let ExprKind::Call(func, args) = match_expr.kind
             && let ExprKind::Path(qpath) = &func.kind
-            && let QPath::LangItem(item, _span, _id) = qpath
+            && let QPath::LangItem(item, _span) = qpath
             && item == &LangItem::IntoIterIntoIter
         {
             if args.first().is_some()
                 && let ExprKind::Struct(qpath, fields, _) = args.first().unwrap().kind
-                && let QPath::LangItem(langitem, _span, _id) = qpath
+                && let QPath::LangItem(langitem, _span) = qpath
                 && (LangItem::Range == *langitem
                     || LangItem::RangeInclusiveStruct == *langitem
                     || LangItem::RangeInclusiveNew == *langitem)

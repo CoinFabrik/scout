@@ -49,11 +49,11 @@ impl<'tcx> Visitor<'tcx> for ForLoopVisitor {
             && source == MatchSource::ForLoopDesugar
             && let ExprKind::Call(func, args) = match_expr.kind
             && let ExprKind::Path(qpath) = &func.kind
-            && let QPath::LangItem(item, _span, _id) = qpath
+            && let QPath::LangItem(item, _) = qpath
             && item == &LangItem::IntoIterIntoIter
             && args.first().is_some()
             && let ExprKind::Struct(qpath, fields, _) = args.first().unwrap().kind
-            && let QPath::LangItem(langitem, _span, _id) = qpath
+            && let QPath::LangItem(langitem, _) = qpath
             && (LangItem::Range == *langitem
                 || LangItem::RangeInclusiveStruct == *langitem
                 || LangItem::RangeInclusiveNew == *langitem)
@@ -74,7 +74,7 @@ impl<'tcx> Visitor<'tcx> for ForLoopVisitor {
             };
             for arm in some_none_arms {
                 if let PatKind::Struct(qpath, pats, _) = &arm.pat.kind
-                    && let QPath::LangItem(item_type, _, _) = qpath
+                    && let QPath::LangItem(item_type, _) = qpath
                     && LangItem::OptionSome == *item_type
                     && pats.last().is_some()
                 {

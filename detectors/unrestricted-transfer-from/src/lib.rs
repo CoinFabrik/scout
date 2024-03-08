@@ -121,9 +121,6 @@ impl<'tcx> LateLintPass<'tcx> for UnrestrictedTransferFrom {
                                                 arg_hir_ids.push(path.segments[j].hir_id);
                                             }
                                         }
-                                        QPath::LangItem(_, _, Some(lang_item_hir_id)) => {
-                                            arg_hir_ids.push(*lang_item_hir_id);
-                                        }
                                         _ => (),
                                     }
                                 }

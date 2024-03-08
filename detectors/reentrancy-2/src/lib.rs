@@ -5,12 +5,12 @@ extern crate rustc_ast;
 extern crate rustc_hir;
 extern crate rustc_middle;
 extern crate rustc_span;
+extern crate rustc_target;
 extern crate rustc_type_ir;
 
 use std::collections::{HashMap, HashSet};
 
 use if_chain::if_chain;
-use rustc_abi::VariantIdx;
 use rustc_ast::ast::LitKind;
 use rustc_hir::def::Res;
 use rustc_hir::intravisit::{walk_expr, FnKind};
@@ -21,6 +21,7 @@ use rustc_lint::{LateContext, LateLintPass};
 use rustc_middle::ty::TyKind;
 use rustc_span::def_id::LocalDefId;
 use rustc_span::{Span, Symbol};
+use rustc_target::abi::VariantIdx;
 use scout_audit_internal::Detector;
 
 dylint_linting::declare_late_lint! {

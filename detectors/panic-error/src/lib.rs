@@ -167,6 +167,6 @@ fn capitalize_err_msg(s: &str) -> String {
 fn is_test_token_present(token_stream: &TokenStream) -> bool {
     token_stream.trees().any(|tree| match tree {
         TokenTree::Token(token, _) => token.is_ident_named(sym::test),
-        TokenTree::Delimited(_, _, token_stream) => is_test_token_present(token_stream),
+        TokenTree::Delimited(_, _, _, token_stream) => is_test_token_present(token_stream),
     })
 }
