@@ -336,11 +336,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSetCodeHash {
                         ));
                     }
                 }
-                TerminatorKind::Return
-                | TerminatorKind::Unreachable
-                | TerminatorKind::GeneratorDrop
-                | TerminatorKind::UnwindResume
-                | TerminatorKind::UnwindTerminate(_) => {}
+                _ => {}
             }
             ret_vec
         }

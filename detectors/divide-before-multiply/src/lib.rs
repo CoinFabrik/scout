@@ -311,11 +311,7 @@ fn navigate_trough_basicblocks<'tcx>(
                     );
                 }
             }
-            TerminatorKind::GeneratorDrop
-            | TerminatorKind::UnwindResume
-            | TerminatorKind::UnwindTerminate(_)
-            | TerminatorKind::Return
-            | TerminatorKind::Unreachable => {}
+            _ => {}
         }
     }
 }

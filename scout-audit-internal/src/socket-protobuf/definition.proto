@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.coinfabrik.scout";
+option java_outer_classname = "ScoutAudit";
+
+package ScoutAudit;
+
+service ScoutAudit {
+  rpc PushFinding (FindingRequest) returns (FindingResponse) {}
+  rpc IsDetectorAvailable (DetectorRequest) returns (DetectorResponse) {}
+}
+
+message FindingRequest {
+  string name = "";
+  string description = "";
+  string span = ""
+}
+
+message DetectorRequest {
+  string detectorName = "";
+}
+
+
+message FindingResponse {
+  bool message = false;
+}
+
+message DetectorResponse {
+  bool habilitado = true;
+}

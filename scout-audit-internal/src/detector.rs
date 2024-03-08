@@ -21,9 +21,10 @@ use scout_audit_clippy_utils::diagnostics::{
 #[cfg(feature = "lint_helper")]
 use serde_json::json;
 use strum::{Display, EnumIter};
-
+//import serialize and deserialize from serde
+use serde::{Deserialize, Serialize};
 /// Available detectors.
-#[derive(Debug, Display, Clone, EnumIter, PartialEq, Eq, Hash)]
+#[derive(Debug, Display, Clone, EnumIter, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[strum(serialize_all = "kebab-case")]
 pub enum Detector {
     AssertViolation,

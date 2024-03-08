@@ -122,6 +122,6 @@ fn is_storage_present(token_stream: &TokenStream) -> bool {
                 false
             }
         }
-        TokenTree::Delimited(_, _, token_stream) => is_storage_present(token_stream),
+        TokenTree::Delimited(_, _, _, token_stream) => is_storage_present(token_stream),
     })
 }
