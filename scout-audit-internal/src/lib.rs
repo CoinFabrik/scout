@@ -1,3 +1,4 @@
+#![feature(const_trait_impl)]
 #![cfg_attr(feature = "lint_helper", feature(rustc_private))]
 //! # Scout Audit Internal
 //!
@@ -8,8 +9,15 @@ mod detector;
 mod socket;
 
 #[cfg(feature = "detector")]
-pub use detector::Detector;
+pub use detector::DetectorImpl;
+#[cfg(feature = "detector")]
+pub use detector::InkDetector;
+#[cfg(feature = "detector")]
+pub use detector::SorobanDetector;
+#[cfg(feature = "detector")]
+pub use strum::IntoEnumIterator;
 #[cfg(feature = "detector")]
 pub use socket::*;
 #[cfg(feature = "detector")]
-pub use strum::IntoEnumIterator;
+pub use detector::*;
+

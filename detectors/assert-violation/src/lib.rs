@@ -12,7 +12,7 @@ use rustc_ast::{
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::{sym, Span};
 use scout_audit_clippy_utils::sym;
-use scout_audit_internal::Detector;
+use scout_audit_internal::{InkDetector as Detector, DetectorImpl};
 
 dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does
@@ -47,7 +47,7 @@ dylint_linting::impl_pre_expansion_lint! {
 
     pub ASSERT_VIOLATION,
     Warn,
-    Detector::AssertViolation.get_lint_message(),
+    scout_audit_internal::ink_lint_message::INK_ASSERT_VIOLATION_LINT_MESSAGE,
     AssertViolation::default()
 }
 

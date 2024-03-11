@@ -426,6 +426,7 @@ dependencies = [
  "dunce",
  "dylint",
  "env_logger",
+ "futures",
  "home",
  "itertools 0.11.0",
  "log",
