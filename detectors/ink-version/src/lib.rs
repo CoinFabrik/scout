@@ -18,7 +18,7 @@ dylint_linting::declare_early_lint! {
     ///```
     pub CHECK_INK_VERSION,
     Warn,
-    scout_audit_internal::ink_lint_message::INK_INK_VERSION_LINT_MESSAGE,
+    scout_audit_internal::ink_lint_message::INK_INK_VERSION_LINT_MESSAGE
 }
 
 impl EarlyLintPass for CheckInkVersion {

@@ -22,7 +22,7 @@ use rustc_middle::ty::TyKind;
 use rustc_span::def_id::LocalDefId;
 use rustc_span::{Span, Symbol};
 use rustc_target::abi::VariantIdx;
-use scout_audit_internal::Detector;
+use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -88,7 +88,7 @@ dylint_linting::declare_late_lint! {
     /// ```
     pub REENTRANCY_2,
     Warn,
-    Detector::Reentrancy2.get_lint_message()
+    scout_audit_internal::ink_lint_message::INK_REENTRANCY_LINT_MESSAGE
 }
 
 const SET_ALLOW_REENTRY: &str = "set_allow_reentry";

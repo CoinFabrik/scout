@@ -12,7 +12,7 @@ use rustc_ast::{
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::{sym, Span};
 use scout_audit_clippy_utils::sym;
-use scout_audit_internal::Detector;
+use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
 
 dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does
@@ -45,7 +45,7 @@ dylint_linting::impl_pre_expansion_lint! {
     /// ```
     pub AVOID_FORMAT_STRING,
     Warn,
-    Detector::AvoidFormatString.get_lint_message(),
+    scout_audit_internal::ink_lint_message::INK_AVOID_FORMAT_STRING_LINT_MESSAGE,
     AvoidFormatString::default()
 }
 

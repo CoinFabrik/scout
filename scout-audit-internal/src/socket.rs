@@ -1,14 +1,13 @@
 use std::net::{IpAddr, SocketAddr};
+use std::sync::{Arc, Mutex};
 
 use futures::{future, prelude::*};
-
-use std::sync::{Arc, Mutex};
+use serde::{Deserialize, Serialize};
 use tarpc::{
     context,
     server::{self, incoming::Incoming, Channel},
     tokio_serde::formats::Json,
 };
-use serde::{Deserialize, Serialize};
 
 use crate::detector::*;
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
@@ -23,15 +22,15 @@ pub trait DetectorSocket {
     async fn is_up() -> bool;
     async fn set_available_detectors(detectors: Vec<Detector>);
     async fn is_detector_available(detector: Detector) -> bool;
-    async fn push_finding(finding: String);
-    async fn get_findings() -> Vec<String>;
+    async fn push_finding(finding: DetectorInfo);
+    async fn get_findings() -> Vec<DetectorInfo>;
 }
 
 #[derive(Clone)]
 struct Server {
     socket_addr: SocketAddr,
     available_detectors: Vec<Detector>,
-    findings: Arc<Mutex<Vec<String>>>,
+    findings: Arc<Mutex<Vec<DetectorInfo>>>,
 }
 
 impl DetectorSocket for Server {
@@ -49,12 +48,12 @@ impl DetectorSocket for Server {
         self.available_detectors.contains(&detector)
     }
 
-    async fn push_finding(self, _: context::Context, finding: String) {
-        println!("Finding: {} was added", finding);
+    async fn push_finding(self, _: context::Context, finding: DetectorInfo) {
+        println!("Finding: {:?} was added", finding);
         self.findings.lock().unwrap().push(finding);
     }
 
-    async fn get_findings(self, _: context::Context) -> Vec<String> {
+    async fn get_findings(self, _: context::Context) -> Vec<DetectorInfo> {
         self.findings.lock().unwrap().clone()
     }
 }
@@ -65,7 +64,7 @@ async fn spawn(fut: impl Future<Output = ()> + Send + 'static) {
 
 pub async fn detector_server(
     server_addr: (IpAddr, u16),
-    findings: Arc<Mutex<Vec<String>>>,
+    findings: Arc<Mutex<Vec<DetectorInfo>>>,
 ) -> anyhow::Result<()> {
     let listener = tarpc::serde_transport::tcp::listen(&server_addr, Json::default).await?;
     listener
@@ -73,10 +72,10 @@ pub async fn detector_server(
         .map(server::BaseChannel::with_defaults)
         .max_channels_per_key(100, |t| t.transport().peer_addr().unwrap().ip())
         .map(|channel| {
-            println!(
+            /*println!(
                 "Incoming connection from: {}",
                 channel.transport().peer_addr().unwrap()
-            );
+            );*/
             let server = Server {
                 socket_addr: channel.transport().peer_addr().unwrap(),
                 available_detectors: vec![],

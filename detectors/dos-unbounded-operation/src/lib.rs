@@ -11,7 +11,7 @@ use rustc_hir::{
 };
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::{def_id::LocalDefId, Span};
-use scout_audit_internal::Detector;
+use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -38,7 +38,7 @@ dylint_linting::declare_late_lint! {
     /// ```
     pub DOS_UNBOUNDED_OPERATION,
     Warn,
-    Detector::DosUnboundedOperation.get_lint_message()
+    scout_audit_internal::ink_lint_message::INK_DOS_UNBOUNDED_OPERATION_LINT_MESSAGE
 }
 
 struct ForLoopVisitor {

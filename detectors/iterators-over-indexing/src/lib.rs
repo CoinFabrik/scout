@@ -13,12 +13,12 @@ use rustc_hir::{
 };
 use rustc_lint::LateLintPass;
 use rustc_span::Span;
-use scout_audit_internal::Detector;
+use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
 
 dylint_linting::declare_late_lint! {
     pub ITERATOR_OVER_INDEXING,
     Warn,
-    Detector::IteratorsOverIndexing.get_lint_message()
+    scout_audit_internal::ink_lint_message::INK_ITERATORS_OVER_INDEXING_LINT_MESSAGE
 }
 
 struct ForLoopVisitor {

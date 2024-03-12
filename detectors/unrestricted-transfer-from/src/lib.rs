@@ -17,12 +17,12 @@ use rustc_hir::{PatKind, QPath};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_middle::mir::{BasicBlock, BasicBlocks, Local, Operand, StatementKind, TerminatorKind};
 use rustc_span::Span;
-use scout_audit_internal::Detector;
+use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
 
 dylint_linting::impl_late_lint! {
     pub UNRESTRICTED_TRANSFER_FROM,
     Warn,
-    Detector::UnrestrictedTransferFrom.get_lint_message(),
+    scout_audit_internal::ink_lint_message::INK_UNRESTRICTED_TRANSFER_FROM_LINT_MESSAGE,
     UnrestrictedTransferFrom::default()
 }
 

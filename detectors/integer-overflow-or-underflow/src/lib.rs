@@ -9,7 +9,7 @@ use rustc_lint::LateLintPass;
 use rustc_span::Span;
 use scout_audit_clippy_utils::consts::constant_simple;
 use scout_audit_clippy_utils::is_integer_literal;
-use scout_audit_internal::Detector;
+use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
 
 dylint_linting::impl_late_lint! {
     /// ### What it does
@@ -33,7 +33,7 @@ dylint_linting::impl_late_lint! {
     /// ```
     pub INTEGER_OVERFLOW_UNDERFLOW,
     Warn,
-    Detector::IntegerOverflowOrUnderflow.get_lint_message(),
+    scout_audit_internal::ink_lint_message::INK_INTEGER_OVERFLOW_OR_UNDERFLOW_LINT_MESSAGE,
     IntegerOverflowUnderflow::default()
 }
 

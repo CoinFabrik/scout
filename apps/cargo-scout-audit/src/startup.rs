@@ -1,6 +1,7 @@
 use core::panic;
 use std::{
     fs,
+    io::Read,
     net::{IpAddr, Ipv4Addr},
     path::PathBuf,
     sync::{Arc, Mutex},
@@ -96,8 +97,9 @@ pub struct Scout {
 }
 
 #[tokio::main]
-pub async fn run_scout(opts: Scout) -> Result<()> {
-    let findings_storage: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
+pub async fn run_scout(mut opts: Scout) -> Result<()> {
+    let findings_storage: Arc<Mutex<Vec<scout_audit_internal::DetectorInfo>>> =
+        Arc::new(Mutex::new(Vec::new()));
     let findings = findings_storage.clone();
 
     tokio::spawn(
@@ -175,13 +177,10 @@ pub async fn run_scout(opts: Scout) -> Result<()> {
     // Run dylint
     run_dylint(detectors_paths, opts).context("Failed to run dylint")?;
 
-    println!("Scout audit finished.");
-    println!("Findings: {:?}", findings.lock().unwrap());
-
     Ok(())
 }
 
-fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> Result<()> {
+fn run_dylint(detectors_paths: Vec<PathBuf>, mut opts: Scout) -> Result<()> {
     // Convert detectors paths to string
     let detectors_paths: Vec<String> = detectors_paths
         .iter()
@@ -194,6 +193,11 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> Result<()> {
 
     let is_output_stdout = opts.output_format == OutputFormat::Text && opts.output_path.is_none();
     let is_output_stdout_json = opts.args.contains(&"--message-format=json".to_string());
+
+    // todo: !is_output_stdout && !is_output_stdout_json
+    if opts.output_format == OutputFormat::Html && !is_output_stdout_json {
+        opts.args.push("--message-format=json".to_string());
+    }
 
     let pipe_stdout = Some(stdout_temp_file.path().to_string_lossy().to_string());
     let pipe_stderr = if is_output_stdout && !is_output_stdout_json {
@@ -211,6 +215,8 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> Result<()> {
         quiet: !opts.verbose,
         ..Default::default()
     };
+
+    dbg!(options.clone());
 
     dylint::run(&options)?;
 
@@ -238,9 +244,13 @@ fn run_dylint(detectors_paths: Vec<PathBuf>, opts: Scout) -> Result<()> {
                 Some(path) => fs::File::create(path)?,
                 None => fs::File::create("report.html")?,
             };
+            let buf: &mut Vec<u8> = &mut Vec::new();
+            stdout_file.read_to_end(buf);
+
             std::io::Write::write_all(
                 &mut html_file,
-                format_into_html(stderr_file, stdout_file)?.as_bytes(),
+                &buf,
+                //format_into_html(stderr_file, stdout_file)?.as_bytes(),
             )?;
         }
         OutputFormat::Text => {

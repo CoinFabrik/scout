@@ -18,12 +18,12 @@ use rustc_middle::mir::{
 use rustc_middle::ty::TyKind;
 use rustc_span::def_id::DefId;
 use rustc_span::Span;
-use scout_audit_internal::Detector;
+use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
 
 dylint_linting::impl_late_lint! {
     pub UNPROTECTED_SELF_DESTRUCT,
     Warn,
-    Detector::UnprotectedSelfDestruct.get_lint_message(),
+    scout_audit_internal::ink_lint_message::INK_UNPROTECTED_SELF_DESTRUCT_LINT_MESSAGE,
     UnprotectedSelfDestruct::default()
 }
 
