@@ -3,9 +3,9 @@ members = ["*"]
 exclude = [".cargo", "target"]
 
 [workspace.dependencies]
-dylint_testing = "2.1.5"
+dylint_testing = "2.6.1"
 if_chain = "1.0.2"
 
-scout-audit-clippy-utils = { version = "=0.2.2", path = "../../scout-audit/scout-audit-clippy-utils" }
-scout-audit-internal = { path = "../../scout-audit/scout-audit-internal", features = ["detector", "lint_helper"] }
-dylint_linting = { package = "scout-audit-dylint-linting", path = "../../scout-audit/scout-audit-dylint-linting" }
+scout-audit-clippy-utils = { version = "=0.2.3" }
+scout-audit-internal = { version = "=0.2.3", features = ["detector", "lint_helper"] }
+dylint_linting = { version = "=2.6.1", package = "scout-audit-dylint-linting"}
