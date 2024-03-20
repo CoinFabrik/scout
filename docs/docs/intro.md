@@ -65,7 +65,7 @@ In the table below, we specify all the option available for the CLI.
 | `cargo scout-audit --output-format [text,json,html,sarif,pdf,md,markdown]` | Sets the output format. Selecting `json`, `html`, `sarif`, `markdown`, or `pdf` will create a file with the output                                 |
 | `cargo scout-audit --output-path <PATH_TO_OUTPUT_FILE>`                    | Sets the output path. If a format was selected, this will replace the default file with the given one                                              |
 
-#### Profile configuration
+## Profile configuration
 
 The profile configuration file is generated automatically in `$HOME/.config/scout/(ink/soroban)-config.toml` the first time scout-audit is run.
 The configuration has the following format
@@ -84,15 +84,18 @@ enabled = false
 enabled = true
 ```
 
-## VSCode Extension
-
-We built the Scout VSCode Extension to help developers write secure and more robust smart contracts. Listing security issues, and highlighting issues with squiggles and hover-over descriptions, we hope our extension will help you catch vulnerabilities during development.
-
 ## HTML Vulnerability Report
 
 We've upgraded Scout's HTML output to introduce a comprehensive HTML Vulnerability Report, enhancing your ability to quickly assess and address the security status of your project. The new features included in the report are designed to provide a detailed yet concise overview of the findings.
 
-![FotoFoto](../static/img/html.png)
+![html](../static/img/html.png)
+
+Usage: `cargo scout-audit --output-format html`
+
+## VSCode Extension
+
+We built the Scout VSCode Extension to help developers write secure and more robust smart contracts. Listing security issues, and highlighting issues with squiggles and hover-over descriptions, we hope our extension will help you catch vulnerabilities during development.
+
 
 ### Installation
 
