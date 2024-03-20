@@ -13,7 +13,7 @@ use rustc_hir::{Body, FnDecl};
 use rustc_hir::{Expr, ExprKind, PatKind, QPath};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::Span;
-use scout_audit_internal::Detector;
+use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
 dylint_linting::declare_late_lint! {
     /// ### What it does
     /// Checks for delegated calls to contracts passed as arguments.
@@ -61,7 +61,7 @@ dylint_linting::declare_late_lint! {
 
     pub DELEGATE_CALL,
     Warn,
-    Detector::DelegateCall.get_lint_message()
+    scout_audit_internal::ink_lint_message::INK_DELEGATE_CALL_LINT_MESSAGE
 }
 impl<'tcx> LateLintPass<'tcx> for DelegateCall {
     fn check_fn(
@@ -106,9 +106,6 @@ impl<'tcx> LateLintPass<'tcx> for DelegateCall {
                                     for j in 0..path.segments.len() {
                                         arg_hir_ids.push(path.segments[j].hir_id);
                                     }
-                                }
-                                QPath::LangItem(_, _, Some(lang_item_hir_id)) => {
-                                    arg_hir_ids.push(*lang_item_hir_id);
                                 }
                                 _ => (),
                             }

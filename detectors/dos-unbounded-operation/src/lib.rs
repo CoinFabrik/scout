@@ -11,7 +11,7 @@ use rustc_hir::{
 };
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::{def_id::LocalDefId, Span};
-use scout_audit_internal::Detector;
+use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -38,7 +38,7 @@ dylint_linting::declare_late_lint! {
     /// ```
     pub DOS_UNBOUNDED_OPERATION,
     Warn,
-    Detector::DosUnboundedOperation.get_lint_message()
+    scout_audit_internal::ink_lint_message::INK_DOS_UNBOUNDED_OPERATION_LINT_MESSAGE
 }
 
 struct ForLoopVisitor {
@@ -50,12 +50,12 @@ impl<'tcx> Visitor<'tcx> for ForLoopVisitor {
             && source == MatchSource::ForLoopDesugar
             && let ExprKind::Call(func, args) = match_expr.kind
             && let ExprKind::Path(qpath) = &func.kind
-            && let QPath::LangItem(item, _span, _id) = qpath
+            && let QPath::LangItem(item, _span) = qpath
             && item == &LangItem::IntoIterIntoIter
         {
             if args.first().is_some()
                 && let ExprKind::Struct(qpath, fields, _) = args.first().unwrap().kind
-                && let QPath::LangItem(langitem, _span, _id) = qpath
+                && let QPath::LangItem(langitem, _span) = qpath
                 && (LangItem::Range == *langitem
                     || LangItem::RangeInclusiveStruct == *langitem
                     || LangItem::RangeInclusiveNew == *langitem)

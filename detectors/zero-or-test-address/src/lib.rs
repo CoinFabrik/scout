@@ -19,7 +19,7 @@ use rustc_lint::{LateContext, LateLintPass};
 use rustc_middle::ty::TyCtxt;
 use rustc_span::def_id::LocalDefId;
 use rustc_span::Span;
-use scout_audit_internal::Detector;
+use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -51,7 +51,7 @@ dylint_linting::declare_late_lint! {
     /// ```
     pub ZERO_OR_TEST_ADDRESS,
     Warn,
-    Detector::ZeroOrTestAddress.get_lint_message()
+    scout_audit_internal::ink_lint_message::INK_ZERO_OR_TEST_ADDRESS_LINT_MESSAGE
 }
 
 impl<'tcx> LateLintPass<'tcx> for ZeroOrTestAddress {

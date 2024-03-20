@@ -10,7 +10,7 @@ use rustc_hir::intravisit::{walk_expr, FnKind, Visitor};
 use rustc_hir::{Expr, ExprKind, QPath, TyKind};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::Span;
-use scout_audit_internal::Detector;
+use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -63,7 +63,7 @@ dylint_linting::declare_late_lint! {
     /// ```
     pub UNUSED_RETURN_ENUM,
     Warn,
-    Detector::UnusedReturnEnum.get_lint_message()
+    scout_audit_internal::ink_lint_message::INK_UNUSED_RETURN_ENUM_LINT_MESSAGE
 }
 
 struct CounterVisitor {

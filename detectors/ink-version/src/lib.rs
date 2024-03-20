@@ -7,7 +7,7 @@ extern crate rustc_span;
 use std::fs;
 
 use rustc_lint::EarlyLintPass;
-use scout_audit_internal::Detector;
+use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
 use semver::*;
 
 dylint_linting::declare_early_lint! {
@@ -18,7 +18,7 @@ dylint_linting::declare_early_lint! {
     ///```
     pub CHECK_INK_VERSION,
     Warn,
-    Detector::InkVersion.get_lint_message()
+    scout_audit_internal::ink_lint_message::INK_INK_VERSION_LINT_MESSAGE
 }
 
 impl EarlyLintPass for CheckInkVersion {

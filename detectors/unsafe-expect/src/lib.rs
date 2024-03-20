@@ -10,7 +10,7 @@ use rustc_hir::{
 };
 use rustc_lint::LateLintPass;
 use rustc_span::{Span, Symbol};
-use scout_audit_internal::Detector;
+use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -45,7 +45,7 @@ dylint_linting::declare_late_lint! {
     /// ```
     pub UNSAFE_EXPECT,
     Warn,
-    Detector::UnsafeExpect.get_lint_message()
+    scout_audit_internal::ink_lint_message::INK_UNSAFE_EXPECT_LINT_MESSAGE
 }
 
 impl<'tcx> LateLintPass<'tcx> for UnsafeExpect {

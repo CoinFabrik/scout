@@ -1,3 +1,0 @@
-[toolchain]
-use rustc_middle::mir::Const;
-components = ["cargo", "llvm-tools", "rust-src", "rust-std", "rustc", "rustc-dev", "rustfmt"]

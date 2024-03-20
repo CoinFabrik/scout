@@ -20,7 +20,7 @@ use rustc_middle::mir::{
 use rustc_middle::ty::{Ty, TyKind};
 use rustc_span::def_id::DefId;
 use rustc_span::Span;
-use scout_audit_internal::Detector;
+use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
 
 dylint_linting::impl_late_lint! {
     /// ### What it does
@@ -52,7 +52,7 @@ dylint_linting::impl_late_lint! {
     /// ```
     pub UNEXPECTED_REVERT_WARN,
     Warn,
-    Detector::DosUnexpectedRevertWithVector.get_lint_message(),
+    scout_audit_internal::ink_lint_message::INK_DOS_UNEXPECTED_REVERT_WITH_VECTOR_LINT_MESSAGE,
     UnexpectedRevertWarn::default()
 }
 
@@ -379,11 +379,7 @@ impl<'tcx> LateLintPass<'tcx> for UnexpectedRevertWarn {
                         ));
                     }
                 }
-                TerminatorKind::UnwindResume
-                | TerminatorKind::UnwindTerminate(_)
-                | TerminatorKind::Return
-                | TerminatorKind::Unreachable
-                | TerminatorKind::GeneratorDrop => {}
+                _ => {}
             }
             ret_vec
         }

@@ -12,7 +12,7 @@ use rustc_ast::{
 };
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::Span;
-use scout_audit_internal::Detector;
+use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
 
 dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does
@@ -39,7 +39,7 @@ dylint_linting::impl_pre_expansion_lint! {
     ///```
     pub LAZY_DELEGATE,
     Warn,
-    Detector::LazyDelegate.get_lint_message(),
+    scout_audit_internal::ink_lint_message::INK_LAZY_DELEGATE_LINT_MESSAGE,
     LazyDelegate::default()
 }
 
@@ -122,6 +122,6 @@ fn is_storage_present(token_stream: &TokenStream) -> bool {
                 false
             }
         }
-        TokenTree::Delimited(_, _, token_stream) => is_storage_present(token_stream),
+        TokenTree::Delimited(_, _, _, token_stream) => is_storage_present(token_stream),
     })
 }

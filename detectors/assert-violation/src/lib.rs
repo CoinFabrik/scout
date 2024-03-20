@@ -12,7 +12,7 @@ use rustc_ast::{
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::{sym, Span};
 use scout_audit_clippy_utils::sym;
-use scout_audit_internal::Detector;
+use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
 
 dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does
@@ -47,7 +47,7 @@ dylint_linting::impl_pre_expansion_lint! {
 
     pub ASSERT_VIOLATION,
     Warn,
-    Detector::AssertViolation.get_lint_message(),
+    scout_audit_internal::ink_lint_message::INK_ASSERT_VIOLATION_LINT_MESSAGE,
     AssertViolation::default()
 }
 
@@ -156,6 +156,6 @@ fn is_test_item(item: &Item) -> bool {
 fn is_test_token_present(token_stream: &TokenStream) -> bool {
     token_stream.trees().any(|tree| match tree {
         TokenTree::Token(token, _) => token.is_ident_named(sym::test),
-        TokenTree::Delimited(_, _, token_stream) => is_test_token_present(token_stream),
+        TokenTree::Delimited(_, _, _, token_stream) => is_test_token_present(token_stream),
     })
 }

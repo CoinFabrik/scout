@@ -5,7 +5,7 @@ use std::vec;
 
 use anyhow::Context;
 use regex::RegexBuilder;
-use scout_audit_internal::{Detector, IntoEnumIterator};
+use scout_audit_internal::{DetectorImpl, InkDetector as Detector, IntoEnumIterator};
 use serde_json::{json, Value};
 
 pub fn format_into_json(scout_output: File, internals: File) -> anyhow::Result<String> {
