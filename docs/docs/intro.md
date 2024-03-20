@@ -55,6 +55,7 @@ In the table below, we specify all the option available for the CLI.
 | `cargo scout-audit`                                              | Runs the static analyzer on the current directory                                                                                                 |
 | `cargo scout-audit --help`                                       | Provides a brief explanation of all the available commands and their usage.                                                                       |
 | `cargo scout-audit --manifest-path <PATH_TO_CARGO_TOML>`         | This option is used to specify the path to the Cargo.toml file that you want to analyze.                                                          |
+| `cargo scout-audit --profile <PROFILE_NAME>`                     | This option allows you to analyze code using specific group of detectors, configured previously on `$HOME/.config/scout/(ink/soroban)-config.toml`|
 | `cargo scout-audit --filter <DETECTOR_LIST_SEPARATED_BY_COMAS>`  | This option allows you to analyze code using specific detectors. Provide a comma-separated list of detectors for this purpose.                    |
 | `cargo scout-audit --exclude <DETECTOR_LIST_SEPARATED_BY_COMAS>` | With this command, you can exclude specific detectors from the analysis. You need to give a comma-separated list of the detectors to be excluded. |
 | `cargo scout-audit --list-detectors`                             | Display a list of all available detectors.                                                                                                        |
@@ -64,6 +65,20 @@ In the table below, we specify all the option available for the CLI.
 | `cargo scout-audit --output-format [text\|json\|html\|sarif]`    | Sets the output format. Selecting `json`, `html` or `sarif` will create a file with the output                                                    |
 | `cargo scout-audit --output-path <PATH_TO_OUTPUT_FILE>`          | Sets the output path. If a format was selected, this will replace the default file with the given one                                             |
 
+#### Profile configuration
+The profile configuration file is generated automatically in `$HOME/.config/scout/(ink/soroban)-config.toml` the first time scout-audit is run.
+The configuration has the following format
+```
+[<profile-name>.<detector-name>]
+enabled = <true|false>
+```
+For example, if you want to define a profile named 'dev' in which the 'panic-error' detector is disabled and the 'ink-version' detector is enabled, you should do the following:
+```toml
+[dev.panic-error]
+enabled = false
+[dev.ink-version]
+enabled = true
+```
 
 ## VSCode Extension
 
