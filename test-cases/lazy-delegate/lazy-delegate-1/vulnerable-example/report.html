@@ -1,0 +1,2129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Scout Audit Report</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body class="h-screen flex flex-col dark:bg-gray-800 text-white">
+    <header class="p-4 text-lg font-bold border-b border-gray-700">
+        <div class="flex flex-col sm:flex-row justify-between items-center">
+            <div class="flex flex-wrap items-center justify-between">
+                <span class="flex items-center px-3 py-1 font-bold">
+                    name
+                </span>
+                <span class="border-l-2 border-gray-400 h-6 my-auto mx-2 hidden sm:block"></span>
+                <span class="flex items-center px-3 py-1">
+                    Date: 2024-03-20 09:52:58
+                </span>
+                <span class="border-l-2 border-gray-400 h-6 my-auto mx-2 hidden sm:block"></span>
+                <a href="source" class="flex items-center px-3 py-1 hover:underline" target="_blank">
+                    Hash: source
+                </a>
+            </div>
+
+            <div class="text-sm flex flex-wrap items-center">
+                <span class="mr-2 mt-2 sm:mt-0">Summary:</span>
+                <span class="bg-gray-700 summary-tag">Total: 6</span>
+                <span class="bg-red-500 summary-tag">Critical: 4</span>
+                <span class="bg-yellow-500 summary-tag">Medium: 1</span>
+                <span class="bg-green-500 summary-tag">Minor: 0</span>
+                <span class="bg-blue-500 summary-tag">Enhancements: 1</span>
+                <button class="analytics-btn border border-gray-200 rounded px-2 py-1 bg-gray-800 mt-2 sm:mt-0">
+                    Analytics
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-grow flex sm:flex-row flex-col">
+        <!-- Column 1: Categories -->
+<nav class="sm:w-1/6 w-full p-4 pb-0 overflow-y-auto text-white sm:border-r border-gray-700" id="categoryMenu">
+    <div class="cursor-pointer category py-2 px-4 rounded-md hover:bg-gray-700" data-category="all">All Categories</div>
+    <div class="border-b border-gray-700 my-4"></div>
+    
+    <div class="cursor-pointer category mt-2 py-2 px-4 rounded-md hover:bg-gray-700"
+        data-category="Unrestricted Transfer From">
+        Unrestricted Transfer From
+    </div>
+    
+    <div class="cursor-pointer category mt-2 py-2 px-4 rounded-md hover:bg-gray-700"
+        data-category="Lazy Delegate">
+        Lazy Delegate
+    </div>
+    
+    <div class="cursor-pointer category mt-2 py-2 px-4 rounded-md hover:bg-gray-700"
+        data-category="Check Ink! version">
+        Check Ink! version
+    </div>
+    
+    <div class="cursor-pointer category mt-2 py-2 px-4 rounded-md hover:bg-gray-700"
+        data-category="Unsafe Delegate Call">
+        Unsafe Delegate Call
+    </div>
+    
+    <div class="sm:border-0 border-b border-gray-700 my-2"></div>
+</nav>
+        <!-- Column 2: Vulnerabilities List -->
+<div class="sm:w-2/6 w-full p-4 overflow-y-auto sm:border-r border-gray-700 text-gray-100" id="vulnerabilitiesList">
+    
+    <div class="category-section mb-5" data-category="Unrestricted Transfer From">
+        <h3 class="text-lg font-bold p-3 bg-gray-700 mt-4 rounded-t-md">
+            Validations and error handling
+        </h3>
+        
+        <div
+            class="vulnerability p-3 hover:bg-gray-600 border bg-gray-500 border-t-0 border-gray-600 rounded-md rounded-t-none flex flex-col cursor-pointer">
+            <div class="flex items-center expand-div relative">
+                <button class="expand-btn bg-blue-500 hover:bg-blue-700 text-white font-bold w-8 h-8 rounded-md">
+                    &#x25B6;
+                </button>
+                <div class="ml-4 w-fit">
+                    <div class="font-bold">
+                        Unrestricted transfer from
+                        <span class="absolute right-2">
+                            
+                            <i class="fas fa-info-circle text-blue-500"></i>
+                            
+                        </span>
+                    </div>
+                    <div>This argument comes from a user-supplied argument</div>
+                </div>
+            </div>
+
+            <!-- The hidden details -->
+            <div class="additional-details hidden mt-3 p-2 overflow-hidden">
+                <table class="table-auto w-full text-sm text-left bg-gray-800">
+                    <thead class="text-xs uppercase bg-gray-700 font-bold">
+                        <tr>
+                            <th class="px-4 py-2 border-b border-gray-600 border-r w-4">Ref</th>
+                            <th class="px-4 py-2 border-b  border-gray-600">Location</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-600">
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <tr class="hover:bg-gray-600 finding-detail" finding-id="4">
+                            <td class="px-4 py-2 text-center border-r border-gray-600">1
+                            </td>
+                            <td class="px-4 py-2">lib.rs:52:26 - 52:45</td>
+                        </tr>
+                        
+                        
+                        
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div
+            class="vulnerability p-3 hover:bg-gray-600 border bg-gray-500 border-t-0 border-gray-600 rounded-md rounded-t-none flex flex-col cursor-pointer">
+            <div class="flex items-center expand-div relative">
+                <button class="expand-btn bg-blue-500 hover:bg-blue-700 text-white font-bold w-8 h-8 rounded-md">
+                    &#x25B6;
+                </button>
+                <div class="ml-4 w-fit">
+                    <div class="font-bold">
+                        Zero or test address
+                        <span class="absolute right-2">
+                            
+                            <i class="fas fa-info-circle text-blue-500"></i>
+                            
+                        </span>
+                    </div>
+                    <div>Not checking for a zero-address could lead to a locked contract</div>
+                </div>
+            </div>
+
+            <!-- The hidden details -->
+            <div class="additional-details hidden mt-3 p-2 overflow-hidden">
+                <table class="table-auto w-full text-sm text-left bg-gray-800">
+                    <thead class="text-xs uppercase bg-gray-700 font-bold">
+                        <tr>
+                            <th class="px-4 py-2 border-b border-gray-600 border-r w-4">Ref</th>
+                            <th class="px-4 py-2 border-b  border-gray-600">Location</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-600">
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <tr class="hover:bg-gray-600 finding-detail" finding-id="5">
+                            <td class="px-4 py-2 text-center border-r border-gray-600">1
+                            </td>
+                            <td class="px-4 py-2">lib.rs:42:13 - 42:33</td>
+                        </tr>
+                        
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+    </div>
+    
+    <div class="category-section mb-5" data-category="Lazy Delegate">
+        <h3 class="text-lg font-bold p-3 bg-gray-700 mt-4 rounded-t-md">
+            Known Bugs
+        </h3>
+        
+        <div
+            class="vulnerability p-3 hover:bg-gray-600 border bg-gray-500 border-t-0 border-gray-600 rounded-md rounded-t-none flex flex-col cursor-pointer">
+            <div class="flex items-center expand-div relative">
+                <button class="expand-btn bg-blue-500 hover:bg-blue-700 text-white font-bold w-8 h-8 rounded-md">
+                    &#x25B6;
+                </button>
+                <div class="ml-4 w-fit">
+                    <div class="font-bold">
+                        Lazy delegate
+                        <span class="absolute right-2">
+                            
+                            <i class="fas fa-info-circle text-blue-500"></i>
+                            
+                        </span>
+                    </div>
+                    <div>Delegate call with non-lazy, non-mapping storage</div>
+                </div>
+            </div>
+
+            <!-- The hidden details -->
+            <div class="additional-details hidden mt-3 p-2 overflow-hidden">
+                <table class="table-auto w-full text-sm text-left bg-gray-800">
+                    <thead class="text-xs uppercase bg-gray-700 font-bold">
+                        <tr>
+                            <th class="px-4 py-2 border-b border-gray-600 border-r w-4">Ref</th>
+                            <th class="px-4 py-2 border-b  border-gray-600">Location</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-600">
+                        
+                        
+                        <tr class="hover:bg-gray-600 finding-detail" finding-id="0">
+                            <td class="px-4 py-2 text-center border-r border-gray-600">1
+                            </td>
+                            <td class="px-4 py-2">lib.rs:49:18 - 49:26</td>
+                        </tr>
+                        
+                        
+                        
+                        <tr class="hover:bg-gray-600 finding-detail" finding-id="1">
+                            <td class="px-4 py-2 text-center border-r border-gray-600">2
+                            </td>
+                            <td class="px-4 py-2">lib.rs:12:5 - 15:6</td>
+                        </tr>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+    </div>
+    
+    <div class="category-section mb-5" data-category="Check Ink! version">
+        <h3 class="text-lg font-bold p-3 bg-gray-700 mt-4 rounded-t-md">
+            Best practices
+        </h3>
+        
+        <div
+            class="vulnerability p-3 hover:bg-gray-600 border bg-gray-500 border-t-0 border-gray-600 rounded-md rounded-t-none flex flex-col cursor-pointer">
+            <div class="flex items-center expand-div relative">
+                <button class="expand-btn bg-blue-500 hover:bg-blue-700 text-white font-bold w-8 h-8 rounded-md">
+                    &#x25B6;
+                </button>
+                <div class="ml-4 w-fit">
+                    <div class="font-bold">
+                        Check ink! version
+                        <span class="absolute right-2">
+                            
+                            <i class="fas fa-info-circle text-blue-500"></i>
+                            
+                        </span>
+                    </div>
+                    <div>Use the latest version of ink!</div>
+                </div>
+            </div>
+
+            <!-- The hidden details -->
+            <div class="additional-details hidden mt-3 p-2 overflow-hidden">
+                <table class="table-auto w-full text-sm text-left bg-gray-800">
+                    <thead class="text-xs uppercase bg-gray-700 font-bold">
+                        <tr>
+                            <th class="px-4 py-2 border-b border-gray-600 border-r w-4">Ref</th>
+                            <th class="px-4 py-2 border-b  border-gray-600">Location</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-600">
+                        
+                        
+                        
+                        
+                        
+                        
+                        <tr class="hover:bg-gray-600 finding-detail" finding-id="2">
+                            <td class="px-4 py-2 text-center border-r border-gray-600">1
+                            </td>
+                            <td class="px-4 py-2">Cargo.toml</td>
+                        </tr>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+    </div>
+    
+    <div class="category-section mb-5" data-category="Unsafe Delegate Call">
+        <h3 class="text-lg font-bold p-3 bg-gray-700 mt-4 rounded-t-md">
+            Authorization 
+        </h3>
+        
+        <div
+            class="vulnerability p-3 hover:bg-gray-600 border bg-gray-500 border-t-0 border-gray-600 rounded-md rounded-t-none flex flex-col cursor-pointer">
+            <div class="flex items-center expand-div relative">
+                <button class="expand-btn bg-blue-500 hover:bg-blue-700 text-white font-bold w-8 h-8 rounded-md">
+                    &#x25B6;
+                </button>
+                <div class="ml-4 w-fit">
+                    <div class="font-bold">
+                        Unsafe delegate call
+                        <span class="absolute right-2">
+                            
+                            <i class="fas fa-info-circle text-blue-500"></i>
+                            
+                        </span>
+                    </div>
+                    <div>Passing arguments to the target of a delegate call is not safe, as it allows the caller to set a malicious hash as the target.</div>
+                </div>
+            </div>
+
+            <!-- The hidden details -->
+            <div class="additional-details hidden mt-3 p-2 overflow-hidden">
+                <table class="table-auto w-full text-sm text-left bg-gray-800">
+                    <thead class="text-xs uppercase bg-gray-700 font-bold">
+                        <tr>
+                            <th class="px-4 py-2 border-b border-gray-600 border-r w-4">Ref</th>
+                            <th class="px-4 py-2 border-b  border-gray-600">Location</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-600">
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <tr class="hover:bg-gray-600 finding-detail" finding-id="3">
+                            <td class="px-4 py-2 text-center border-r border-gray-600">1
+                            </td>
+                            <td class="px-4 py-2">lib.rs:48:23 - 49:34</td>
+                        </tr>
+                        
+                        
+                        
+                        
+                        
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+    </div>
+    
+</div>
+        <style>
+    .code-snippet-container {
+        position: relative;
+        padding-left: 4rem;
+        overflow-y: hidden;
+    }
+
+    .code-snippet-container .code-line {
+        position: relative;
+        counter-increment: line;
+        padding: 0.25rem 0.5rem;
+        display: block;
+        background-color: #2D3748;
+    }
+
+    .code-snippet-container .code-line:before {
+        content: counter(line);
+        position: absolute;
+        left: 0;
+        padding: 0 10px;
+        text-align: center;
+        width: 3rem;
+        margin-left: -3.5rem;
+        background-color: #1A202C;
+        color: #4A5568;
+        box-sizing: border-box;
+    }
+
+    .code-line:hover {
+        background-color: #334155;
+    }
+
+    .code-snippet-container {
+        background-color: #1A202C;
+        border-radius: 0.375rem;
+    }
+</style>
+
+
+
+<div id="vulnerabilityDetails" class="p-4 max-w-4xl mx-auto bg-gray-800 rounded-lg text-gray-100">
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div id="detail-0"
+        class="shadow-lg overflow-hidden p-6 my-4 bg-gradient-to-r from-gray-700 to-gray-900 rounded-lg space-y-4 hidden">
+        <div class="flex justify-between items-center">
+            <h3 class="text-xl font-bold text-blue-400"> Lazy Delegate</h3>
+            <span
+                class="px-3 py-1  rounded-full text-gray-900 font-semibold severity-critical">Severity:
+                CRITICAL</span>
+        </div>
+        <p class="text-gray-300">Delegate call with non-lazy, non-mapping storage</p>
+        <p class="text-gray-400">A bug in ink! causes delegated calls to not modify the caller&#x27;s storage unless Lazy with ManualKey or Mapping is used.</p>
+        <p class="text-gray-400">Source: <span class="font-mono text-gray-200">&quot;&#x2F;home&#x2F;flerena&#x2F;coinfabrik&#x2F;scout&#x2F;scout&#x2F;test-cases&#x2F;lazy-delegate&#x2F;lazy-delegate-1&#x2F;vulnerable-example&#x2F;lib.rs&quot;</span></p>
+        <p class="text-gray-400">Span: <span class="font-mono text-gray-200">lib.rs:49:18 - 49:26</span></p>
+
+         
+            <div class="code-snippet-container bg-gray-800 rounded overflow-auto font-mono text-green-400" data-lines="">
+            
+                
+                <div class="code-line">delegate</div>
+                
+            </div>
+        
+        <p class="text-gray-400">Error message: <span class="font-mono text-gray-200">&quot;Delegate call with non-lazy, non-mapping storage&quot;</span>
+        </p>
+        <p>
+            Learn more about:
+            <a href=""
+                class="inline-block bg-blue-500 hover:bg-blue-600 text-blue-100 font-semibold px-3 py-1 rounded transition duration-150 ease-in-out">Lazy Delegate</a>
+        </p>
+    </div>
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div id="detail-1"
+        class="shadow-lg overflow-hidden p-6 my-4 bg-gradient-to-r from-gray-700 to-gray-900 rounded-lg space-y-4 hidden">
+        <div class="flex justify-between items-center">
+            <h3 class="text-xl font-bold text-blue-400"> Lazy Delegate</h3>
+            <span
+                class="px-3 py-1  rounded-full text-gray-900 font-semibold severity-critical">Severity:
+                CRITICAL</span>
+        </div>
+        <p class="text-gray-300">Delegate call with non-lazy, non-mapping storage</p>
+        <p class="text-gray-400">A bug in ink! causes delegated calls to not modify the caller&#x27;s storage unless Lazy with ManualKey or Mapping is used.</p>
+        <p class="text-gray-400">Source: <span class="font-mono text-gray-200">&quot;&#x2F;home&#x2F;flerena&#x2F;coinfabrik&#x2F;scout&#x2F;scout&#x2F;test-cases&#x2F;lazy-delegate&#x2F;lazy-delegate-1&#x2F;vulnerable-example&#x2F;lib.rs&quot;</span></p>
+        <p class="text-gray-400">Span: <span class="font-mono text-gray-200">lib.rs:12:5 - 15:6</span></p>
+
+         
+            <div class="code-snippet-container bg-gray-800 rounded overflow-auto font-mono text-green-400" data-lines="">
+            
+                
+                <div class="code-line">pub struct DelegateCall {</div>
+                
+                <div class="code-line">        admin: AccountId,</div>
+                
+                <div class="code-line">        balances: Mapping&lt;AccountId, Balance&gt;,</div>
+                
+                <div class="code-line">    }</div>
+                
+            </div>
+        
+        <p class="text-gray-400">Error message: <span class="font-mono text-gray-200">&quot;Delegate call with non-lazy, non-mapping storage&quot;</span>
+        </p>
+        <p>
+            Learn more about:
+            <a href=""
+                class="inline-block bg-blue-500 hover:bg-blue-600 text-blue-100 font-semibold px-3 py-1 rounded transition duration-150 ease-in-out">Lazy Delegate</a>
+        </p>
+    </div>
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div id="detail-2"
+        class="shadow-lg overflow-hidden p-6 my-4 bg-gradient-to-r from-gray-700 to-gray-900 rounded-lg space-y-4 hidden">
+        <div class="flex justify-between items-center">
+            <h3 class="text-xl font-bold text-blue-400"> Check Ink! version</h3>
+            <span
+                class="px-3 py-1  rounded-full text-gray-900 font-semibold severity-enhancement">Severity:
+                ENHANCEMENT</span>
+        </div>
+        <p class="text-gray-300">Use the latest version of ink!</p>
+        <p class="text-gray-400"></p>
+        <p class="text-gray-400">Source: <span class="font-mono text-gray-200">&quot;&#x2F;home&#x2F;flerena&#x2F;coinfabrik&#x2F;scout&#x2F;scout&#x2F;test-cases&#x2F;lazy-delegate&#x2F;lazy-delegate-1&#x2F;vulnerable-example&#x2F;lib.rs&quot;</span></p>
+        <p class="text-gray-400">Span: <span class="font-mono text-gray-200">Cargo.toml</span></p>
+
+        
+        <p class="text-gray-400">Error message: <span class="font-mono text-gray-200">&quot;Use the latest version of ink!&quot;</span>
+        </p>
+        <p>
+            Learn more about:
+            <a href="Using a older version of ink! can be dangerous, as it may have bugs or security issues. Use the latest version available.    "
+                class="inline-block bg-blue-500 hover:bg-blue-600 text-blue-100 font-semibold px-3 py-1 rounded transition duration-150 ease-in-out">Check Ink! version</a>
+        </p>
+    </div>
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div id="detail-3"
+        class="shadow-lg overflow-hidden p-6 my-4 bg-gradient-to-r from-gray-700 to-gray-900 rounded-lg space-y-4 hidden">
+        <div class="flex justify-between items-center">
+            <h3 class="text-xl font-bold text-blue-400"> Unsafe Delegate Call</h3>
+            <span
+                class="px-3 py-1  rounded-full text-gray-900 font-semibold severity-critical">Severity:
+                CRITICAL</span>
+        </div>
+        <p class="text-gray-300">Passing arguments to the target of a delegate call is not safe, as it allows the caller to set a malicious hash as the target.</p>
+        <p class="text-gray-400">It is important to validate and restrict delegate calls to trusted contracts, implement proper access control mechanisms, and carefully review external contracts to prevent unauthorized modifications, unexpected behavior, and potential exploits.</p>
+        <p class="text-gray-400">Source: <span class="font-mono text-gray-200">&quot;&#x2F;home&#x2F;flerena&#x2F;coinfabrik&#x2F;scout&#x2F;scout&#x2F;test-cases&#x2F;lazy-delegate&#x2F;lazy-delegate-1&#x2F;vulnerable-example&#x2F;lib.rs&quot;</span></p>
+        <p class="text-gray-400">Span: <span class="font-mono text-gray-200">lib.rs:48:23 - 49:34</span></p>
+
+         
+            <div class="code-snippet-container bg-gray-800 rounded overflow-auto font-mono text-green-400" data-lines="">
+            
+                
+                <div class="code-line">build_call::&lt;DefaultEnvironment&gt;()</div>
+                
+                <div class="code-line">                .delegate(target)</div>
+                
+            </div>
+        
+        <p class="text-gray-400">Error message: <span class="font-mono text-gray-200">&quot;Passing arguments to the target of a delegate call is not safe, as it allows the caller to set a malicious hash as the target.&quot;</span>
+        </p>
+        <p>
+            Learn more about:
+            <a href=""
+                class="inline-block bg-blue-500 hover:bg-blue-600 text-blue-100 font-semibold px-3 py-1 rounded transition duration-150 ease-in-out">Unsafe Delegate Call</a>
+        </p>
+    </div>
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div id="detail-4"
+        class="shadow-lg overflow-hidden p-6 my-4 bg-gradient-to-r from-gray-700 to-gray-900 rounded-lg space-y-4 hidden">
+        <div class="flex justify-between items-center">
+            <h3 class="text-xl font-bold text-blue-400"> Unrestricted Transfer From</h3>
+            <span
+                class="px-3 py-1  rounded-full text-gray-900 font-semibold severity-critical">Severity:
+                CRITICAL</span>
+        </div>
+        <p class="text-gray-300">This argument comes from a user-supplied argument</p>
+        <p class="text-gray-400">In an ink! Substrate smart contract, allowing unrestricted transfer_from operations poses a significant vulnerability. When from arguments for that function is provided directly by the user, this might enable the withdrawal of funds from any actor with token approval on the contract. This could result in unauthorized transfers and loss of funds. To mitigate this vulnerability, instead of allowing an arbitrary from address, the from address should be restricted, ideally to the address of the caller (self.env().caller()), ensuring that the sender can initiate a transfer only with their own tokens.    </p>
+        <p class="text-gray-400">Source: <span class="font-mono text-gray-200">&quot;&#x2F;home&#x2F;flerena&#x2F;coinfabrik&#x2F;scout&#x2F;scout&#x2F;test-cases&#x2F;lazy-delegate&#x2F;lazy-delegate-1&#x2F;vulnerable-example&#x2F;lib.rs&quot;</span></p>
+        <p class="text-gray-400">Span: <span class="font-mono text-gray-200">lib.rs:52:26 - 52:45</span></p>
+
+         
+            <div class="code-snippet-container bg-gray-800 rounded overflow-auto font-mono text-green-400" data-lines="">
+            
+                
+                <div class="code-line">push_arg(new_admin)</div>
+                
+            </div>
+        
+        <p class="text-gray-400">Error message: <span class="font-mono text-gray-200">&quot;This argument comes from a user-supplied argument&quot;</span>
+        </p>
+        <p>
+            Learn more about:
+            <a href=""
+                class="inline-block bg-blue-500 hover:bg-blue-600 text-blue-100 font-semibold px-3 py-1 rounded transition duration-150 ease-in-out">Unrestricted Transfer From</a>
+        </p>
+    </div>
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div id="detail-5"
+        class="shadow-lg overflow-hidden p-6 my-4 bg-gradient-to-r from-gray-700 to-gray-900 rounded-lg space-y-4 hidden">
+        <div class="flex justify-between items-center">
+            <h3 class="text-xl font-bold text-blue-400"> Zero or Test Address</h3>
+            <span
+                class="px-3 py-1  rounded-full text-gray-900 font-semibold severity-medium">Severity:
+                MEDIUM</span>
+        </div>
+        <p class="text-gray-300">Not checking for a zero-address could lead to a locked contract</p>
+        <p class="text-gray-400">The assignment of the zero address to a variable in a smart contract represents a critical vulnerability because it can lead to loss of control over the contract. This stems from the fact that the zero address does not have an associated private key, which means it&#x27;s impossible to claim ownership, rendering any contract assets or functions permanently inaccessible.    </p>
+        <p class="text-gray-400">Source: <span class="font-mono text-gray-200">&quot;&#x2F;home&#x2F;flerena&#x2F;coinfabrik&#x2F;scout&#x2F;scout&#x2F;test-cases&#x2F;lazy-delegate&#x2F;lazy-delegate-1&#x2F;vulnerable-example&#x2F;lib.rs&quot;</span></p>
+        <p class="text-gray-400">Span: <span class="font-mono text-gray-200">lib.rs:42:13 - 42:33</span></p>
+
+         
+            <div class="code-snippet-container bg-gray-800 rounded overflow-auto font-mono text-green-400" data-lines="">
+            
+                
+                <div class="code-line">new_admin: AccountId</div>
+                
+            </div>
+        
+        <p class="text-gray-400">Error message: <span class="font-mono text-gray-200">&quot;Not checking for a zero-address could lead to a locked contract&quot;</span>
+        </p>
+        <p>
+            Learn more about:
+            <a href=""
+                class="inline-block bg-blue-500 hover:bg-blue-600 text-blue-100 font-semibold px-3 py-1 rounded transition duration-150 ease-in-out">Zero or Test Address</a>
+        </p>
+    </div>
+    
+</div>
+    </div>
+
+    <footer class="p-4 text-center bg-gray-800 border-t border-gray-700 text-xs sm:text-base">
+        <div class="flex flex-row justify-center">
+            <span class="w-1/3">
+                <a href="https://www.coinfabrik.com/products/scout/"
+                    class="w-1/3 text-blue-400 hover:text-blue-300 sm:text-base text-sm" target="_blank">
+                    Scout
+                </a>
+                with ❤️ by
+                <a href="https://www.coinfabrik.com/"
+                    class="w-1/3 text-blue-400 hover:text-blue-300 sm:text-base text-sm" target="_blank">
+                    CoinFabrik
+                </a>
+            </span>
+        </div>
+    </footer>
+
+    <style>
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+        background-color: #1A202C;
+        margin: 10% auto;
+        border: 1px solid #2D3748;
+        width: fit-content;
+    }
+
+    .close {
+        color: #cbd5e0;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close:hover {
+        color: #e2e8f0;
+    }
+</style>
+
+<div id="analyticsModal" class="modal">
+    <div class="modal-content flex flex-col rounded-md">
+        <div class="flex justify-center items-center w-full relative mt-2">
+            <h2 class="text-lg font-bold">Analytics</h2>
+            <span class="close absolute right-4 -top-2">&times;</span>
+        </div>
+        <div class="flex flex-col items-center">
+            <div class="w-fit mt-2 m-4">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-700">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                                File
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                                Occurrences
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-gray-800 divide-y divide-gray-700">
+                        
+                        <tr class="hover:bg-gray-600">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-left">&quot;&#x2F;home&#x2F;flerena&#x2F;coinfabrik&#x2F;scout&#x2F;scout&#x2F;test-cases&#x2F;lazy-delegate&#x2F;lazy-delegate-1&#x2F;vulnerable-example&#x2F;lib.rs&quot;</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-center">6</td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+<script> var modal = document.getElementById("analyticsModal");
+var btn = document.getElementsByClassName("analytics-btn")[0];
+var span = document.getElementsByClassName("close")[0];
+
+btn.onclick = function () {
+  modal.style.display = "block";
+};
+
+span.onclick = function () {
+  modal.style.display = "none";
+};
+
+window.onclick = function (event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+};
+ </script>
+<script> document.addEventListener("DOMContentLoaded", () => {
+  const buttons = document.querySelectorAll(".category");
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const category = button.getAttribute("data-category");
+      const categorySections = document.querySelectorAll(".category-section");
+      categorySections.forEach((section) => {
+        if (
+          category === "all" ||
+          section.getAttribute("data-category") === category
+        ) {
+          section.classList.remove("hidden");
+        } else {
+          section.classList.add("hidden");
+        }
+      });
+    });
+  });
+});
+ </script>
+<script> document.addEventListener("DOMContentLoaded", () => {
+  const expandDiv = document.querySelectorAll(".expand-div");
+
+  expandDiv.forEach((div) => {
+    div.addEventListener("click", function () {
+      const expandBtn = div.querySelector(".expand-btn");
+      expandBtn.classList.toggle("rotate-90");
+      const additionalDetailsDiv = this.closest(".vulnerability").querySelector(
+        ".additional-details"
+      );
+      additionalDetailsDiv.classList.toggle("hidden");
+    });
+  });
+});
+ </script>
+<script> document.addEventListener("DOMContentLoaded", () => {
+  const findingsElements = document.querySelectorAll(".finding-detail");
+
+  findingsElements.forEach((element) => {
+    element.addEventListener("click", () => {
+      const detailId = element.getAttribute("finding-id");
+
+      document
+        .querySelectorAll("#vulnerabilityDetails > div")
+        .forEach((div) => {
+          div.classList.add("hidden");
+        });
+
+      const detailElement = document.querySelector(`#detail-${detailId}`);
+      if (detailElement) {
+        detailElement.classList.remove("hidden");
+      }
+    });
+  });
+});
+ </script>
+
+<style>
+    /*
+! tailwindcss v3.4.1 | MIT License | https://tailwindcss.com
+*/
+
+/*
+1. Prevent padding and border from affecting element width. (https://github.com/mozdevs/cssremedy/issues/4)
+2. Allow adding a border to an element by just adding a border-width. (https://github.com/tailwindcss/tailwindcss/pull/116)
+*/
+
+*,
+::before,
+::after {
+  box-sizing: border-box;
+  /* 1 */
+  border-width: 0;
+  /* 2 */
+  border-style: solid;
+  /* 2 */
+  border-color: #e5e7eb;
+  /* 2 */
+}
+
+::before,
+::after {
+  --tw-content: "";
+}
+
+/*
+1. Use a consistent sensible line-height in all browsers.
+2. Prevent adjustments of font size after orientation changes in iOS.
+3. Use a more readable tab size.
+4. Use the user's configured `sans` font-family by default.
+5. Use the user's configured `sans` font-feature-settings by default.
+6. Use the user's configured `sans` font-variation-settings by default.
+7. Disable tap highlights on iOS
+*/
+
+html,
+:host {
+  line-height: 1.5;
+  /* 1 */
+  -webkit-text-size-adjust: 100%;
+  /* 2 */
+  -moz-tab-size: 4;
+  /* 3 */
+  -o-tab-size: 4;
+  tab-size: 4;
+  /* 3 */
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  /* 4 */
+  font-feature-settings: normal;
+  /* 5 */
+  font-variation-settings: normal;
+  /* 6 */
+  -webkit-tap-highlight-color: transparent;
+  /* 7 */
+}
+
+/*
+1. Remove the margin in all browsers.
+2. Inherit line-height from `html` so users can set them as a class directly on the `html` element.
+*/
+
+body {
+  margin: 0;
+  /* 1 */
+  line-height: inherit;
+  /* 2 */
+}
+
+/*
+1. Add the correct height in Firefox.
+2. Correct the inheritance of border color in Firefox. (https://bugzilla.mozilla.org/show_bug.cgi?id=190655)
+3. Ensure horizontal rules are visible by default.
+*/
+
+hr {
+  height: 0;
+  /* 1 */
+  color: inherit;
+  /* 2 */
+  border-top-width: 1px;
+  /* 3 */
+}
+
+/*
+Add the correct text decoration in Chrome, Edge, and Safari.
+*/
+
+abbr:where([title]) {
+  -webkit-text-decoration: underline dotted;
+  text-decoration: underline dotted;
+}
+
+/*
+Remove the default font size and weight for headings.
+*/
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+/*
+Reset links to optimize for opt-in styling instead of opt-out.
+*/
+
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+/*
+Add the correct font weight in Edge and Safari.
+*/
+
+b,
+strong {
+  font-weight: bolder;
+}
+
+/*
+1. Use the user's configured `mono` font-family by default.
+2. Use the user's configured `mono` font-feature-settings by default.
+3. Use the user's configured `mono` font-variation-settings by default.
+4. Correct the odd `em` font sizing in all browsers.
+*/
+
+code,
+kbd,
+samp,
+pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  /* 1 */
+  font-feature-settings: normal;
+  /* 2 */
+  font-variation-settings: normal;
+  /* 3 */
+  font-size: 1em;
+  /* 4 */
+}
+
+/*
+Add the correct font size in all browsers.
+*/
+
+small {
+  font-size: 80%;
+}
+
+/*
+Prevent `sub` and `sup` elements from affecting the line height in all browsers.
+*/
+
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+sup {
+  top: -0.5em;
+}
+
+/*
+1. Remove text indentation from table contents in Chrome and Safari. (https://bugs.chromium.org/p/chromium/issues/detail?id=999088, https://bugs.webkit.org/show_bug.cgi?id=201297)
+2. Correct table border color inheritance in all Chrome and Safari. (https://bugs.chromium.org/p/chromium/issues/detail?id=935729, https://bugs.webkit.org/show_bug.cgi?id=195016)
+3. Remove gaps between table borders by default.
+*/
+
+table {
+  text-indent: 0;
+  /* 1 */
+  border-color: inherit;
+  /* 2 */
+  border-collapse: collapse;
+  /* 3 */
+}
+
+/*
+1. Change the font styles in all browsers.
+2. Remove the margin in Firefox and Safari.
+3. Remove default padding in all browsers.
+*/
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit;
+  /* 1 */
+  font-feature-settings: inherit;
+  /* 1 */
+  font-variation-settings: inherit;
+  /* 1 */
+  font-size: 100%;
+  /* 1 */
+  font-weight: inherit;
+  /* 1 */
+  line-height: inherit;
+  /* 1 */
+  color: inherit;
+  /* 1 */
+  margin: 0;
+  /* 2 */
+  padding: 0;
+  /* 3 */
+}
+
+/*
+Remove the inheritance of text transform in Edge and Firefox.
+*/
+
+button,
+select {
+  text-transform: none;
+}
+
+/*
+1. Correct the inability to style clickable types in iOS and Safari.
+2. Remove default button styles.
+*/
+
+button,
+[type="button"],
+[type="reset"],
+[type="submit"] {
+  -webkit-appearance: button;
+  /* 1 */
+  background-color: transparent;
+  /* 2 */
+  background-image: none;
+  /* 2 */
+}
+
+/*
+Use the modern Firefox focus style for all focusable elements.
+*/
+
+:-moz-focusring {
+  outline: auto;
+}
+
+/*
+Remove the additional `:invalid` styles in Firefox. (https://github.com/mozilla/gecko-dev/blob/2f9eacd9d3d995c937b4251a5557d95d494c9be1/layout/style/res/forms.css#L728-L737)
+*/
+
+:-moz-ui-invalid {
+  box-shadow: none;
+}
+
+/*
+Add the correct vertical alignment in Chrome and Firefox.
+*/
+
+progress {
+  vertical-align: baseline;
+}
+
+/*
+Correct the cursor style of increment and decrement buttons in Safari.
+*/
+
+::-webkit-inner-spin-button,
+::-webkit-outer-spin-button {
+  height: auto;
+}
+
+/*
+1. Correct the odd appearance in Chrome and Safari.
+2. Correct the outline style in Safari.
+*/
+
+[type="search"] {
+  -webkit-appearance: textfield;
+  /* 1 */
+  outline-offset: -2px;
+  /* 2 */
+}
+
+/*
+Remove the inner padding in Chrome and Safari on macOS.
+*/
+
+::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+
+/*
+1. Correct the inability to style clickable types in iOS and Safari.
+2. Change font properties to `inherit` in Safari.
+*/
+
+::-webkit-file-upload-button {
+  -webkit-appearance: button;
+  /* 1 */
+  font: inherit;
+  /* 2 */
+}
+
+/*
+Add the correct display in Chrome and Safari.
+*/
+
+summary {
+  display: list-item;
+}
+
+/*
+Removes the default spacing and border for appropriate elements.
+*/
+
+blockquote,
+dl,
+dd,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+hr,
+figure,
+p,
+pre {
+  margin: 0;
+}
+
+fieldset {
+  margin: 0;
+  padding: 0;
+}
+
+legend {
+  padding: 0;
+}
+
+ol,
+ul,
+menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/*
+Reset default styling for dialogs.
+*/
+
+dialog {
+  padding: 0;
+}
+
+/*
+Prevent resizing textareas horizontally by default.
+*/
+
+textarea {
+  resize: vertical;
+}
+
+/*
+1. Reset the default placeholder opacity in Firefox. (https://github.com/tailwindlabs/tailwindcss/issues/3300)
+2. Set the default placeholder color to the user's configured gray 400 color.
+*/
+
+input::-moz-placeholder,
+textarea::-moz-placeholder {
+  opacity: 1;
+  /* 1 */
+  color: #9ca3af;
+  /* 2 */
+}
+
+input::placeholder,
+textarea::placeholder {
+  opacity: 1;
+  /* 1 */
+  color: #9ca3af;
+  /* 2 */
+}
+
+/*
+Set the default cursor for buttons.
+*/
+
+button,
+[role="button"] {
+  cursor: pointer;
+}
+
+/*
+Make sure disabled buttons don't get the pointer cursor.
+*/
+
+:disabled {
+  cursor: default;
+}
+
+/*
+1. Make replaced elements `display: block` by default. (https://github.com/mozdevs/cssremedy/issues/14)
+2. Add `vertical-align: middle` to align replaced elements more sensibly by default. (https://github.com/jensimmons/cssremedy/issues/14#issuecomment-634934210)
+   This can trigger a poorly considered lint error in some tools but is included by design.
+*/
+
+img,
+svg,
+video,
+canvas,
+audio,
+iframe,
+embed,
+object {
+  display: block;
+  /* 1 */
+  vertical-align: middle;
+  /* 2 */
+}
+
+/*
+Constrain images and videos to the parent width and preserve their intrinsic aspect ratio. (https://github.com/mozdevs/cssremedy/issues/14)
+*/
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Make elements with the HTML hidden attribute stay hidden by default */
+
+[hidden] {
+  display: none;
+}
+
+*,
+::before,
+::after {
+  --tw-border-spacing-x: 0;
+  --tw-border-spacing-y: 0;
+  --tw-translate-x: 0;
+  --tw-translate-y: 0;
+  --tw-rotate: 0;
+  --tw-skew-x: 0;
+  --tw-skew-y: 0;
+  --tw-scale-x: 1;
+  --tw-scale-y: 1;
+  --tw-pan-x: ;
+  --tw-pan-y: ;
+  --tw-pinch-zoom: ;
+  --tw-scroll-snap-strictness: proximity;
+  --tw-gradient-from-position: ;
+  --tw-gradient-via-position: ;
+  --tw-gradient-to-position: ;
+  --tw-ordinal: ;
+  --tw-slashed-zero: ;
+  --tw-numeric-figure: ;
+  --tw-numeric-spacing: ;
+  --tw-numeric-fraction: ;
+  --tw-ring-inset: ;
+  --tw-ring-offset-width: 0px;
+  --tw-ring-offset-color: #fff;
+  --tw-ring-color: rgb(59 130 246 / 0.5);
+  --tw-ring-offset-shadow: 0 0 #0000;
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-shadow: 0 0 #0000;
+  --tw-shadow-colored: 0 0 #0000;
+  --tw-blur: ;
+  --tw-brightness: ;
+  --tw-contrast: ;
+  --tw-grayscale: ;
+  --tw-hue-rotate: ;
+  --tw-invert: ;
+  --tw-saturate: ;
+  --tw-sepia: ;
+  --tw-drop-shadow: ;
+  --tw-backdrop-blur: ;
+  --tw-backdrop-brightness: ;
+  --tw-backdrop-contrast: ;
+  --tw-backdrop-grayscale: ;
+  --tw-backdrop-hue-rotate: ;
+  --tw-backdrop-invert: ;
+  --tw-backdrop-opacity: ;
+  --tw-backdrop-saturate: ;
+  --tw-backdrop-sepia: ;
+}
+
+::backdrop {
+  --tw-border-spacing-x: 0;
+  --tw-border-spacing-y: 0;
+  --tw-translate-x: 0;
+  --tw-translate-y: 0;
+  --tw-rotate: 0;
+  --tw-skew-x: 0;
+  --tw-skew-y: 0;
+  --tw-scale-x: 1;
+  --tw-scale-y: 1;
+  --tw-pan-x: ;
+  --tw-pan-y: ;
+  --tw-pinch-zoom: ;
+  --tw-scroll-snap-strictness: proximity;
+  --tw-gradient-from-position: ;
+  --tw-gradient-via-position: ;
+  --tw-gradient-to-position: ;
+  --tw-ordinal: ;
+  --tw-slashed-zero: ;
+  --tw-numeric-figure: ;
+  --tw-numeric-spacing: ;
+  --tw-numeric-fraction: ;
+  --tw-ring-inset: ;
+  --tw-ring-offset-width: 0px;
+  --tw-ring-offset-color: #fff;
+  --tw-ring-color: rgb(59 130 246 / 0.5);
+  --tw-ring-offset-shadow: 0 0 #0000;
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-shadow: 0 0 #0000;
+  --tw-shadow-colored: 0 0 #0000;
+  --tw-blur: ;
+  --tw-brightness: ;
+  --tw-contrast: ;
+  --tw-grayscale: ;
+  --tw-hue-rotate: ;
+  --tw-invert: ;
+  --tw-saturate: ;
+  --tw-sepia: ;
+  --tw-drop-shadow: ;
+  --tw-backdrop-blur: ;
+  --tw-backdrop-brightness: ;
+  --tw-backdrop-contrast: ;
+  --tw-backdrop-grayscale: ;
+  --tw-backdrop-hue-rotate: ;
+  --tw-backdrop-invert: ;
+  --tw-backdrop-opacity: ;
+  --tw-backdrop-saturate: ;
+  --tw-backdrop-sepia: ;
+}
+
+.container {
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1536px;
+  }
+}
+
+.fixed {
+  position: fixed;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.relative {
+  position: relative;
+}
+
+.left-0 {
+  left: 0px;
+}
+
+.top-0 {
+  top: 0px;
+}
+
+.right-4 {
+  right: 1rem;
+}
+
+.top-1\/2 {
+  top: 50%;
+}
+
+.-top-2 {
+  top: -0.5rem;
+}
+
+.z-\[1\] {
+  z-index: 1;
+}
+
+.m-10 {
+  margin: 2.5rem;
+}
+
+.m-auto {
+  margin: auto;
+}
+
+.m-4 {
+  margin: 1rem;
+}
+
+.mx-2 {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.my-2 {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.my-4 {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.my-auto {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.mx-1 {
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+}
+
+.mx-10 {
+  margin-left: 2.5rem;
+  margin-right: 2.5rem;
+}
+
+.mb-5 {
+  margin-bottom: 1.25rem;
+}
+
+.ml-4 {
+  margin-left: 1rem;
+}
+
+.mr-2 {
+  margin-right: 0.5rem;
+}
+
+.mt-0 {
+  margin-top: 0px;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+.mt-3 {
+  margin-top: 0.75rem;
+}
+
+.mt-4 {
+  margin-top: 1rem;
+}
+
+.mr-4 {
+  margin-right: 1rem;
+}
+
+.block {
+  display: block;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.flex {
+  display: flex;
+}
+
+.table {
+  display: table;
+}
+
+.hidden {
+  display: none;
+}
+
+.h-6 {
+  height: 1.5rem;
+}
+
+.h-8 {
+  height: 2rem;
+}
+
+.h-screen {
+  height: 100vh;
+}
+
+.h-full {
+  height: 100%;
+}
+
+.w-1\/3 {
+  width: 33.333333%;
+}
+
+.w-4 {
+  width: 1rem;
+}
+
+.w-8 {
+  width: 2rem;
+}
+
+.w-fit {
+  width: -moz-fit-content;
+  width: fit-content;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.w-80 {
+  width: 20rem;
+}
+
+.min-w-full {
+  min-width: 100%;
+}
+
+.max-w-4xl {
+  max-width: 56rem;
+}
+
+.flex-grow {
+  flex-grow: 1;
+}
+
+.table-auto {
+  table-layout: auto;
+}
+
+.rotate-90 {
+  --tw-rotate: 90deg;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y))
+    rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y))
+    scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.space-y-4 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(1rem * var(--tw-space-y-reverse));
+}
+
+.divide-y > :not([hidden]) ~ :not([hidden]) {
+  --tw-divide-y-reverse: 0;
+  border-top-width: calc(1px * calc(1 - var(--tw-divide-y-reverse)));
+  border-bottom-width: calc(1px * var(--tw-divide-y-reverse));
+}
+
+.divide-gray-600 > :not([hidden]) ~ :not([hidden]) {
+  --tw-divide-opacity: 1;
+  border-color: rgb(75 85 99 / var(--tw-divide-opacity));
+}
+
+.divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+  --tw-divide-opacity: 1;
+  border-color: rgb(229 231 235 / var(--tw-divide-opacity));
+}
+
+.divide-gray-700 > :not([hidden]) ~ :not([hidden]) {
+  --tw-divide-opacity: 1;
+  border-color: rgb(55 65 81 / var(--tw-divide-opacity));
+}
+
+.overflow-auto {
+  overflow: auto;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.overflow-y-auto {
+  overflow-y: auto;
+}
+
+.whitespace-nowrap {
+  white-space: nowrap;
+}
+
+.rounded {
+  border-radius: 0.25rem;
+}
+
+.rounded-full {
+  border-radius: 9999px;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.rounded-md {
+  border-radius: 0.375rem;
+}
+
+.rounded-t-md {
+  border-top-left-radius: 0.375rem;
+  border-top-right-radius: 0.375rem;
+}
+
+.rounded-t-none {
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+}
+
+.border {
+  border-width: 1px;
+}
+
+.border-b {
+  border-bottom-width: 1px;
+}
+
+.border-l-2 {
+  border-left-width: 2px;
+}
+
+.border-r {
+  border-right-width: 1px;
+}
+
+.border-t {
+  border-top-width: 1px;
+}
+
+.border-t-0 {
+  border-top-width: 0px;
+}
+
+.border-gray-200 {
+  --tw-border-opacity: 1;
+  border-color: rgb(229 231 235 / var(--tw-border-opacity));
+}
+
+.border-gray-400 {
+  --tw-border-opacity: 1;
+  border-color: rgb(156 163 175 / var(--tw-border-opacity));
+}
+
+.border-gray-600 {
+  --tw-border-opacity: 1;
+  border-color: rgb(75 85 99 / var(--tw-border-opacity));
+}
+
+.border-gray-700 {
+  --tw-border-opacity: 1;
+  border-color: rgb(55 65 81 / var(--tw-border-opacity));
+}
+
+.bg-blue-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(59 130 246 / var(--tw-bg-opacity));
+}
+
+.bg-gray-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(107 114 128 / var(--tw-bg-opacity));
+}
+
+.bg-gray-700 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(55 65 81 / var(--tw-bg-opacity));
+}
+
+.bg-gray-800 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(31 41 55 / var(--tw-bg-opacity));
+}
+
+.bg-green-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(34 197 94 / var(--tw-bg-opacity));
+}
+
+.bg-red-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(239 68 68 / var(--tw-bg-opacity));
+}
+
+.bg-yellow-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(234 179 8 / var(--tw-bg-opacity));
+}
+
+.bg-gradient-to-r {
+  background-image: linear-gradient(to right, var(--tw-gradient-stops));
+}
+
+.from-gray-700 {
+  --tw-gradient-from: #374151 var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(55 65 81 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.to-gray-900 {
+  --tw-gradient-to: #111827 var(--tw-gradient-to-position);
+}
+
+.p-2 {
+  padding: 0.5rem;
+}
+
+.p-3 {
+  padding: 0.75rem;
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.p-6 {
+  padding: 1.5rem;
+}
+
+.px-2 {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.px-3 {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.py-1 {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.px-6 {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.py-3 {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.py-4 {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.pb-0 {
+  padding-bottom: 0px;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.font-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.text-base {
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.capitalize {
+  text-transform: capitalize;
+}
+
+.tracking-wider {
+  letter-spacing: 0.05em;
+}
+
+.text-blue-100 {
+  --tw-text-opacity: 1;
+  color: rgb(219 234 254 / var(--tw-text-opacity));
+}
+
+.text-blue-400 {
+  --tw-text-opacity: 1;
+  color: rgb(96 165 250 / var(--tw-text-opacity));
+}
+
+.text-gray-100 {
+  --tw-text-opacity: 1;
+  color: rgb(243 244 246 / var(--tw-text-opacity));
+}
+
+.text-gray-200 {
+  --tw-text-opacity: 1;
+  color: rgb(229 231 235 / var(--tw-text-opacity));
+}
+
+.text-gray-300 {
+  --tw-text-opacity: 1;
+  color: rgb(209 213 219 / var(--tw-text-opacity));
+}
+
+.text-gray-400 {
+  --tw-text-opacity: 1;
+  color: rgb(156 163 175 / var(--tw-text-opacity));
+}
+
+.text-gray-900 {
+  --tw-text-opacity: 1;
+  color: rgb(17 24 39 / var(--tw-text-opacity));
+}
+
+.text-green-400 {
+  --tw-text-opacity: 1;
+  color: rgb(74 222 128 / var(--tw-text-opacity));
+}
+
+.text-white {
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+.shadow-lg {
+  --tw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color),
+    0 4px 6px -4px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
+    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.filter {
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast)
+    var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate)
+    var(--tw-sepia) var(--tw-drop-shadow);
+}
+
+.transition {
+  transition-property: color, background-color, border-color,
+    text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter,
+    -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color,
+    text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter,
+    backdrop-filter;
+  transition-property: color, background-color, border-color,
+    text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter,
+    backdrop-filter, -webkit-backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.duration-150 {
+  transition-duration: 150ms;
+}
+
+.ease-in-out {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover\:bg-blue-600:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(37 99 235 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-blue-700:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(29 78 216 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-gray-600:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(75 85 99 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-gray-700:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(55 65 81 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-gray-50:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(249 250 251 / var(--tw-bg-opacity));
+}
+
+.hover\:text-blue-300:hover {
+  --tw-text-opacity: 1;
+  color: rgb(147 197 253 / var(--tw-text-opacity));
+}
+
+.hover\:underline:hover {
+  text-decoration-line: underline;
+}
+
+@media (min-width: 640px) {
+  .sm\:mt-0 {
+    margin-top: 0px;
+  }
+
+  .sm\:block {
+    display: block;
+  }
+
+  .sm\:w-1\/6 {
+    width: 16.666667%;
+  }
+
+  .sm\:w-2\/6 {
+    width: 33.333333%;
+  }
+
+  .sm\:w-1\/5 {
+    width: 20%;
+  }
+
+  .sm\:w-2\/5 {
+    width: 40%;
+  }
+
+  .sm\:flex-row {
+    flex-direction: row;
+  }
+
+  .sm\:border-0 {
+    border-width: 0px;
+  }
+
+  .sm\:border-r {
+    border-right-width: 1px;
+  }
+
+  .sm\:text-base {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .dark\:bg-gray-800 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(31 41 55 / var(--tw-bg-opacity));
+  }
+}
+
+
+    .summary-tag {
+        padding: 0.25rem 0.5rem;
+        margin-right: 0.5rem;
+        border-radius: 0.25rem;
+        margin-top: 0.5rem;
+    }
+
+    @media (min-width: 640px) {
+        .summary-tag {
+            margin-top: 0;
+        }
+    }
+
+    .severity-critical {
+        background-color: #E53E3E;
+    }
+
+    .severity-medium {
+        background-color: #ED8936;
+    }
+
+    .severity-minor {
+        background-color: #ECC94B;
+    }
+
+    .severity-enhancement {
+        background-color: #38B2AC;
+    }
+</style>
+
+</html>

@@ -7,7 +7,7 @@ extern crate rustc_span;
 use std::fs;
 
 use rustc_lint::EarlyLintPass;
-use scout_audit_internal::{InkDetector as Detector, DetectorImpl};
+use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
 use semver::*;
 
 dylint_linting::declare_early_lint! {

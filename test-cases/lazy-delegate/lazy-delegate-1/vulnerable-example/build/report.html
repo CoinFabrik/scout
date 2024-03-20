@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Scout Report - 2024-03-20 09:54:12</title>
+<style>
+body { font-family: 'Arial', sans-serif; line-height: 1.6; }
+img.banner { width: 100%; height: auto; }
+h1, h2, h3 { color: #333; }
+table { width: 100%; border-collapse: collapse; background-color: #f8f8f8; }
+th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+th { background-color: #f0f0f0; color: #333; }
+td { word-wrap: break-word; }
+ul.summary { list-style: none; padding: 0; }
+ul.summary li a { text-decoration: none; color: #333; }
+</style>
+</head>
+<body>
+<h1>Scout Report - 2024-03-20 09:54:12</h1>
+<h2>Summary</h2> - <a href="unrestricted-transfer-from">Unrestricted Transfer From</a> (2 results) (Critical)<br> - <a href="lazy-delegate">Lazy Delegate</a> (2 results) (Critical)<br> - <a href="unsafe-delegate-call">Unsafe Delegate Call</a> (1 results) (Critical)<br> - <a href="check-ink!-version">Check Ink! version</a> (1 results) (Enhancement)<br><br><h2>Unrestricted Transfer From</h2><br><h3>Unrestricted Transfer From</h3><br><strong>Impact:</strong> <span style="font-weight: bold">Critical</span><br><br><strong>Description:</strong> This argument comes from a user-supplied argument<br><br><strong>More about:</strong> <a href="">here</a><br><br><h3>Zero or Test Address</h3><br><strong>Impact:</strong> <span style="font-weight: bold">Medium</span><br><br><strong>Description:</strong> Not checking for a zero-address could lead to a locked contract<br><br><strong>More about:</strong> <a href="">here</a><br><br><table style="width: 100%; table-layout: fixed;"><thead><tr><th style="width: 20%;">ID</th><th style="width: 60%;">Detection</th><th style="width: 20%;">Status</th></tr></thead><tbody>
+<tr><td>4</td><td><a href="link-to-github">lib.rs:52:26 - 52:45</a></td><td><ul><li>- [ ] False Positive </li><li>- [ ] Acknowledged</li><li>- [ ] Resolved</li></ul></td></tr>
+<tr><td>5</td><td><a href="link-to-github">lib.rs:42:13 - 42:33</a></td><td><ul><li>- [ ] False Positive </li><li>- [ ] Acknowledged</li><li>- [ ] Resolved</li></ul></td></tr>
+</tbody></table><br><br></tbody></table><br><br><br><h2>Lazy Delegate</h2><br><h3>Lazy Delegate</h3><br><strong>Impact:</strong> <span style="font-weight: bold">Critical</span><br><br><strong>Description:</strong> Delegate call with non-lazy, non-mapping storage<br><br><strong>More about:</strong> <a href="">here</a><br><br><table style="width: 100%; table-layout: fixed;"><thead><tr><th style="width: 20%;">ID</th><th style="width: 60%;">Detection</th><th style="width: 20%;">Status</th></tr></thead><tbody>
+<tr><td>0</td><td><a href="link-to-github">lib.rs:49:18 - 49:26</a></td><td><ul><li>- [ ] False Positive </li><li>- [ ] Acknowledged</li><li>- [ ] Resolved</li></ul></td></tr>
+<tr><td>1</td><td><a href="link-to-github">lib.rs:12:5 - 15:6</a></td><td><ul><li>- [ ] False Positive </li><li>- [ ] Acknowledged</li><li>- [ ] Resolved</li></ul></td></tr>
+</tbody></table><br><br></tbody></table><br><br><br><h2>Unsafe Delegate Call</h2><br><h3>Unsafe Delegate Call</h3><br><strong>Impact:</strong> <span style="font-weight: bold">Critical</span><br><br><strong>Description:</strong> Passing arguments to the target of a delegate call is not safe, as it allows the caller to set a malicious hash as the target.<br><br><strong>More about:</strong> <a href="">here</a><br><br><table style="width: 100%; table-layout: fixed;"><thead><tr><th style="width: 20%;">ID</th><th style="width: 60%;">Detection</th><th style="width: 20%;">Status</th></tr></thead><tbody>
+<tr><td>3</td><td><a href="link-to-github">lib.rs:48:23 - 49:34</a></td><td><ul><li>- [ ] False Positive </li><li>- [ ] Acknowledged</li><li>- [ ] Resolved</li></ul></td></tr>
+</tbody></table><br><br></tbody></table><br><br><br><h2>Check Ink! version</h2><br><h3>Check Ink! version</h3><br><strong>Impact:</strong> <span style="font-weight: bold">Enhancement</span><br><br><strong>Description:</strong> Use the latest version of ink!<br><br><strong>More about:</strong> <a href="Using a older version of ink! can be dangerous, as it may have bugs or security issues. Use the latest version available.    ">here</a><br><br><table style="width: 100%; table-layout: fixed;"><thead><tr><th style="width: 20%;">ID</th><th style="width: 60%;">Detection</th><th style="width: 20%;">Status</th></tr></thead><tbody>
+<tr><td>2</td><td><a href="link-to-github">Cargo.toml</a></td><td><ul><li>- [ ] False Positive </li><li>- [ ] Acknowledged</li><li>- [ ] Resolved</li></ul></td></tr>
+</tbody></table><br><br></tbody></table><br><br>
