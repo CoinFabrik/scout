@@ -7,7 +7,7 @@
 - Detectors: [`ink-version`](https://github.com/CoinFabrik/scout/tree/main/detectors/ink-version)
 - Test Cases: [`ink-version-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/ink-version/ink-version-1)
 
-Using a pinned version of ink! can be dangerous, as it may have bugs or security issues. Use the latest version available.
+Using an old version of ink! can be dangerous, as it may have bugs or security issues. Use the latest version available.
 
 ## Exploit Scenario
 
