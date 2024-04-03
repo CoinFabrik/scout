@@ -105,8 +105,7 @@ impl<'tcx> Visitor<'tcx> for AvoidAutokeyUpgradableVisitor<'tcx, '_> {
     }
 }
 
-
-fn foo(x:i32) {
+fn foo(x: i32) {
     let a = x;
     let b = a;
     let c = b;
