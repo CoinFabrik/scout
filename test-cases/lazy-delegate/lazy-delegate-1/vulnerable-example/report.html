@@ -8,20 +8,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
-<body class="h-screen flex flex-col dark:bg-gray-800 text-white">
+<body class="h-screen flex flex-col bg-gray-800 text-white">
     <header class="p-4 text-lg font-bold border-b border-gray-700">
         <div class="flex flex-col sm:flex-row justify-between items-center">
             <div class="flex flex-wrap items-center justify-between">
                 <span class="flex items-center px-3 py-1 font-bold">
-                    name
+                    delegate-call
                 </span>
                 <span class="border-l-2 border-gray-400 h-6 my-auto mx-2 hidden sm:block"></span>
                 <span class="flex items-center px-3 py-1">
-                    Date: 2024-03-20 09:52:58
+                    Date: 2024-03-27 12:48:10
                 </span>
                 <span class="border-l-2 border-gray-400 h-6 my-auto mx-2 hidden sm:block"></span>
-                <a href="source" class="flex items-center px-3 py-1 hover:underline" target="_blank">
-                    Hash: source
+                <a href="7718051041570146454" class="flex items-center px-3 py-1 hover:underline" target="_blank">
+                    Hash: 7718051041570146454
                 </a>
             </div>
 
@@ -46,8 +46,13 @@
     <div class="border-b border-gray-700 my-4"></div>
     
     <div class="cursor-pointer category mt-2 py-2 px-4 rounded-md hover:bg-gray-700"
-        data-category="Unrestricted Transfer From">
-        Unrestricted Transfer From
+        data-category="Unsafe Delegate Call">
+        Unsafe Delegate Call
+    </div>
+    
+    <div class="cursor-pointer category mt-2 py-2 px-4 rounded-md hover:bg-gray-700"
+        data-category="Zero or Test Address">
+        Zero or Test Address
     </div>
     
     <div class="cursor-pointer category mt-2 py-2 px-4 rounded-md hover:bg-gray-700"
@@ -60,19 +65,14 @@
         Check Ink! version
     </div>
     
-    <div class="cursor-pointer category mt-2 py-2 px-4 rounded-md hover:bg-gray-700"
-        data-category="Unsafe Delegate Call">
-        Unsafe Delegate Call
-    </div>
-    
     <div class="sm:border-0 border-b border-gray-700 my-2"></div>
 </nav>
         <!-- Column 2: Vulnerabilities List -->
 <div class="sm:w-2/6 w-full p-4 overflow-y-auto sm:border-r border-gray-700 text-gray-100" id="vulnerabilitiesList">
     
-    <div class="category-section mb-5" data-category="Unrestricted Transfer From">
+    <div class="category-section mb-5" data-category="Unsafe Delegate Call">
         <h3 class="text-lg font-bold p-3 bg-gray-700 mt-4 rounded-t-md">
-            Validations and error handling
+            Authorization 
         </h3>
         
         <div
@@ -83,14 +83,14 @@
                 </button>
                 <div class="ml-4 w-fit">
                     <div class="font-bold">
-                        Unrestricted transfer from
+                        Unsafe delegate call
                         <span class="absolute right-2">
                             
                             <i class="fas fa-info-circle text-blue-500"></i>
                             
                         </span>
                     </div>
-                    <div>This argument comes from a user-supplied argument</div>
+                    <div>Passing arguments to the target of a delegate call is not safe, as it allows the caller to set a malicious hash as the target.</div>
                 </div>
             </div>
 
@@ -112,13 +112,13 @@
                         
                         
                         
-                        
-                        
-                        <tr class="hover:bg-gray-600 finding-detail" finding-id="4">
+                        <tr class="hover:bg-gray-600 finding-detail" finding-id="3">
                             <td class="px-4 py-2 text-center border-r border-gray-600">1
                             </td>
-                            <td class="px-4 py-2">lib.rs:52:26 - 52:45</td>
+                            <td class="px-4 py-2">lib.rs:48:23 - 49:34</td>
                         </tr>
+                        
+                        
                         
                         
                         
@@ -127,6 +127,13 @@
                 </table>
             </div>
         </div>
+        
+    </div>
+    
+    <div class="category-section mb-5" data-category="Zero or Test Address">
+        <h3 class="text-lg font-bold p-3 bg-gray-700 mt-4 rounded-t-md">
+            Validations and error handling
+        </h3>
         
         <div
             class="vulnerability p-3 hover:bg-gray-600 border bg-gray-500 border-t-0 border-gray-600 rounded-md rounded-t-none flex flex-col cursor-pointer">
@@ -174,6 +181,59 @@
                             </td>
                             <td class="px-4 py-2">lib.rs:42:13 - 42:33</td>
                         </tr>
+                        
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div
+            class="vulnerability p-3 hover:bg-gray-600 border bg-gray-500 border-t-0 border-gray-600 rounded-md rounded-t-none flex flex-col cursor-pointer">
+            <div class="flex items-center expand-div relative">
+                <button class="expand-btn bg-blue-500 hover:bg-blue-700 text-white font-bold w-8 h-8 rounded-md">
+                    &#x25B6;
+                </button>
+                <div class="ml-4 w-fit">
+                    <div class="font-bold">
+                        Unrestricted transfer from
+                        <span class="absolute right-2">
+                            
+                            <i class="fas fa-info-circle text-blue-500"></i>
+                            
+                        </span>
+                    </div>
+                    <div>This argument comes from a user-supplied argument</div>
+                </div>
+            </div>
+
+            <!-- The hidden details -->
+            <div class="additional-details hidden mt-3 p-2 overflow-hidden">
+                <table class="table-auto w-full text-sm text-left bg-gray-800">
+                    <thead class="text-xs uppercase bg-gray-700 font-bold">
+                        <tr>
+                            <th class="px-4 py-2 border-b border-gray-600 border-r w-4">Ref</th>
+                            <th class="px-4 py-2 border-b  border-gray-600">Location</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-600">
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <tr class="hover:bg-gray-600 finding-detail" finding-id="4">
+                            <td class="px-4 py-2 text-center border-r border-gray-600">1
+                            </td>
+                            <td class="px-4 py-2">lib.rs:52:26 - 52:45</td>
+                        </tr>
+                        
+                        
                         
                         
                     </tbody>
@@ -309,66 +369,6 @@
         
     </div>
     
-    <div class="category-section mb-5" data-category="Unsafe Delegate Call">
-        <h3 class="text-lg font-bold p-3 bg-gray-700 mt-4 rounded-t-md">
-            Authorization 
-        </h3>
-        
-        <div
-            class="vulnerability p-3 hover:bg-gray-600 border bg-gray-500 border-t-0 border-gray-600 rounded-md rounded-t-none flex flex-col cursor-pointer">
-            <div class="flex items-center expand-div relative">
-                <button class="expand-btn bg-blue-500 hover:bg-blue-700 text-white font-bold w-8 h-8 rounded-md">
-                    &#x25B6;
-                </button>
-                <div class="ml-4 w-fit">
-                    <div class="font-bold">
-                        Unsafe delegate call
-                        <span class="absolute right-2">
-                            
-                            <i class="fas fa-info-circle text-blue-500"></i>
-                            
-                        </span>
-                    </div>
-                    <div>Passing arguments to the target of a delegate call is not safe, as it allows the caller to set a malicious hash as the target.</div>
-                </div>
-            </div>
-
-            <!-- The hidden details -->
-            <div class="additional-details hidden mt-3 p-2 overflow-hidden">
-                <table class="table-auto w-full text-sm text-left bg-gray-800">
-                    <thead class="text-xs uppercase bg-gray-700 font-bold">
-                        <tr>
-                            <th class="px-4 py-2 border-b border-gray-600 border-r w-4">Ref</th>
-                            <th class="px-4 py-2 border-b  border-gray-600">Location</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-600">
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        <tr class="hover:bg-gray-600 finding-detail" finding-id="3">
-                            <td class="px-4 py-2 text-center border-r border-gray-600">1
-                            </td>
-                            <td class="px-4 py-2">lib.rs:48:23 - 49:34</td>
-                        </tr>
-                        
-                        
-                        
-                        
-                        
-                        
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        
-    </div>
-    
 </div>
         <style>
     .code-snippet-container {
@@ -435,7 +435,7 @@
         </div>
         <p class="text-gray-300">Delegate call with non-lazy, non-mapping storage</p>
         <p class="text-gray-400">A bug in ink! causes delegated calls to not modify the caller&#x27;s storage unless Lazy with ManualKey or Mapping is used.</p>
-        <p class="text-gray-400">Source: <span class="font-mono text-gray-200">&quot;&#x2F;home&#x2F;flerena&#x2F;coinfabrik&#x2F;scout&#x2F;scout&#x2F;test-cases&#x2F;lazy-delegate&#x2F;lazy-delegate-1&#x2F;vulnerable-example&#x2F;lib.rs&quot;</span></p>
+        <p class="text-gray-400">Source: <span class="font-mono text-gray-200">lib.rs</span></p>
         <p class="text-gray-400">Span: <span class="font-mono text-gray-200">lib.rs:49:18 - 49:26</span></p>
 
          
@@ -446,11 +446,11 @@
                 
             </div>
         
-        <p class="text-gray-400">Error message: <span class="font-mono text-gray-200">&quot;Delegate call with non-lazy, non-mapping storage&quot;</span>
+        <p class="text-gray-400">Error message: <span class="font-mono text-gray-200">Delegate call with non-lazy, non-mapping storage</span>
         </p>
         <p>
             Learn more about:
-            <a href=""
+            <a href="https:&#x2F;&#x2F;coinfabrik.github.io&#x2F;scout&#x2F;docs&#x2F;vulnerabilities&#x2F;lazy-delegate"
                 class="inline-block bg-blue-500 hover:bg-blue-600 text-blue-100 font-semibold px-3 py-1 rounded transition duration-150 ease-in-out">Lazy Delegate</a>
         </p>
     </div>
@@ -478,7 +478,7 @@
         </div>
         <p class="text-gray-300">Delegate call with non-lazy, non-mapping storage</p>
         <p class="text-gray-400">A bug in ink! causes delegated calls to not modify the caller&#x27;s storage unless Lazy with ManualKey or Mapping is used.</p>
-        <p class="text-gray-400">Source: <span class="font-mono text-gray-200">&quot;&#x2F;home&#x2F;flerena&#x2F;coinfabrik&#x2F;scout&#x2F;scout&#x2F;test-cases&#x2F;lazy-delegate&#x2F;lazy-delegate-1&#x2F;vulnerable-example&#x2F;lib.rs&quot;</span></p>
+        <p class="text-gray-400">Source: <span class="font-mono text-gray-200">lib.rs</span></p>
         <p class="text-gray-400">Span: <span class="font-mono text-gray-200">lib.rs:12:5 - 15:6</span></p>
 
          
@@ -495,11 +495,11 @@
                 
             </div>
         
-        <p class="text-gray-400">Error message: <span class="font-mono text-gray-200">&quot;Delegate call with non-lazy, non-mapping storage&quot;</span>
+        <p class="text-gray-400">Error message: <span class="font-mono text-gray-200">Delegate call with non-lazy, non-mapping storage</span>
         </p>
         <p>
             Learn more about:
-            <a href=""
+            <a href="https:&#x2F;&#x2F;coinfabrik.github.io&#x2F;scout&#x2F;docs&#x2F;vulnerabilities&#x2F;lazy-delegate"
                 class="inline-block bg-blue-500 hover:bg-blue-600 text-blue-100 font-semibold px-3 py-1 rounded transition duration-150 ease-in-out">Lazy Delegate</a>
         </p>
     </div>
@@ -526,16 +526,16 @@
                 ENHANCEMENT</span>
         </div>
         <p class="text-gray-300">Use the latest version of ink!</p>
-        <p class="text-gray-400"></p>
-        <p class="text-gray-400">Source: <span class="font-mono text-gray-200">&quot;&#x2F;home&#x2F;flerena&#x2F;coinfabrik&#x2F;scout&#x2F;scout&#x2F;test-cases&#x2F;lazy-delegate&#x2F;lazy-delegate-1&#x2F;vulnerable-example&#x2F;lib.rs&quot;</span></p>
+        <p class="text-gray-400">Using a older version of ink! can be dangerous, as it may have bugs or security issues. Use the latest version available.</p>
+        <p class="text-gray-400">Source: <span class="font-mono text-gray-200">lib.rs</span></p>
         <p class="text-gray-400">Span: <span class="font-mono text-gray-200">Cargo.toml</span></p>
 
         
-        <p class="text-gray-400">Error message: <span class="font-mono text-gray-200">&quot;Use the latest version of ink!&quot;</span>
+        <p class="text-gray-400">Error message: <span class="font-mono text-gray-200">Use the latest version of ink!</span>
         </p>
         <p>
             Learn more about:
-            <a href="Using a older version of ink! can be dangerous, as it may have bugs or security issues. Use the latest version available.    "
+            <a href="https:&#x2F;&#x2F;coinfabrik.github.io&#x2F;scout&#x2F;docs&#x2F;vulnerabilities&#x2F;ink-version"
                 class="inline-block bg-blue-500 hover:bg-blue-600 text-blue-100 font-semibold px-3 py-1 rounded transition duration-150 ease-in-out">Check Ink! version</a>
         </p>
     </div>
@@ -563,7 +563,7 @@
         </div>
         <p class="text-gray-300">Passing arguments to the target of a delegate call is not safe, as it allows the caller to set a malicious hash as the target.</p>
         <p class="text-gray-400">It is important to validate and restrict delegate calls to trusted contracts, implement proper access control mechanisms, and carefully review external contracts to prevent unauthorized modifications, unexpected behavior, and potential exploits.</p>
-        <p class="text-gray-400">Source: <span class="font-mono text-gray-200">&quot;&#x2F;home&#x2F;flerena&#x2F;coinfabrik&#x2F;scout&#x2F;scout&#x2F;test-cases&#x2F;lazy-delegate&#x2F;lazy-delegate-1&#x2F;vulnerable-example&#x2F;lib.rs&quot;</span></p>
+        <p class="text-gray-400">Source: <span class="font-mono text-gray-200">lib.rs</span></p>
         <p class="text-gray-400">Span: <span class="font-mono text-gray-200">lib.rs:48:23 - 49:34</span></p>
 
          
@@ -576,11 +576,11 @@
                 
             </div>
         
-        <p class="text-gray-400">Error message: <span class="font-mono text-gray-200">&quot;Passing arguments to the target of a delegate call is not safe, as it allows the caller to set a malicious hash as the target.&quot;</span>
+        <p class="text-gray-400">Error message: <span class="font-mono text-gray-200">Passing arguments to the target of a delegate call is not safe, as it allows the caller to set a malicious hash as the target.</span>
         </p>
         <p>
             Learn more about:
-            <a href=""
+            <a href="https:&#x2F;&#x2F;coinfabrik.github.io&#x2F;scout&#x2F;docs&#x2F;vulnerabilities&#x2F;delegate-call"
                 class="inline-block bg-blue-500 hover:bg-blue-600 text-blue-100 font-semibold px-3 py-1 rounded transition duration-150 ease-in-out">Unsafe Delegate Call</a>
         </p>
     </div>
@@ -608,7 +608,7 @@
         </div>
         <p class="text-gray-300">This argument comes from a user-supplied argument</p>
         <p class="text-gray-400">In an ink! Substrate smart contract, allowing unrestricted transfer_from operations poses a significant vulnerability. When from arguments for that function is provided directly by the user, this might enable the withdrawal of funds from any actor with token approval on the contract. This could result in unauthorized transfers and loss of funds. To mitigate this vulnerability, instead of allowing an arbitrary from address, the from address should be restricted, ideally to the address of the caller (self.env().caller()), ensuring that the sender can initiate a transfer only with their own tokens.    </p>
-        <p class="text-gray-400">Source: <span class="font-mono text-gray-200">&quot;&#x2F;home&#x2F;flerena&#x2F;coinfabrik&#x2F;scout&#x2F;scout&#x2F;test-cases&#x2F;lazy-delegate&#x2F;lazy-delegate-1&#x2F;vulnerable-example&#x2F;lib.rs&quot;</span></p>
+        <p class="text-gray-400">Source: <span class="font-mono text-gray-200">lib.rs</span></p>
         <p class="text-gray-400">Span: <span class="font-mono text-gray-200">lib.rs:52:26 - 52:45</span></p>
 
          
@@ -619,11 +619,11 @@
                 
             </div>
         
-        <p class="text-gray-400">Error message: <span class="font-mono text-gray-200">&quot;This argument comes from a user-supplied argument&quot;</span>
+        <p class="text-gray-400">Error message: <span class="font-mono text-gray-200">This argument comes from a user-supplied argument</span>
         </p>
         <p>
             Learn more about:
-            <a href=""
+            <a href="https:&#x2F;&#x2F;coinfabrik.github.io&#x2F;scout&#x2F;docs&#x2F;vulnerabilities&#x2F;unrestricted-transfer-from"
                 class="inline-block bg-blue-500 hover:bg-blue-600 text-blue-100 font-semibold px-3 py-1 rounded transition duration-150 ease-in-out">Unrestricted Transfer From</a>
         </p>
     </div>
@@ -651,7 +651,7 @@
         </div>
         <p class="text-gray-300">Not checking for a zero-address could lead to a locked contract</p>
         <p class="text-gray-400">The assignment of the zero address to a variable in a smart contract represents a critical vulnerability because it can lead to loss of control over the contract. This stems from the fact that the zero address does not have an associated private key, which means it&#x27;s impossible to claim ownership, rendering any contract assets or functions permanently inaccessible.    </p>
-        <p class="text-gray-400">Source: <span class="font-mono text-gray-200">&quot;&#x2F;home&#x2F;flerena&#x2F;coinfabrik&#x2F;scout&#x2F;scout&#x2F;test-cases&#x2F;lazy-delegate&#x2F;lazy-delegate-1&#x2F;vulnerable-example&#x2F;lib.rs&quot;</span></p>
+        <p class="text-gray-400">Source: <span class="font-mono text-gray-200">lib.rs</span></p>
         <p class="text-gray-400">Span: <span class="font-mono text-gray-200">lib.rs:42:13 - 42:33</span></p>
 
          
@@ -662,11 +662,11 @@
                 
             </div>
         
-        <p class="text-gray-400">Error message: <span class="font-mono text-gray-200">&quot;Not checking for a zero-address could lead to a locked contract&quot;</span>
+        <p class="text-gray-400">Error message: <span class="font-mono text-gray-200">Not checking for a zero-address could lead to a locked contract</span>
         </p>
         <p>
             Learn more about:
-            <a href=""
+            <a href="https:&#x2F;&#x2F;coinfabrik.github.io&#x2F;scout&#x2F;docs&#x2F;vulnerabilities&#x2F;zero-or-test-address"
                 class="inline-block bg-blue-500 hover:bg-blue-600 text-blue-100 font-semibold px-3 py-1 rounded transition duration-150 ease-in-out">Zero or Test Address</a>
         </p>
     </div>
@@ -744,7 +744,7 @@
                     <tbody class="bg-gray-800 divide-y divide-gray-700">
                         
                         <tr class="hover:bg-gray-600">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-left">&quot;&#x2F;home&#x2F;flerena&#x2F;coinfabrik&#x2F;scout&#x2F;scout&#x2F;test-cases&#x2F;lazy-delegate&#x2F;lazy-delegate-1&#x2F;vulnerable-example&#x2F;lib.rs&quot;</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-left">lib.rs</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-center">6</td>
                         </tr>
                         
