@@ -98,9 +98,9 @@ jobs:
         test:
           [
             "assert-violation",
+            "avoid-autokey-upgradable",
             "avoid-core-mem-forget",
             "avoid-format-string",
-            "avoid-autokey-upgradable",
             "delegate-call",
             "divide-before-multiply",
             "dos-unbounded-operation",
