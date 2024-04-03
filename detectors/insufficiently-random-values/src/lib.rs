@@ -5,7 +5,8 @@ extern crate rustc_hir;
 use if_chain::if_chain;
 use rustc_hir::{BinOpKind, Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
-use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
+
+const LINT_MESSAGE: &str = "In order to prevent randomness manipulations by validators block_timestamp should not be used as random number source";
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -21,7 +22,14 @@ dylint_linting::declare_late_lint! {
     ///
     pub INSUFFICIENTLY_RANDOM_VALUES,
     Warn,
-    scout_audit_internal::ink_lint_message::INK_INSUFFICIENTLY_RANDOM_VALUES_LINT_MESSAGE
+    LINT_MESSAGE,
+    {
+        name: "Insufficiently Random Values",
+        long_message: "Using block attributes like block_timestamp or block_number for random number generation in ink! Substrate smart contracts is not recommended due to the predictability of these values. Block attributes are publicly visible and deterministic, making it easy for malicious actors to anticipate their values and manipulate outcomes to their advantage.",
+        severity: "Critical",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/insufficiently-random-values",
+        vulnerability_class: "Block attributes",
+    }
 }
 
 impl<'tcx> LateLintPass<'tcx> for InsufficientlyRandomValues {
@@ -31,12 +39,14 @@ impl<'tcx> LateLintPass<'tcx> for InsufficientlyRandomValues {
             if op.node == BinOpKind::Rem;
             if let ExprKind::MethodCall(path, _, _, _) = lexp.kind;
             if path.ident.as_str() == "block_timestamp" ||
-                path.ident.as_str() == "block_number";
+            path.ident.as_str() == "block_number";
             then {
-                Detector::InsufficientlyRandomValues.span_lint_and_help(
+                scout_audit_clippy_utils::diagnostics::span_lint_and_help(
                     cx,
                     INSUFFICIENTLY_RANDOM_VALUES,
                     expr.span,
+                    LINT_MESSAGE,
+                    None,
                     "This expression seems to use block_timestamp as a pseudo random number",
                 );
             }

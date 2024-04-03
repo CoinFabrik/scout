@@ -18,13 +18,21 @@ use rustc_middle::mir::{
 use rustc_middle::ty::TyKind;
 use rustc_span::def_id::DefId;
 use rustc_span::Span;
-use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
+
+const LINT_MESSAGE: &str = "This terminate_contract is called without access control";
 
 dylint_linting::impl_late_lint! {
     pub UNPROTECTED_SELF_DESTRUCT,
     Warn,
-    scout_audit_internal::ink_lint_message::INK_UNPROTECTED_SELF_DESTRUCT_LINT_MESSAGE,
-    UnprotectedSelfDestruct::default()
+    LINT_MESSAGE,
+    UnprotectedSelfDestruct::default(),
+    {
+        name: "Unprotected Self Destruct",
+        long_message: "If users are allowed to call terminate_contract, they can intentionally or accidentally destroy the contract, leading to the loss of all associated data and functionalities given by this contract or by others that depend on it. To prevent this, the function should be restricted to administrators or authorized users only.    ",
+        severity: "Critical",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/unprotected-self-destruct",
+        vulnerability_class: "Authorization",
+    }
 }
 
 #[derive(Default)]
@@ -137,10 +145,11 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
             if caller_and_terminate.callers.is_empty() {
                 for terminate in caller_and_terminate.terminates {
                     if let TerminatorKind::Call { fn_span, .. } = terminate.0.terminator().kind {
-                        Detector::UnprotectedSelfDestruct.span_lint(
+                        scout_audit_clippy_utils::diagnostics::span_lint(
                             cx,
                             UNPROTECTED_SELF_DESTRUCT,
                             fn_span,
+                            LINT_MESSAGE,
                         );
                     }
                 }
@@ -153,10 +162,11 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
                     &mut vec![],
                 );
                 for place in unchecked_places {
-                    Detector::UnprotectedSelfDestruct.span_lint(
+                    scout_audit_clippy_utils::diagnostics::span_lint(
                         cx,
                         UNPROTECTED_SELF_DESTRUCT,
                         place.1,
+                        LINT_MESSAGE,
                     );
                 }
             }

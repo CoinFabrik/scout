@@ -15,7 +15,6 @@ serde_json = "1.0"
 toml = "0.7.6"
 ureq = { version = "2.7.1", features = ["json"] }
 
-scout-audit-internal = { workspace = true }
 
 [dev-dependencies]
 dylint_testing = { workspace = true }

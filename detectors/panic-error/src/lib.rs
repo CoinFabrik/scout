@@ -14,7 +14,8 @@ use rustc_ast::{
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::{sym, Span};
 use scout_audit_clippy_utils::sym;
-use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
+
+const LINT_MESSAGE: &str = "The panic! macro is used to stop execution when a condition is not met. This is useful for testing and prototyping, but should be avoided in production code";
 
 dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does
@@ -48,8 +49,15 @@ dylint_linting::impl_pre_expansion_lint! {
     /// ```
     pub PANIC_ERROR,
     Warn,
-    scout_audit_internal::ink_lint_message::INK_PANIC_ERROR_LINT_MESSAGE,
-    PanicError::default()
+    LINT_MESSAGE,
+    PanicError::default(),
+    {
+        name: "Panic Error",
+        long_message: "The use of the panic! macro to stop execution when a condition is not met is useful for testing and prototyping but should be avoided in production code. Using Result as the return type for functions that can fail is the idiomatic way to handle errors in Rust.    ",
+        severity: "Enhancement",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/panic-error",
+        vulnerability_class: "Validations and error handling",
+    }
 }
 
 #[derive(Default)]
@@ -103,11 +111,13 @@ fn check_macro_call(cx: &EarlyContext, span: Span, mac: &P<MacCall>) {
         if let TokenKind::Literal(lit) = token.kind;
         if lit.kind == LitKind::Str;
         then {
-            Detector::PanicError.span_lint_and_help(
+            scout_audit_clippy_utils::diagnostics::span_lint_and_help(
                 cx,
                 PANIC_ERROR,
                 span,
-                &format!("You could use instead an Error enum and then 'return Err(Error::{})'", capitalize_err_msg(lit.symbol.as_str()).replace(' ', "")),
+                LINT_MESSAGE,
+                None,
+                &format!("You could use instead an Error enum and then 'return Err(Error::{})'", capitalize_err_msg(lit.symbol.as_str()).replace(' ', ""))
             );
         }
     }

@@ -8,4 +8,5 @@ if_chain = "1.0.2"
 
 scout-audit-clippy-utils = { version = "=0.2.3" }
 scout-audit-internal = { version = "=0.2.3", features = ["detector", "lint_helper"] }
-dylint_linting = { version = "=2.6.1", package = "scout-audit-dylint-linting"}
+dylint_linting = { package = "scout-audit-dylint-linting", version = "3.0.0" }
+#version = "=2.6.1", 

@@ -21,13 +21,21 @@ use rustc_middle::mir::{
 use rustc_middle::ty::TyKind;
 use rustc_span::def_id::DefId;
 use rustc_span::Span;
-use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
+
+const LINT_MESSAGE: &str = "This mapping operation is called without access control on a different key than the caller's address";
 
 dylint_linting::impl_late_lint! {
     pub UNPROTECTED_MAPPING_OPERATION,
     Warn,
-    scout_audit_internal::ink_lint_message::INK_UNPROTECTED_MAPPING_OPERATION_LINT_MESSAGE,
-    UnprotectedMappingOperation::default()
+    LINT_MESSAGE,
+    UnprotectedMappingOperation::default(),
+    {
+        name: "Unprotected Mapping Operation",
+        long_message: "Modifying mappings with an arbitrary key given by the user could lead to unintented modifications of critical data, modifying data belonging to other users, causing denial of service, unathorized access, and other potential issues.",
+        severity: "Critical",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/unprotected-mapping-operation",
+        vulnerability_class: "Validations and error handling",
+    }
 }
 
 #[derive(Default)]
@@ -164,10 +172,11 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
                 &mut HashSet::<BasicBlock>::default(),
             );
             for place in unchecked_places {
-                Detector::UnprotectedMappingOperation.span_lint(
+                scout_audit_clippy_utils::diagnostics::span_lint(
                     cx,
                     UNPROTECTED_MAPPING_OPERATION,
                     place.1,
+                    LINT_MESSAGE,
                 );
             }
         }
