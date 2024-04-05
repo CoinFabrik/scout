@@ -23,6 +23,12 @@ dylint_linting::impl_late_lint! {
     AvoidAutokeyUpgradable::default()
 }
 
+const LAZY_TYPE: &str = "ink_storage::lazy::Lazy";
+const MAPPING_TYPE: &str = "ink_storage::lazy::mapping::Mapping";
+const INK_VEC_STORAGE_TYPE: &str = "ink_storage::lazy::vec::StorageVec";
+const SET_CODE_HASH_METHOD: &str = "set_code_hash";
+const MANUAL_KEY: &str = "ManualKey";
+
 #[derive(Default)]
 pub struct AvoidAutokeyUpgradable {
     lazy_fields: Vec<Span>,
@@ -95,12 +101,6 @@ impl<'tcx> AvoidAutokeyUpgradable {
         false
     }
 }
-
-const LAZY_TYPE: &str = "ink_storage::lazy::Lazy";
-const MAPPING_TYPE: &str = "ink_storage::lazy::mapping::Mapping";
-const INK_VEC_STORAGE_TYPE: &str = "ink_storage::lazy::vec::StorageVec";
-const SET_CODE_HASH_METHOD: &str = "set_code_hash";
-const MANUAL_KEY: &str = "ManualKey";
 
 fn is_lazy_type(def_path: &str) -> bool {
     def_path == LAZY_TYPE || def_path == MAPPING_TYPE || def_path == INK_VEC_STORAGE_TYPE
