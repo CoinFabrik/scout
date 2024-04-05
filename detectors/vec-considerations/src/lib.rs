@@ -17,7 +17,7 @@ use rustc_span::symbol::Ident;
 dylint_linting::impl_late_lint! {
     pub VEC_CONSIDERATIONS,
     Warn,
-    "Do not use `.insert(..)` with an unsized (dynamically sized) type.",
+    "Do not use `x` method with an unsized (dynamically sized) type.",
     VecConsiderations::default()
 }
 
