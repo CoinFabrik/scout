@@ -10,6 +10,7 @@ crate-type = ["cdylib"]
 scout-audit-clippy-utils = { workspace = true }
 dylint_linting = { workspace = true }
 if_chain = { workspace = true }
+itertools = { workspace = true }
 
 scout-audit-internal = { workspace = true }
 
