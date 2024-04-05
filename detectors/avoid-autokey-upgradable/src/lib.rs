@@ -113,9 +113,10 @@ impl<'tcx> Visitor<'tcx> for AvoidAutokeyUpgradableVisitor<'tcx, '_> {
                     .collect::<Vec<Span>>(),
             );
 
-            self.lazy_fields.iter().for_each(|x| {
-                spans.push_span_label(*x, "This field has an automatic storage key generation");
-            });
+            spans.push_span_label(
+                *self.lazy_fields.iter().last().unwrap(),
+                "These fields have an automatic storage key generation",
+            );
 
             spans.push_span_label(expr.span, "This makes the contract upgradable");
 
