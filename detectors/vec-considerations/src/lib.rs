@@ -21,9 +21,19 @@ dylint_linting::impl_late_lint! {
     VecConsiderations::default()
 }
 
+
+const INK_MAPPING_TYPE : &str = "ink_storage::lazy::mapping::Mapping";
+const INK_VEC_STORAGE_TYPE : &str = "ink_storage::lazy::vec::StorageVec";
+const FUNCTIONS_TO_CHECK: [&str; 5]  = ["insert", "pop", "push", "set", "peek"];
+
+pub fn method_is_wanted(method: &str) -> bool {
+    FUNCTIONS_TO_CHECK.contains(&method)
+}
+
 #[derive(Default)]
 pub struct VecConsiderations {
-    mapping_fields: HashMap<Ident, Span>,
+    mapping_fields: HashMap<Ident, Span>, 
+
 }
 
 impl VecConsiderations {
@@ -32,7 +42,21 @@ impl VecConsiderations {
     }
 }
 
-const INK_MAPPING_TYPE : &str = "ink_storage::lazy::mapping::Mapping";
+impl<'tcx> VecConsiderations {
+    fn is_lazy_storage(&self, cx: &LateContext<'_>, field: &'tcx rustc_hir::FieldDef<'tcx>) -> bool {
+        if let TyKind::Path(QPath::Resolved(Some(ty), _)) = field.ty.kind
+        && let TyKind::Path(QPath::Resolved(None, p)) = ty.kind
+        && p.res.opt_def_id().is_some() 
+        && let Some(def_path) = cx
+        .get_def_path(p.res.def_id())
+        .iter()
+        .map(|x| x.to_string())
+        .reduce(|a, b| a + "::" + &b) {
+            return def_path == INK_MAPPING_TYPE || def_path == INK_VEC_STORAGE_TYPE;
+        }
+        false
+    }
+}
 
 impl<'tcx> LateLintPass<'tcx> for VecConsiderations {
     fn check_fn(
@@ -52,21 +76,12 @@ impl<'tcx> LateLintPass<'tcx> for VecConsiderations {
     }
 
     fn check_field_def(&mut self, cx: &LateContext<'tcx>, field: &'tcx rustc_hir::FieldDef<'tcx>) {
-        if let TyKind::Path(QPath::Resolved(Some(ty), _)) = field.ty.kind
-            && let TyKind::Path(QPath::Resolved(None, p)) = ty.kind
-            && p.res.opt_def_id().is_some() 
-            && cx
-                .get_def_path(p.res.def_id())
-                .iter()
-                .map(|x| x.to_string())
-                .reduce(|a, b| a + "::" + &b)
-                .unwrap()
-                == INK_MAPPING_TYPE
-        {
-                self.mapping_fields.insert(field.ident, field.span);
+        if self.is_lazy_storage(cx, &field) {
+            self.mapping_fields.insert(field.ident, field.span);
         }
     }
 }
+
 
 struct VecConsiderationsVisitor<'tcx, 'tcx_ref> {
     cx: &'tcx_ref LateContext<'tcx>,
@@ -77,23 +92,23 @@ impl<'tcx> Visitor<'tcx> for VecConsiderationsVisitor<'tcx, '_> {
     fn visit_expr(&mut self, expr: &'tcx Expr<'tcx>) {
 
         if let ExprKind::MethodCall(p,q,_,_) = expr.kind
-        && p.ident.name.to_string() == "insert" 
-        && let ExprKind::Field(ex, id) = q.kind 
-        && let ExprKind::Path(QPath::Resolved(_, path), ..) = ex.kind 
+        && method_is_wanted(& p.ident.name.to_string())
+        && let ExprKind::Field(path_expr, struct_field_name) = q.kind 
+        && let ExprKind::Path(QPath::Resolved(_, path), ..) = path_expr.kind 
         && path.segments.into_iter().any(|x| x.ident.name.to_string() == "self") 
-        && self.mapping_fields.keys().any(|x| x == &id) {
-            self.mapping_fields.iter().for_each(
-                |(ident, span)| {
-                    span_lint_and_help(
-                        self.cx,
-                        VEC_CONSIDERATIONS,
-                        expr.span,
-                        "Do not use `.insert(..)` with an unsized (dynamically sized) type.",
-                        Some(*span),
-                        &format!("The variable `{}` is a Mapping with a dinamically sized value.", ident.name.to_string()),
-                    );
-                }
+        && self.mapping_fields.keys().any(|x| x == &struct_field_name) {
+            let met_name = p.ident.name.to_string();
+            let field_name = struct_field_name.name.to_string();
+            span_lint_and_help(
+                self.cx,
+                VEC_CONSIDERATIONS,
+                expr.span,
+                &format!("Do not use `{}` with an unsized type. Use the `try_{}` method instead.", met_name, met_name),
+                Some(self.mapping_fields.get(&struct_field_name).unwrap().clone()),
+                &format!("The variable `{}` is a storage type with a dinamically sized value.", field_name),
             );
+        
+    
         }
 
         walk_expr(self, expr)
