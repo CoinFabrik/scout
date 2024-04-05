@@ -2,13 +2,14 @@
 
 #[ink::contract]
 mod avoid_autokey_upgradable {
-    use ink::storage::{Lazy, Mapping};
+    use ink::storage::{Lazy, Mapping, StorageVec};
 
     #[ink(storage)]
     pub struct AvoidAutoKeyUpgradable {
         admin: AccountId,
         lazy_field: Lazy<[u8; 32]>,
         mapping: Mapping<AccountId, u32>,
+        vec: StorageVec<u32>,
     }
 
     #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
@@ -25,6 +26,7 @@ mod avoid_autokey_upgradable {
                 admin: Self::env().caller(),
                 lazy_field: Lazy::new(),
                 mapping: Mapping::new(),
+                vec: StorageVec::new(),
             }
         }
 

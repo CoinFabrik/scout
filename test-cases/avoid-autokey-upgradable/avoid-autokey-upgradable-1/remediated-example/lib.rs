@@ -2,15 +2,13 @@
 
 #[ink::contract]
 mod avoid_autokey_upgradable {
-    use ink::env::set_code_hash;
-    use ink::storage::Lazy;
-    use ink::storage::Mapping;
-
+    use ink::storage::{traits::ManualKey, Lazy, Mapping, StorageVec};
     #[ink(storage)]
     pub struct AvoidAutoKeyUpgradable {
         admin: AccountId,
-        lazy_value: Lazy<[u8; 32]>,
-        mapping: Mapping<AccountId, u32>,
+        lazy_field: Lazy<[u8; 32], ManualKey<0xDEAD>>,
+        mapping: Mapping<AccountId, u32, ManualKey<0xBEEF>>,
+        vec: StorageVec<u32, ManualKey<0xABCD>>,
     }
 
     #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
@@ -25,15 +23,14 @@ mod avoid_autokey_upgradable {
         pub fn new() -> Self {
             Self {
                 admin: Self::env().caller(),
-                lazy_value: Lazy::new(),
+                lazy_field: Lazy::new(),
                 mapping: Mapping::new(),
+                vec: StorageVec::new(),
             }
         }
 
         #[ink(message)]
         pub fn upgrade_contract(&self, value: [u8; 32]) -> Result<(), Error> {
-            let mut v = 1;
-
             if self.admin != Self::env().caller() {
                 return Err(Error::NotAnAdmin);
             }

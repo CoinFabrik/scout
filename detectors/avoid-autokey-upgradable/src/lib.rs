@@ -10,11 +10,11 @@ use rustc_error_messages::MultiSpan;
 use rustc_hir::GenericArg;
 use rustc_hir::{
     intravisit::{walk_expr, Visitor},
-    Expr, QPath, TyKind,
+    Expr, GenericArgs, QPath, TyKind,
 };
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::Span;
-use scout_audit_clippy_utils::diagnostics::span_lint_and_help;
+use scout_audit_clippy_utils::diagnostics::span_lint_and_note;
 
 dylint_linting::impl_late_lint! {
     pub AVOID_AUTOKEY_UPGRADABLE,
@@ -26,8 +26,8 @@ dylint_linting::impl_late_lint! {
 const LAZY_TYPE: &str = "ink_storage::lazy::Lazy";
 const MAPPING_TYPE: &str = "ink_storage::lazy::mapping::Mapping";
 const INK_VEC_STORAGE_TYPE: &str = "ink_storage::lazy::vec::StorageVec";
+
 const SET_CODE_HASH_METHOD: &str = "set_code_hash";
-const MANUAL_KEY: &str = "ManualKey";
 
 #[derive(Default)]
 pub struct AvoidAutokeyUpgradable {
@@ -64,6 +64,9 @@ impl<'tcx> LateLintPass<'tcx> for AvoidAutokeyUpgradable {
     }
 }
 
+fn is_lazy_type(def_path: &String) -> bool {
+    def_path == LAZY_TYPE || def_path == MAPPING_TYPE || def_path == INK_VEC_STORAGE_TYPE
+}
 impl<'tcx> AvoidAutokeyUpgradable {
     fn lazy_value_has_manual_key(
         &mut self,
@@ -77,33 +80,19 @@ impl<'tcx> AvoidAutokeyUpgradable {
                 .get_def_path(p.res.def_id())
                 .iter()
                 .map(|x| x.to_string())
-                .reduce(|a, b| a + "::" + &b)
-                .unwrap()
-            && (is_lazy_type(&def_path))
+                .join("::")
+            && is_lazy_type(&def_path)
         {
-            match p.segments[0].args {
-                //check if the type has generic arg ManualKey<...>
-                Some(gargs) => gargs.args.iter().any(|arg| {
-                    if let GenericArg::Type(ty) = arg
-                        && let TyKind::Path(QPath::Resolved(None, p)) = ty.kind
-                    {
-                        return p
-                            .segments
-                            .iter()
-                            .any(|x| x.ident.name.to_string() != MANUAL_KEY);
-                    };
-                    false
-                }),
-                None => false,
-            };
+            if let Some(GenericArgs { args, .. }) = p.segments[0].args
+                && let Some(GenericArg::Type(ty)) = args.iter().last()
+                && let TyKind::Path(QPath::Resolved(None, p)) = ty.kind
+            {
+                return p.segments[0].ident.name.to_string() != "ManualKey";
+            }
             return true;
         }
         false
     }
-}
-
-fn is_lazy_type(def_path: &str) -> bool {
-    def_path == LAZY_TYPE || def_path == MAPPING_TYPE || def_path == INK_VEC_STORAGE_TYPE
 }
 
 struct AvoidAutokeyUpgradableVisitor<'tcx, 'tcx_ref> {
@@ -116,38 +105,31 @@ impl<'tcx> Visitor<'tcx> for AvoidAutokeyUpgradableVisitor<'tcx, '_> {
         if let Some(v) = expr.method_ident()
             && v.name.to_string() == SET_CODE_HASH_METHOD
         {
-            self.lazy_fields.iter().dedup().for_each(
-                |lazy_field| {
-                    let mut spans : MultiSpan = MultiSpan::from_spans(vec![
-                        *lazy_field,
-                        expr.span,
-                    ]);
+            let mut spans: MultiSpan = MultiSpan::from_spans(
+                self.lazy_fields
+                    .iter()
+                    .dedup()
+                    .map(|x| *x)
+                    .collect::<Vec<Span>>(),
+            );
 
-                    spans.push_span_label(
-                        *lazy_field,
-                        "This `Lazy` field doesn't have `ManualKey<...>`",
-                    );
+            self.lazy_fields.iter().for_each(|x| {
+                spans.push_span_label(*x, "This field has an automatic storage key generation");
+            });
 
-                    spans.push_span_label(
-                        expr.span,
-                        "This makes the contract upgradable",
-                    );
+            spans.push_span_label(expr.span, "This makes the contract upgradable");
 
-                    span_lint_and_help(
+            span_lint_and_note(
                         self.cx,
                         AVOID_AUTOKEY_UPGRADABLE,
                         spans,
                         "Avoid using `Lazy` fields without `ManualKey` in upgradable contracts",
-                        Some(*lazy_field),
+                        None,
                         &format!(
-                            "Consider using `Lazy` fields with `ManualKey<...>` instead of leaving it to the compiler \
-                            \nThis will allow you to upgrade the contract without losing the data stored in the `Lazy` field. \
-                            \nFor more information, see: \n[#171](https://github.com/CoinFabrik/scout/issues/171) \
+                            "For more information, see: \n[#171](https://github.com/CoinFabrik/scout/issues/171) \
                             \n[Manual vs. Automatic Key Generation](https://use.ink/datastructures/storage-layout/#manual-vs-automatic-key-generation)"
                         ),
                     );
-                }
-            );
         }
         walk_expr(self, expr)
     }
