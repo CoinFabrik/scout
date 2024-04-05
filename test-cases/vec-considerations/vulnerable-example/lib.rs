@@ -2,13 +2,14 @@
 
 #[ink::contract]
 pub mod vec_considerations {
-    use ink::prelude::string::String;
-    use ink::storage::Mapping;
+    use ink::prelude::{format, string::String};
+    use ink::storage::{Mapping, StorageVec};
 
     #[derive(Default)]
     #[ink(storage)]
     pub struct VecConsiderations {
         on_chain_log: Mapping<AccountId, String>,
+        donations: StorageVec<String>,
     }
     
     impl VecConsiderations {
@@ -26,6 +27,21 @@ pub mod vec_considerations {
 
             // Panics if data overgrows the static buffer size!
             self.on_chain_log.insert(caller, &data);
+        }
+
+        #[ink(message)]
+        pub fn donate(&mut self) {
+            let caller = self.env().caller();
+            let endowment = self.env().transferred_value();
+
+            let log_message = format!("{caller:?} donated {endowment}");
+
+            self.donations.push(&log_message);
+        }
+
+        #[ink(message)]
+        pub fn last_donation(&self) -> Option<String> {
+            self.donations.peek()
         }
     }
 }
