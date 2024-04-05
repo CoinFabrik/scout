@@ -12,7 +12,6 @@ use rustc_hir::{
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::Span;
 use scout_audit_clippy_utils::diagnostics::span_lint_and_help;
-//use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
 
 dylint_linting::impl_late_lint! {
     pub AVOID_AUTOKEY_UPGRADABLE,
@@ -47,6 +46,11 @@ impl<'tcx> LateLintPass<'tcx> for AvoidAutokeyUpgradable {
             lazy_fields: &mut self.lazy_fields,
         };
         walk_expr(&mut aau_storage, body.value);
+    }
+
+
+    fn check_stmt(&mut self,_: &LateContext<'tcx>,_: &'tcx rustc_hir::Stmt<'tcx>) {
+        
     }
 
     fn check_field_def(&mut self, cx: &LateContext<'tcx>, field: &'tcx rustc_hir::FieldDef<'tcx>) {

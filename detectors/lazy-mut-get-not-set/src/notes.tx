@@ -1,0 +1,19 @@
+
+En mi version vieja, tengo definido
+
+PARA ARMAR UN LINTER NECESITO
+
+LA COSA A LA QUE QUIERO LINTEAR Y SU IMPL
+EL LINTER (LA IMPL DIRECTAMENTE)
+COMO VOY A LINTEAR (LA STRUC DEL VISITOR Y SU IMPLEMENTACION)
+
+-----  Se traduce a ---------
+
+pub struct AvoidAutokeyUpgradable
+impl AvoidAutokeyUpgradable
+
+struct AvoidAutokeyUpgradableVisitor
+impl<'tcx> Visitor<'tcx> for AvoidAutokeyUpgradableVisitor<'tcx, '_> 
+
+
+impl latelintpass for AvoidAutokeyUpgradable
