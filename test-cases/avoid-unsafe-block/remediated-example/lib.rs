@@ -1,7 +1,7 @@
 #![cfg_attr(not(feature = "std"), no_std, no_main)]
 
 #[ink::contract]
-mod vec_considerations {
+mod avoid_unsafe_block {
 
     use ink::prelude::{string::String, format};
     use ink::storage::{StorageVec, Mapping};
