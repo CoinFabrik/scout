@@ -1,0 +1,20 @@
+[package]
+name = "assert-violation"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+scout-audit-clippy-utils = { workspace = true }
+dylint_linting = { workspace = true }
+if_chain = { workspace = true }
+
+scout-audit-internal = { workspace = true }
+
+[dev-dependencies]
+dylint_testing = { workspace = true }
+
+[package.metadata.rust-analyzer]
+rustc_private = true
