@@ -14,16 +14,6 @@ mod avoid_unsafe_block {
 
     }
 
-    #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
-    #[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
-    pub enum Error {
-        InsertFailed,
-        PeekFailed,
-        PushFailed,
-        ErrNone,
-    }
-
-
     impl MyContract {
 
         #[ink(constructor)]
