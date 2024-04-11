@@ -31,9 +31,3 @@ overflow-checks = false
 [profile.dev]
 overflow-checks = false
 
-[workspace.metadata.dylint]
-libraries = [
-
-   { path = "/home/cami/Desktop/coinfabrik/scout/detectors/avoid-unsafe-block"},
-]
-

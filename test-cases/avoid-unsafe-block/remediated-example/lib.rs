@@ -3,7 +3,7 @@
 #[ink::contract]
 mod avoid_unsafe_block {
 
-    use ink::prelude::{string::String, format};
+    use ink::prelude::{string::String};
     use ink::storage::{StorageVec, Mapping};
 
     #[derive(Default)]
@@ -32,36 +32,19 @@ mod avoid_unsafe_block {
         }
 
         #[ink(message)]
-        pub fn do_something2(&mut self, data: String) -> Result<(), Error> {
-            let caller = self.env().caller();
-    
-            match self.on_chain_log.try_insert(caller, &data) {
-                Ok(_) => Ok(()),
-                Err(_) => Err(Error::InsertFailed)
-            }
-        }
-
-        #[ink(message)]
-        pub fn donate(&mut self) -> Result<(), Error> {
-            let caller = self.env().caller();
-            let endowment = self.env().transferred_value();
-
-            let log_message = format!("{caller:?} donated {endowment}");
+        pub fn safe_function(&mut self, n: u64) -> u64 {
             
-            match self.donations.try_push(&log_message) {
-                Ok(_) => Ok(()),
-                Err(_) => Err(Error::PushFailed)
-            }
-        }
-
-        #[ink(message)]
-        pub fn last_donation(&self) -> Result<(), Error>{
-
-            match self.donations.try_peek() {
-                    Some(Ok(_)) => Ok(()),
-                    Some(Err(_)) => Err(Error::PeekFailed),
-                    None => Err(Error::ErrNone),
-            }
+            let mut i = n as f64;
+            let mut y = i.to_bits();
+            y = 0x5fe6ec85e7de30da - (y >> 1);
+            i = f64::from_bits(y);
+            i *= 1.5 - 0.5 * n as f64 * i * i;
+            i *= 1.5 - 0.5 * n as f64 * i * i;
+    
+            let result =  &mut i;
+    
+            result.to_bits()
+            
         }
 
     }

@@ -17,7 +17,7 @@ use scout_audit_clippy_utils::diagnostics;
 dylint_linting::impl_late_lint! {
     pub AVOID_UNSAFE_BLOCK,
     Warn,
-    "Do NOT use unsafe rust mode.",
+    "Avoid using unsafe blocks as it may lead to undefined behavior.",
     AvoidUnsafeBlock::default()
 }
 
@@ -49,7 +49,7 @@ impl<'tcx> LateLintPass<'tcx> for AvoidUnsafeBlock {
                     cx,
                     AVOID_UNSAFE_BLOCK,
                     *var,
-                    "Do NOT use unsafe rust."
+                    "Avoid using unsafe blocks as it may lead to undefined behavior."
                 )
 
             }

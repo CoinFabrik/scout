@@ -3,7 +3,7 @@
 #[ink::contract]
 mod avoid_unsafe_block {
 
-    use ink::prelude::{string::String, format};
+    use ink::prelude::{string::String};
     use ink::storage::{StorageVec, Mapping};
 
     #[derive(Default)]
@@ -32,7 +32,7 @@ mod avoid_unsafe_block {
         }
 
         #[ink(message)]
-        pub fn unsafe_function(n: u64) -> u64 {
+        pub fn unsafe_function(&mut self, n: u64) -> u64 {
             unsafe {
                 let mut i = n as f64;
                 let mut y = i.to_bits();
