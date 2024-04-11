@@ -1,41 +1,70 @@
 #![cfg_attr(not(feature = "std"), no_std, no_main)]
 
 #[ink::contract]
-mod assert_violation {
+mod avoid_unsafe_block {
 
+    use ink::prelude::{string::String, format};
+    use ink::storage::{StorageVec, Mapping};
+
+    #[derive(Default)]
     #[ink(storage)]
-    pub struct AssertViolation {
-        value: u128,
+    pub struct MyContract {
+        on_chain_log: Mapping<AccountId, String>,
+        donations: StorageVec<String>,
+
     }
 
-    impl AssertViolation {
+    #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
+    #[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
+    pub enum Error {
+        InsertFailed,
+        PeekFailed,
+        PushFailed,
+        ErrNone,
+    }
+
+
+    impl MyContract {
+
         #[ink(constructor)]
-        pub fn new(init_value: u128) -> Self {
-            Self { value: init_value }
+        pub fn new_default() -> Self {
+            Self::default()
         }
 
         #[ink(message)]
-        pub fn assert_if_greater_than_10(&self, value: u128) -> bool {
-            assert!(value <= 10, "value should be less than 10");
-            true
-        }
-    }
-
-    #[cfg(test)]
-    mod tests {
-        use super::*;
-
-        #[ink::test]
-        fn doesnt_revert_if_greater() {
-            let contract = AssertViolation::new(0);
-            assert_eq!(contract.assert_if_greater_than_10(5), true);
+        pub fn do_something2(&mut self, data: String) -> Result<(), Error> {
+            let caller = self.env().caller();
+    
+            match self.on_chain_log.try_insert(caller, &data) {
+                Ok(_) => Ok(()),
+                Err(_) => Err(Error::InsertFailed)
+            }
         }
 
-        #[ink::test]
-        #[should_panic(expected = "value should be less than 10")]
-        fn reverts_if_greater() {
-            let contract = AssertViolation::new(0);
-            contract.assert_if_greater_than_10(11);
+        #[ink(message)]
+        pub fn donate(&mut self) -> Result<(), Error> {
+            let caller = self.env().caller();
+            let endowment = self.env().transferred_value();
+
+            let log_message = unsafe { format!("{caller:?} donated {endowment}") };
+            
+            match self.donations.try_push(&log_message) {
+                Ok(_) => Ok(()),
+                Err(_) => Err(Error::PushFailed)
+            }
         }
+
+        #[ink(message)]
+        pub fn last_donation(&self) -> Result<(), Error>{
+
+            unsafe{
+                match self.donations.try_peek() {
+                    Some(Ok(_)) => Ok(()),
+                    Some(Err(_)) => Err(Error::PeekFailed),
+                    None => Err(Error::ErrNone),
+                }
+            }
+        }
+
     }
 }
