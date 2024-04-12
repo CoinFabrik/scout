@@ -21,7 +21,8 @@ use rustc_middle::mir::{
 use rustc_middle::ty::TyKind;
 use rustc_span::def_id::DefId;
 use rustc_span::Span;
-use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
+
+const LINT_MESSAGE: &str = "Division before multiplication might result in a loss of precision";
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -46,7 +47,14 @@ dylint_linting::declare_late_lint! {
     /// ```
     pub DIVIDE_BEFORE_MULTIPLY,
     Warn,
-    scout_audit_internal::ink_lint_message::INK_DIVIDE_BEFORE_MULTIPLY_LINT_MESSAGE
+    LINT_MESSAGE,
+    {
+        name: "Divide Before Multiply",
+        long_message: "Performing a division operation before a multiplication can lead to a loss of precision. This issue becomes significant in programs like smart contracts where numerical precision is crucial.",
+        severity: "Medium",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/divide-before-multiply",
+        vulnerability_class: "Arithmetic",
+    }
 }
 
 fn get_divisions_inside_expr(expr: &Expr<'_>) -> Vec<Span> {
@@ -352,10 +360,12 @@ impl<'tcx> LateLintPass<'tcx> for DivideBeforeMultiply {
             );
 
             for span in spans {
-                Detector::DivideBeforeMultiply.span_lint_and_help(
+                scout_audit_clippy_utils::diagnostics::span_lint_and_help(
                     cx,
                     DIVIDE_BEFORE_MULTIPLY,
                     span,
+                    LINT_MESSAGE,
+                    None,
                     "Consider reversing the order of operations to reduce the loss of precision.",
                 );
             }
@@ -367,10 +377,12 @@ impl<'tcx> LateLintPass<'tcx> for DivideBeforeMultiply {
             if BinOpKind::Mul == op.node;
             then{
                 for division in get_divisions_inside_expr(expr) {
-                    Detector::DivideBeforeMultiply.span_lint_and_help(
+                    scout_audit_clippy_utils::diagnostics::span_lint_and_help(
                         cx,
                         DIVIDE_BEFORE_MULTIPLY,
                         division,
+                        LINT_MESSAGE,
+                        None,
                         "Consider reversing the order of operations to reduce the loss of precision.",
                     );
                 }

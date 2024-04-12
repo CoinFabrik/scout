@@ -315,7 +315,7 @@ security implications, under the [Best practices](#vulnerability-categories) cat
 
 ### 20 - Ink version
 
-Using a pinned version of ink! can be dangerous, as it may have bugs or security issues. Use the latest version available.
+Using an old version of ink! can be dangerous, as it may have bugs or security issues. Use the latest version available.
 
 We classified this issue, a deviation from best practices which could have
 security implications, under the [Best practices](#vulnerability-categories) category and assigned it an Enhancement severity.

@@ -8,7 +8,8 @@ use if_chain::if_chain;
 use rustc_ast::{Expr, ExprKind, Item, NodeId};
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::sym;
-use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
+
+const LINT_MESSAGE: &str = "Using `core::mem::forget` is not recommended.";
 
 dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does
@@ -45,8 +46,15 @@ dylint_linting::impl_pre_expansion_lint! {
 
     pub AVOID_STD_CORE_MEM_FORGET,
     Warn,
-    scout_audit_internal::ink_lint_message::INK_AVOID_CORE_MEM_FORGET_LINT_MESSAGE,
-    AvoidStdCoreMemForget::default()
+    LINT_MESSAGE,
+    AvoidStdCoreMemForget::default(),
+    {
+        name: "Avoid std::mem::forget usage",
+        long_message: "The core::mem::forget function is used to forget about a value without running its destructor. This could lead to memory leaks and logic errors.",
+        severity: "Enhancement",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/avoid-core-mem-forget",
+        vulnerability_class: "Best practices",
+    }
 }
 
 #[derive(Default)]
@@ -71,11 +79,12 @@ impl EarlyLintPass for AvoidStdCoreMemForget {
             if path.segments[1].ident.name.to_string() == "mem";
             if path.segments[2].ident.name.to_string() == "forget";
             then {
-
-                Detector::AvoidCoreMemForget.span_lint_and_help(
+                scout_audit_clippy_utils::diagnostics::span_lint_and_help(
                     cx,
                     AVOID_STD_CORE_MEM_FORGET,
                     expr.span,
+                    LINT_MESSAGE,
+                    None,
                     "Instead, use the `let _ = ...` pattern or `.drop` method to forget the value.",
                 );
             }

@@ -5,65 +5,107 @@ on:
     branches:
       - "main"
     paths:
-      - "apps/cargo-scout-audit/**"
       - "detectors/**"
       - "test-cases/**"
-      - "Makefile"
   pull_request:
     paths:
-      - "apps/cargo-scout-audit/**"
       - "detectors/**"
       - "test-cases/**"
-      - "Makefile"
-  workflow_dispatch:
 
 env:
   CARGO_TERM_COLOR: always
+  PYTHONUNBUFFERED: 1
 
 jobs:
   format:
-    name: Format
+    name: Check Rust Format
     runs-on: ubuntu-latest
+    outputs:
+      status: ${{ job.status }}
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - name: Update Rust
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Update Rust Toolchain
         run: rustup update
 
       - name: Install Rust nightly
         run: rustup install nightly --profile minimal
 
-      - name: Install Rustfmt
+      - name: Install rustfmt
         run: rustup component add rustfmt --toolchain nightly
 
-      - name: Run cargo fmt
-        run: make fmt-rust-check
+      - name: Check Format
+        run: python scripts/run-fmt.py --dir test-cases detectors
 
   clippy:
-    name: Clippy
+    name: Lint with Clippy
     runs-on: ubuntu-latest
+    outputs:
+      status: ${{ job.status }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - name: Cache cargo-scout-audit dependencies
-        id: cache-cargo-scout-audit-dependencies
-        uses: actions/cache@v3
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          path: ./apps/cargo-scout-audit/target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('apps/cargo-scout-audit/Cargo.lock') }}
+          python-version: "3.9"
 
-      - name: Update Rust
+      - name: Cache Rust Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo
+            ~/.rustup
+          key: ${{ runner.os }}-cargo-clippy-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Update Rust Toolchain
         run: rustup update
 
-      - name: Install Rust nightly-2023-12-16
+      - name: Install Rust nightly
         run: rustup install nightly-2023-12-16 --profile minimal
-
-      - name: Install Clippy nightly-2023-12-16
-        run: rustup component add clippy --toolchain nightly-2023-12-16
 
       - name: Install dylint-link
         run: cargo install dylint-link
 
-      - name: Run clippy
-        run: make lint
+      - name: Install clippy
+        run: rustup component add clippy --toolchain nightly-2023-12-16
+
+      - name: Lint with Clippy
+        run: python scripts/run-clippy.py --dir test-cases detectors
+
+  comment-on-pr:
+    name: Comment on PR
+    runs-on: ubuntu-latest
+    if: ${{ always()}}
+    needs: [format, clippy]
+    steps:
+      - name: Find comment
+        id: find_comment
+        uses: peter-evans/find-comment@v3
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: "🎉 **General Rust Workflow Summary** 🎉"
+
+      - name: Create or Update PR Comment
+        uses: peter-evans/create-or-update-comment@v4.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          comment-id: ${{ steps.find_comment.outputs.comment-id }}
+          edit-mode: replace
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            🎉 **General Rust Workflow Summary** 🎉
+
+            | Component                 | Status |
+            |---------------------------|--------|
+            | Check Rust Format         | ${{ (needs.format.outputs.status == 'success' && '✅ Successful') || '❌ Failed' }} |
+            | Lint with Clippy          | ${{ (needs.clippy.outputs.status == 'success' && '✅ Successful') || '❌ Failed' }} |
+
+            The workflow has completed. Great job! 🚀
