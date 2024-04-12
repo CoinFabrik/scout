@@ -19,7 +19,8 @@ use rustc_lint::{LateContext, LateLintPass};
 use rustc_middle::ty::TyCtxt;
 use rustc_span::def_id::LocalDefId;
 use rustc_span::Span;
-use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
+
+const LINT_MESSAGE: &str = "Not checking for a zero-address could lead to a locked contract";
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -51,7 +52,14 @@ dylint_linting::declare_late_lint! {
     /// ```
     pub ZERO_OR_TEST_ADDRESS,
     Warn,
-    scout_audit_internal::ink_lint_message::INK_ZERO_OR_TEST_ADDRESS_LINT_MESSAGE
+    LINT_MESSAGE,
+    {
+        name: "Zero or Test Address",
+        long_message: "The assignment of the zero address to a variable in a smart contract represents a critical vulnerability because it can lead to loss of control over the contract. This stems from the fact that the zero address does not have an associated private key, which means it's impossible to claim ownership, rendering any contract assets or functions permanently inaccessible.    ",
+        severity: "Medium",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/zero-or-test-address",
+        vulnerability_class: "Validations and error handling",
+    }
 }
 
 impl<'tcx> LateLintPass<'tcx> for ZeroOrTestAddress {
@@ -181,10 +189,12 @@ impl<'tcx> LateLintPass<'tcx> for ZeroOrTestAddress {
 
         for param in zerocheck_storage.acc_id_params {
             if !zerocheck_storage.checked_params.contains(&param.hir_id) {
-                Detector::ZeroOrTestAddress.span_lint_and_help(
+                scout_audit_clippy_utils::diagnostics::span_lint_and_help(
                     cx,
                     ZERO_OR_TEST_ADDRESS,
                     param.span,
+                    LINT_MESSAGE,
+                    None,
                     "This function should check if the AccountId passed is zero and revert if it is",
                 );
             }

@@ -20,13 +20,21 @@ use rustc_middle::mir::{
 use rustc_middle::ty::TyKind;
 use rustc_span::def_id::DefId;
 use rustc_span::Span;
-use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
+
+const LINT_MESSAGE: &str = "This set_code_hash is called without access control";
 
 dylint_linting::impl_late_lint! {
     pub UNPROTECTED_SET_CODE_HASH,
     Warn,
-    scout_audit_internal::ink_lint_message::INK_SET_CODE_HASH_LINT_MESSAGE,
-    UnprotectedSetCodeHash::default()
+    LINT_MESSAGE,
+    UnprotectedSetCodeHash::default(),
+    {
+        name: "Unprotected Set Code Hash",
+        long_message: "If users are allowed to call set_code_hash, they can intentionally modify the contract behaviour, leading to the loss of all associated data/tokens and functionalities given by this contract or by others that depend on it. To prevent this, the function should be restricted to administrators or authorized users only.    ",
+        severity: "Critical",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/unprotected-set-code-hash",
+        vulnerability_class: "Authorization",
+    }
 }
 
 #[derive(Default)]
@@ -165,7 +173,12 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSetCodeHash {
             if caller_and_terminate.callers.is_empty() {
                 for terminate in caller_and_terminate.terminates {
                     if let TerminatorKind::Call { fn_span, .. } = terminate.0.terminator().kind {
-                        Detector::SetCodeHash.span_lint(cx, UNPROTECTED_SET_CODE_HASH, fn_span);
+                        scout_audit_clippy_utils::diagnostics::span_lint(
+                            cx,
+                            UNPROTECTED_SET_CODE_HASH,
+                            fn_span,
+                            LINT_MESSAGE,
+                        );
                     }
                 }
             } else {
@@ -177,7 +190,12 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSetCodeHash {
                     &mut vec![],
                 );
                 for place in unchecked_places {
-                    Detector::SetCodeHash.span_lint(cx, UNPROTECTED_SET_CODE_HASH, place.1);
+                    scout_audit_clippy_utils::diagnostics::span_lint(
+                        cx,
+                        UNPROTECTED_SET_CODE_HASH,
+                        place.1,
+                        LINT_MESSAGE,
+                    );
                 }
             }
         }

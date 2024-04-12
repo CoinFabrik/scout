@@ -9,7 +9,8 @@ use rustc_lint::LateLintPass;
 use rustc_span::Span;
 use scout_audit_clippy_utils::consts::constant_simple;
 use scout_audit_clippy_utils::is_integer_literal;
-use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
+
+pub const LINT_MESSAGE: &str = "Potential for integer arithmetic overflow/underflow. Consider checked, wrapping or saturating arithmetic.";
 
 dylint_linting::impl_late_lint! {
     /// ### What it does
@@ -33,8 +34,15 @@ dylint_linting::impl_late_lint! {
     /// ```
     pub INTEGER_OVERFLOW_UNDERFLOW,
     Warn,
-    scout_audit_internal::ink_lint_message::INK_INTEGER_OVERFLOW_OR_UNDERFLOW_LINT_MESSAGE,
-    IntegerOverflowUnderflow::default()
+    LINT_MESSAGE,
+    IntegerOverflowUnderflow::default(),
+    {
+        name: "Integer Overflow/Underflow",
+        long_message: "An overflow/underflow is typically caught and generates an error. When it is not caught, the operation will result in an inexact result which could lead to serious problems.\n In Ink! 5.0.0, using raw math operations will result in `cargo contract build` failing with an error message.",
+        severity: "Critical",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/integer-overflow-or-underflow",
+        vulnerability_class: "Arithmetic",
+    }
 }
 
 #[derive(Default)]
@@ -130,30 +138,36 @@ impl ArithmeticContext {
                     hir::ExprKind::Lit(_lit) => (),
                     hir::ExprKind::Unary(hir::UnOp::Neg, expr) => {
                         if is_integer_literal(expr, 1) {
-                            Detector::IntegerOverflowOrUnderflow.span_lint_and_help(
+                            scout_audit_clippy_utils::diagnostics::span_lint_and_help(
                                 cx,
                                 INTEGER_OVERFLOW_UNDERFLOW,
                                 expr.span,
-                                "Potential for integer arithmetic overflow/underflow in unary operation with negative expression. Consider checked, wrapping or saturating arithmetic.",
+                                LINT_MESSAGE,
+                                None,
+                                "Potential for integer arithmetic overflow/underflow in unary operation with negative expression. Consider checked, wrapping or saturating arithmetic."
                             );
                             self.expr_id = Some(expr.hir_id);
                         }
                     }
                     _ => {
-                        Detector::IntegerOverflowOrUnderflow.span_lint_and_help(
+                        scout_audit_clippy_utils::diagnostics::span_lint_and_help(
                             cx,
                             INTEGER_OVERFLOW_UNDERFLOW,
                             expr.span,
+                            LINT_MESSAGE,
+                            None,
                             &format!("Potential for integer arithmetic overflow/underflow in operation '{}'. Consider checked, wrapping or saturating arithmetic.", op.as_str()),
                         );
                         self.expr_id = Some(expr.hir_id);
                     }
                 },
                 _ => {
-                    Detector::IntegerOverflowOrUnderflow.span_lint_and_help(
+                    scout_audit_clippy_utils::diagnostics::span_lint_and_help(
                         cx,
                         INTEGER_OVERFLOW_UNDERFLOW,
                         expr.span,
+                        LINT_MESSAGE,
+                        None,
                         &format!("Potential for integer arithmetic overflow/underflow in operation '{}'. Consider checked, wrapping or saturating arithmetic.", op.as_str()),
                     );
                     self.expr_id = Some(expr.hir_id);
@@ -173,10 +187,12 @@ impl ArithmeticContext {
         }
         let ty = cx.typeck_results().expr_ty(arg);
         if constant_simple(cx, cx.typeck_results(), expr).is_none() && ty.is_integral() {
-            Detector::IntegerOverflowOrUnderflow.span_lint_and_help(
+            scout_audit_clippy_utils::diagnostics::span_lint_and_help(
                 cx,
                 INTEGER_OVERFLOW_UNDERFLOW,
                 expr.span,
+                LINT_MESSAGE,
+                None,
                 "Potential for integer arithmetic overflow/underflow. Consider checked, wrapping or saturating arithmetic.",
             );
             self.expr_id = Some(expr.hir_id);

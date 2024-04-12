@@ -10,7 +10,8 @@ use rustc_hir::{
 };
 use rustc_lint::LateLintPass;
 use rustc_span::{Span, Symbol};
-use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
+
+const LINT_MESSAGE: &str = "Unsafe usage of `expect`";
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -45,7 +46,14 @@ dylint_linting::declare_late_lint! {
     /// ```
     pub UNSAFE_EXPECT,
     Warn,
-    scout_audit_internal::ink_lint_message::INK_UNSAFE_EXPECT_LINT_MESSAGE
+    LINT_MESSAGE,
+    {
+        name: "Unsafe Expect",
+        long_message: "In Rust, the expect method is commonly used for error handling. It retrieves the value from a Result or Option and panics with a specified error message if an error occurs. However, using expect can lead to unexpected program crashes.    ",
+        severity: "Medium",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/unsafe-expect",
+        vulnerability_class: "Validations and error handling",
+    }
 }
 
 impl<'tcx> LateLintPass<'tcx> for UnsafeExpect {
@@ -85,10 +93,12 @@ impl<'tcx> LateLintPass<'tcx> for UnsafeExpect {
         if visitor.has_expect {
             visitor.has_expect_span.iter().for_each(|span| {
                 if let Some(span) = span {
-                    Detector::UnsafeExpect.span_lint_and_help(
+                    scout_audit_clippy_utils::diagnostics::span_lint_and_help(
                         cx,
                         UNSAFE_EXPECT,
                         *span,
+                        LINT_MESSAGE,
+                        None,
                         "Please, use a custom error instead of `expect`",
                     );
                 }

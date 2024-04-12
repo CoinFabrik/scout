@@ -17,13 +17,21 @@ use rustc_hir::{PatKind, QPath};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_middle::mir::{BasicBlock, BasicBlocks, Local, Operand, StatementKind, TerminatorKind};
 use rustc_span::Span;
-use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
+
+const LINT_MESSAGE: &str = "This argument comes from a user-supplied argument";
 
 dylint_linting::impl_late_lint! {
     pub UNRESTRICTED_TRANSFER_FROM,
     Warn,
-    scout_audit_internal::ink_lint_message::INK_UNRESTRICTED_TRANSFER_FROM_LINT_MESSAGE,
-    UnrestrictedTransferFrom::default()
+    LINT_MESSAGE,
+    UnrestrictedTransferFrom::default(),
+    {
+        name: "Unrestricted Transfer From",
+        long_message: "In an ink! Substrate smart contract, allowing unrestricted transfer_from operations poses a significant vulnerability. When from arguments for that function is provided directly by the user, this might enable the withdrawal of funds from any actor with token approval on the contract. This could result in unauthorized transfers and loss of funds. To mitigate this vulnerability, instead of allowing an arbitrary from address, the from address should be restricted, ideally to the address of the caller (self.env().caller()), ensuring that the sender can initiate a transfer only with their own tokens.    ",
+        severity: "Critical",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/unrestricted-transfer-from",
+        vulnerability_class: "Validations and error handling",
+    }
 }
 
 #[derive(Default)]
@@ -175,10 +183,11 @@ impl<'tcx> LateLintPass<'tcx> for UnrestrictedTransferFrom {
         walk_expr(&mut utf_storage, body.value);
 
         if utf_storage.from_ref {
-            Detector::UnrestrictedTransferFrom.span_lint(
+            scout_audit_clippy_utils::diagnostics::span_lint(
                 cx,
                 UNRESTRICTED_TRANSFER_FROM,
                 utf_storage.span.unwrap(),
+                LINT_MESSAGE,
             );
         }
 
@@ -265,10 +274,11 @@ impl<'tcx> LateLintPass<'tcx> for UnrestrictedTransferFrom {
                                     if arg.place().map_or(false, |place| {
                                         tainted_locals.iter().any(|l| l == &place.local)
                                     }) {
-                                        Detector::UnrestrictedTransferFrom.span_lint(
+                                        scout_audit_clippy_utils::diagnostics::span_lint(
                                             cx,
                                             UNRESTRICTED_TRANSFER_FROM,
                                             *fn_span,
+                                            LINT_MESSAGE,
                                         );
                                     }
                                 }

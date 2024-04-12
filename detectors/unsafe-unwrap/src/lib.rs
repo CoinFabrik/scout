@@ -10,7 +10,8 @@ use rustc_hir::{
 };
 use rustc_lint::LateLintPass;
 use rustc_span::{Span, Symbol};
-use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
+
+const LINT_MESSAGE: &str = "Unsafe usage of `unwrap`";
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -45,7 +46,14 @@ dylint_linting::declare_late_lint! {
     /// ```
     pub UNSAFE_UNWRAP,
     Warn,
-    scout_audit_internal::ink_lint_message::INK_UNSAFE_UNWRAP_LINT_MESSAGE
+    LINT_MESSAGE,
+    {
+        name: "Unsafe Unwrap",
+        long_message: "This vulnerability class pertains to the inappropriate usage of the unwrap method in Rust, which is commonly employed for error handling. The unwrap method retrieves the inner value of an Option or Result, but if an error or None occurs, it triggers a panic and crashes the program.    ",
+        severity: "Medium",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/unsafe-unwrap",
+        vulnerability_class: "Validations and error handling",
+    }
 }
 
 impl<'tcx> LateLintPass<'tcx> for UnsafeUnwrap {
@@ -85,10 +93,12 @@ impl<'tcx> LateLintPass<'tcx> for UnsafeUnwrap {
         if visitor.has_unwrap {
             visitor.has_unwrap_span.iter().for_each(|span| {
                 if let Some(span) = span {
-                    Detector::UnsafeUnwrap.span_lint_and_help(
+                    scout_audit_clippy_utils::diagnostics::span_lint_and_help(
                         cx,
                         UNSAFE_UNWRAP,
                         *span,
+                        LINT_MESSAGE,
+                        None,
                         "Please, use a custom error instead of `unwrap`",
                     );
                 }

@@ -13,12 +13,21 @@ use rustc_hir::{
 };
 use rustc_lint::LateLintPass;
 use rustc_span::Span;
-use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
+
+const LINT_MESSAGE: &str =
+    "Hardcoding an index could lead to panic if the top bound is out of bounds.";
 
 dylint_linting::declare_late_lint! {
     pub ITERATOR_OVER_INDEXING,
     Warn,
-    scout_audit_internal::ink_lint_message::INK_ITERATORS_OVER_INDEXING_LINT_MESSAGE
+    LINT_MESSAGE,
+    {
+        name: "Iterator Over Indexing",
+        long_message: "The use of iterators over indexing is a best practice that should be followed in Rust. This is because accessing a vector by index is slower than using an iterator. Also, if the index is out of bounds, it will panic.    ",
+        severity: "Enhancement",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/iterators-over-indexing",
+        vulnerability_class: "Best practices",
+    }
 }
 
 struct ForLoopVisitor {
@@ -109,10 +118,12 @@ impl<'tcx> LateLintPass<'tcx> for IteratorOverIndexing {
             walk_expr(&mut visitor, body.value);
 
             for span in visitor.span_constant {
-                Detector::IteratorsOverIndexing.span_lint_and_help(
+                scout_audit_clippy_utils::diagnostics::span_lint_and_help(
                     cx,
                     ITERATOR_OVER_INDEXING,
                     span,
+                    LINT_MESSAGE,
+                    None,
                     "Instead, use an iterator or index to `.len()`.",
                 );
             }
