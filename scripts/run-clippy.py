@@ -46,6 +46,7 @@ def get_command(directory, root):
         return subprocess.run(
             [
             "cargo",
+            "+nightly",
             "clippy",
             "--target=wasm32-unknown-unknown",
             "-Zbuild-std=std,core,alloc",
