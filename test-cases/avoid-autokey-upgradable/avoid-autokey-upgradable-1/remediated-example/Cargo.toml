@@ -5,7 +5,7 @@ authors = ["[your_name] <[your_email]>"]
 edition = "2021"
 
 [lib]
-path = "lib.rs"
+path = "src/lib.rs"
 
 [features]
 default = ["std"]
@@ -23,7 +23,7 @@ scale = { package = "parity-scale-codec", version = "3", default-features = fals
 scale-info = { version = "2.6", default-features = false, features = ["derive"], optional = true }
 
 [dev-dependencies]
-ink_e2e = "5.0.0"
+ink_e2e = "=5.0.0"
 
 [profile.release]
 overflow-checks = false
@@ -33,6 +33,6 @@ overflow-checks = false
 
 [workspace.metadata.dylint]
 libraries = [
- 
+
    { path = "/home/flerena/coinfabrik/scout/scout/detectors/avoid-autokey-upgradable"},
 ]

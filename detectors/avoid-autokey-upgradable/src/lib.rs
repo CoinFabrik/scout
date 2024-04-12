@@ -20,7 +20,14 @@ dylint_linting::impl_late_lint! {
     pub AVOID_AUTOKEY_UPGRADABLE,
     Warn,
     "",
-    AvoidAutokeyUpgradable::default()
+    AvoidAutokeyUpgradable::default(),
+    {
+        name: "Avoid AutoKey Upgradable",
+        long_message: "Avoid using `Lazy` fields without `ManualKey` in upgradable contracts. This could lead to a locked contract after an upgrade.",
+        severity: "Critical",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/avoid-autokey-upgradable",
+        vulnerability_class: "Upgradability",
+    }
 }
 
 const LAZY_TYPE: &str = "ink_storage::lazy::Lazy";
@@ -109,7 +116,7 @@ impl<'tcx> Visitor<'tcx> for AvoidAutokeyUpgradableVisitor<'tcx, '_> {
                 self.lazy_fields
                     .iter()
                     .dedup()
-                    .map(|x| *x)
+                    .copied()
                     .collect::<Vec<Span>>(),
             );
 
@@ -126,10 +133,9 @@ impl<'tcx> Visitor<'tcx> for AvoidAutokeyUpgradableVisitor<'tcx, '_> {
                         spans,
                         "Avoid using `Lazy` fields without `ManualKey` in upgradable contracts",
                         None,
-                        &format!(
-                            "For more information, see: \n[#171](https://github.com/CoinFabrik/scout/issues/171) \
+                        "For more information, see: \n[#171](https://github.com/CoinFabrik/scout/issues/171) \
                             \n[Manual vs. Automatic Key Generation](https://use.ink/datastructures/storage-layout/#manual-vs-automatic-key-generation)"
-                        ),
+                        ,
                     );
         }
         walk_expr(self, expr)

@@ -12,8 +12,6 @@ dylint_linting = { workspace = true }
 if_chain = { workspace = true }
 itertools = { workspace = true }
 
-scout-audit-internal = { workspace = true }
-
 [dev-dependencies]
 dylint_testing = { workspace = true }
 
