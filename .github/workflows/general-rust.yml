@@ -80,6 +80,9 @@ jobs:
       - name: Default to nightly
         run: rustup default nightly-2023-12-16
 
+      - name: Install required srcs
+        run: rustup component add rust-src --toolchain nightly-2023-12-16-x86_64-unknown-linux-gnu
+
       - name: Lint with Clippy
         run: python scripts/run-clippy.py --dir test-cases detectors
 
