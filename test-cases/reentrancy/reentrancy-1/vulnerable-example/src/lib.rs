@@ -99,7 +99,7 @@ mod vault {
                 .exec_input(ink::env::call::ExecutionInput::new(Selector::new(
                     selector.to_be_bytes(),
                 )))
-                .call_flags(ink::env::CallFlags::default().set_allow_reentry(true))
+                .call_flags(ink::env::CallFlags::ALLOW_REENTRY)
                 .returns::<()>()
                 .params();
             self.env()
