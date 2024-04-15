@@ -57,6 +57,9 @@ jobs:
           path: ~/.cargo
           key: ${{ runner.os }}-tests-${{ hashFiles('**/Cargo.lock') }}
 
+      - name: Install Rust stable
+        run: rustup install stable --profile minimal
+
       - name: Update Rust Toolchain
         run: rustup update
 

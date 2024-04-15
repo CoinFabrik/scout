@@ -40,7 +40,7 @@ def parse_json_from_string(console_output):
 def run_unit_tests(root):
     start_time = time.time()
     result = subprocess.run(
-        ["cargo", "test", "--all", "--target=wasm32-unknown-unknown", "-Zbuild-std=std,core,alloc","--no-default-features"],
+        ["cargo", "test", "+stable", "--all"],
         cwd=root,
         capture_output=True,
         text=True,
