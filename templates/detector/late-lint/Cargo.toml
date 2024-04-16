@@ -7,15 +7,10 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-clippy_utils = { git = "https://github.com/rust-lang/rust-clippy", rev = "1480cea393d0cee195e59949eabdfbcf1230f7f9" }
-dylint_linting = "2.1.5"
-if_chain = "1.0.2"
+dylint_linting = { workspace = true }
+if_chain = { workspace = true }
 
-[dev-dependencies]
-dylint_testing = "2.1.5"
+scout-audit-clippy-utils = { workspace = true }
 
 [package.metadata.rust-analyzer]
 rustc_private = true
-
-
-
