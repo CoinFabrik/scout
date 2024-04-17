@@ -90,13 +90,16 @@ jobs:
         run: du -hs /opt/hostedtoolcache/*
 
       - name: Free-space claim-usage report2
-        run: du -hs /usr/share/dotnet
+        run: du -hs /opt/hostedtoolcache/Python/*
 
       - name: Free-space claim-usage report3
-        run: (ls -la /opt/ghc && du -hs /opt/ghc) || true
+        run: (ls -la /usr/local/share && du -hs /usr/local/share/boost) || true
 
-      - name: Free-space claim-usage report4
-        run: (ls -la /usr/local/share/boost && du -hs /usr/local/share/boost) || true
+      # - name: Free-space claim-usage report3  ## not existing anymore
+      #   run: (ls -la /opt/ghc && du -hs /opt/ghc) || true
+
+      - name: Free-space claim-dotnet
+        run: rm -rf /usr/share/dotnet || true
 
       - name: Free-space claim-codeql
         run: rm -rf /opt/hostedtoolcache/CodeQL || true
@@ -123,7 +126,7 @@ jobs:
         run: du -hs /opt/hostedtoolcache/*
 
       - name: Lint with Clippy
-        run: python scripts/run-clippy.py --dir test-cases detectors
+        run: RUSTC_WRAPPER=sccache python scripts/run-clippy.py --dir test-cases detectors
 
   comment-on-pr:
     name: Comment on PR
