@@ -13,15 +13,21 @@ mod set_code_hash {
         InvalidCodeHash,
     }
 
-    impl SetCodeHash {
+    impl Default for SetCodeHash {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+
+   impl SetCodeHash {
         #[ink(constructor)]
         pub fn new() -> Self {
             Self {}
         }
 
         #[ink(message)]
-        pub fn update_code(&self, value: [u8; 32]) -> Result<(), Error> {
-            let res = set_code_hash(&value);
+        pub fn update_code(&self, value: Hash) -> Result<(), Error> {
+            let res = Self::env().set_code_hash(&value);
 
             if res.is_err() {
                 return res.map_err(|_| Error::InvalidCodeHash);
