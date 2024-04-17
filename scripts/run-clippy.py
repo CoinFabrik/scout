@@ -27,6 +27,9 @@ def run_clippy(directories):
                 start_time = time.time()
                 result = get_command(directory, root)
                 end_time = time.time()
+
+                clean_up(root)
+
                 elapsed_time = end_time - start_time
                 print(
                     f"{BLUE}[> {elapsed_time:.2f} sec]{ENDC} - Completed clippy check in: {root}."
@@ -39,6 +42,27 @@ def run_clippy(directories):
                     print("\n")
                     errors.append(root)
     return errors
+
+
+def clean_up(root):
+    ret = subprocess.run(['du', '-hs', 'target'],
+            cwd=root,
+            capture_output=True,
+            text=True)
+    if ret.returncode!=0:
+        print(" ?> ", ret.returncode)
+        print(" -> ", ret.stdout)
+        print(" e> ", ret.stderr)
+        print(" -------------- ")
+    ret = subprocess.run(['rm', '-rf', 'target'],
+            cwd=root,
+            capture_output=True,
+            text=True)
+    if ret.returncode!=0:
+        print(" ?> ", ret.returncode)
+        print(" -> ", ret.stdout)
+        print(" e> ", ret.stderr)
+        print(" -------------- ")
 
 
 def get_command(directory, root):
