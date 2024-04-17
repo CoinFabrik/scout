@@ -93,10 +93,10 @@ jobs:
         run: du -hs /usr/share/dotnet
 
       - name: Free-space claim-usage report3
-        run: ls -la /opt/ghc && du -hs /opt/ghc
+        run: (ls -la /opt/ghc && du -hs /opt/ghc) || true
 
       - name: Free-space claim-usage report4
-        run: ls -la /usr/local/share/boost && du -hs /usr/local/share/boost
+        run: (ls -la /usr/local/share/boost && du -hs /usr/local/share/boost) || true
 
       - name: Free-space claim-codeql
         run: rm -rf /opt/hostedtoolcache/CodeQL || true
