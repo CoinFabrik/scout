@@ -15,7 +15,7 @@ Consider the following `ink!` contract:
 
 ```toml
 [dependencies]
-    ink = { version = "=4.2.0", default-features = false }
+    ink = { version = "5.0.0", default-features = false }
 ```
 
 Problems can arise if the version is not updated to the latest available.

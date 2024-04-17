@@ -8,9 +8,10 @@ def is_rust_project(dir_path):
     """Check if a directory contains a Rust project with a Cargo.toml and src/lib.rs."""
     errors = []
     has_cargo_toml = os.path.isfile(os.path.join(dir_path, "Cargo.toml"))
+    has_cargo_toml_skip = os.path.isfile(os.path.join(dir_path, "Cargo.toml.skip"))
     has_lib_rs = os.path.isfile(os.path.join(dir_path, "src", "lib.rs"))
 
-    if not has_cargo_toml:
+    if not (has_cargo_toml or has_cargo_toml_skip):
         errors.append(f"Missing Cargo.toml in {dir_path}.")
     if not has_lib_rs:
         errors.append(f"Missing src/lib.rs in {dir_path}.")
