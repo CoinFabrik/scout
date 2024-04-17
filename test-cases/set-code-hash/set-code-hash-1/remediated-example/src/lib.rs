@@ -2,8 +2,6 @@
 
 #[ink::contract]
 mod set_code_hash {
-    use ink::env::set_code_hash;
-
     #[ink(storage)]
     pub struct SetCodeHash {
         admin: AccountId,
