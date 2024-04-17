@@ -126,7 +126,7 @@ jobs:
         run: du -hs /opt/hostedtoolcache/*
 
       - name: Lint with Clippy
-        run: RUSTC_WRAPPER=sccache python scripts/run-clippy.py --dir test-cases detectors
+        run: python scripts/run-clippy.py --dir test-cases detectors
 
   comment-on-pr:
     name: Comment on PR
