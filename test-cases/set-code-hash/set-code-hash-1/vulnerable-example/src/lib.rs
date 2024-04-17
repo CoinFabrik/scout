@@ -17,7 +17,7 @@ mod set_code_hash {
         }
     }
 
-   impl SetCodeHash {
+    impl SetCodeHash {
         #[ink(constructor)]
         pub fn new() -> Self {
             Self {}

@@ -14,11 +14,11 @@ mod set_code_hash {
         NotAnAdmin,
     }
 
-     impl Default for SetCodeHash {
-         fn default() -> Self {
-             Self::new()
-         }
-     }
+    impl Default for SetCodeHash {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
 
     impl SetCodeHash {
         #[ink(constructor)]
