@@ -7,7 +7,7 @@ extern crate rustc_span;
 use scout_audit_clippy_utils::diagnostics::span_lint_and_help;
 use rustc_hir::{
     intravisit::{walk_expr, walk_body, Visitor},
-    Expr, ExprKind, QPath, 
+    Expr, ExprKind, QPath,
 };
 use rustc_lint::LateLintPass;
 use rustc_span::Span;
@@ -22,8 +22,8 @@ dylint_linting::declare_late_lint! {
         name: "Unstable Interface",
         long_message: LINT_MESSAGE,
         severity: "Medium",
-        help: "To complete",
-        vulnerability_class: "To complete",
+        help: "https://github.com/CoinFabrik/scout-soroban/tree/main/detectors/unstable-interface",
+        vulnerability_class: "Known Bugs",
     }
 }
 
@@ -45,7 +45,7 @@ impl<'tcx> LateLintPass<'tcx> for UnstableInterface {
         impl<'tcx> Visitor<'tcx> for UnstableInterfaceVisitor {
             fn visit_expr(&mut self, expr: &'tcx Expr<'_>) {
 
-                if let ExprKind::Path(QPath::Resolved(_, path)) = &expr.kind 
+                if let ExprKind::Path(QPath::Resolved(_, path)) = &expr.kind
                 && path.segments.iter().any(|x| x.ident.name.to_string() == "sr25519_verify")
                 {
                     self.has_sr25519_verify = true;
