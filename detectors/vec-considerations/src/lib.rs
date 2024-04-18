@@ -89,7 +89,7 @@ impl<'tcx> LateLintPass<'tcx> for VecConsiderations {
     }
 
     fn check_field_def(&mut self, cx: &LateContext<'tcx>, field: &'tcx rustc_hir::FieldDef<'tcx>) {
-        if self.is_lazy_storage(cx, &field) {
+        if self.is_lazy_storage(cx, field) {
             self.mapping_fields.insert(field.ident, field.span);
         }
     }
@@ -108,7 +108,7 @@ impl<'tcx> Visitor<'tcx> for VecConsiderationsVisitor<'tcx, '_> {
             && let ExprKind::Path(QPath::Resolved(_, path), ..) = path_expr.kind
             && path
                 .segments
-                .into_iter()
+                .iter()
                 .any(|x| x.ident.name.to_string() == "self")
             && self.mapping_fields.keys().any(|x| x == &struct_field_name)
         {
@@ -122,7 +122,7 @@ impl<'tcx> Visitor<'tcx> for VecConsiderationsVisitor<'tcx, '_> {
                     "Do not use `{}` with an unsized type. Use the `try_{}` method instead.",
                     met_name, met_name
                 ),
-                Some(self.mapping_fields.get(&struct_field_name).unwrap().clone()),
+                Some(*self.mapping_fields.get(&struct_field_name).unwrap()),
                 &format!(
                     "The variable `{}` is a storage type with a dinamically sized value.",
                     field_name
