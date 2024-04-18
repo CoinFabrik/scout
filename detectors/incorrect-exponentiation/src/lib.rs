@@ -2,7 +2,6 @@
 #![warn(unused_extern_crates)]
 
 extern crate rustc_hir;
-extern crate rustc_lint;
 extern crate rustc_span;
 
 use rustc_hir::def_id::LocalDefId;
