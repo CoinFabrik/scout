@@ -14,7 +14,7 @@ use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::Span;
 
 const LINT_MESSAGE: &str = "'^' It is not an exponential operator. It is a bitwise XOR one.";
-const LINT_HELP: &str = "Use '.pow()' instead of '^'.";
+const LINT_HELP: &str = "If you want to use XOR, use bitxor(). If you want to raise a number use .checked_pow() or .pow() ";
 
 dylint_linting::declare_late_lint! {
     pub INCORRECT_EXPONENTIATION,
@@ -22,7 +22,7 @@ dylint_linting::declare_late_lint! {
     LINT_MESSAGE,
     {
         name: "Incorrect Exponentiation",
-        long_message: "The '^' operator is not an exponential operator. It is a bitwise XOR one.",
+        long_message: LINT_MESSAGE,
         severity: "High",
         help: "Falta link",
         vulnerability_class: "Incorrect Exponentiation",
