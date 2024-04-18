@@ -2,7 +2,6 @@
 #![warn(unused_extern_crates)]
 #![feature(let_chains)]
 extern crate rustc_hir;
-extern crate rustc_lint;
 extern crate rustc_span;
 
 use std::collections::HashMap;

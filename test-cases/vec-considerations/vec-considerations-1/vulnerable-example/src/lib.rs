@@ -22,10 +22,10 @@ pub mod vec_considerations {
         pub fn do_something(&mut self, data: String) {
             let caller = self.env().caller();
 
-            let log_message = format!("{caller:?}: {data}");
+            let example = format!("{caller:?}: {data}");
 
             // Panics if data overgrows the static buffer size!
-            self.on_chain_log.insert(caller, &data);
+            self.on_chain_log.insert(caller, &example);
         }
 
         #[ink(message)]
