@@ -106,19 +106,15 @@ impl<'tcx> LateLintPass<'tcx> for DelegateCall {
                     for i in 0..arguments.len() {
                         arg_hir_ids.push(arguments[i].hir_id);
 
-                        if let ExprKind::Path(qpath) = &arguments[i].kind {
-                            match qpath {
-                                QPath::Resolved(_, path) => {
-                                    if let Res::Local(hir_id) = path.res {
-                                        arg_hir_ids.push(hir_id);
-                                    }
-                                    for j in 0..path.segments.len() {
-                                        arg_hir_ids.push(path.segments[j].hir_id);
-                                    }
-                                }
-                                _ => (),
+                        if let ExprKind::Path(QPath::Resolved(_, path)) = &arguments[i].kind {
+                            if let Res::Local(hir_id) = path.res {
+                                arg_hir_ids.push(hir_id);
+                            }
+                            for j in 0..path.segments.len() {
+                                arg_hir_ids.push(path.segments[j].hir_id);
                             }
                         }
+
                     }
 
                     for param_id in param_hir_ids {
