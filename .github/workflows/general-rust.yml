@@ -83,6 +83,48 @@ jobs:
       - name: Install required srcs
         run: rustup component add rust-src --toolchain nightly-2023-12-16-x86_64-unknown-linux-gnu
 
+      - name: Free-space claim-usage report0
+        run: df -h .
+
+      - name: Free-space claim-usage report1
+        run: du -hs /opt/hostedtoolcache/*
+
+      - name: Free-space claim-usage report2
+        run: du -hs /opt/hostedtoolcache/Python/*
+
+      - name: Free-space claim-usage report3
+        run: (ls -la /usr/local/share && du -hs /usr/local/share/boost) || true
+
+      # - name: Free-space claim-usage report3  ## not existing anymore
+      #   run: (ls -la /opt/ghc && du -hs /opt/ghc) || true
+
+      - name: Free-space claim-dotnet
+        run: rm -rf /usr/share/dotnet || true
+
+      - name: Free-space claim-codeql
+        run: rm -rf /opt/hostedtoolcache/CodeQL || true
+
+      - name: Free-space claim-Java
+        run: rm -rf /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk || true
+
+      - name: Free-space claim-PyPy
+        run: rm -rf /opt/hostedtoolcache/PyPy || true
+
+      - name: Free-space claim-Ruby
+        run: rm -rf /opt/hostedtoolcache/Ruby || true
+
+      - name: Free-space claim-go
+        run: rm -rf /opt/hostedtoolcache/go || true
+
+      - name: Free-space claim-node
+        run: rm -rf /opt/hostedtoolcache/node || true
+
+      - name: Free-space claim-usage report0
+        run: df -h .
+
+      - name: Free-space claim-usage report1
+        run: du -hs /opt/hostedtoolcache/*
+
       - name: Lint with Clippy
         run: python scripts/run-clippy.py --dir test-cases detectors
 
