@@ -5,7 +5,7 @@ authors = ["[your_name] <[your_email]>"]
 edition = "2021"
 
 [lib]
-path = "lib.rs"
+path = "src/lib.rs"
 
 [features]
 default = ["std"]
