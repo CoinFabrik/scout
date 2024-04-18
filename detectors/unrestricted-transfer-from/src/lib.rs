@@ -119,18 +119,15 @@ impl<'tcx> LateLintPass<'tcx> for UnrestrictedTransferFrom {
 
                                 arg_hir_ids.push(args[1].hir_id);
 
-                                if let ExprKind::Path(qpath) = &args[1].kind {
-                                    match qpath {
-                                        QPath::Resolved(_, path) => {
-                                            if let Res::Local(hir_id) = path.res {
-                                                arg_hir_ids.push(hir_id);
-                                            }
-                                            for j in 0..path.segments.len() {
-                                                arg_hir_ids.push(path.segments[j].hir_id);
-                                            }
-                                        }
-                                        _ => (),
+                                if let ExprKind::Path(QPath::Resolved(_, path)) = &args[1].kind {
+
+                                    if let Res::Local(hir_id) = path.res {
+                                        arg_hir_ids.push(hir_id);
                                     }
+                                    for j in 0..path.segments.len() {
+                                        arg_hir_ids.push(path.segments[j].hir_id);
+                                    }
+
                                 }
 
 

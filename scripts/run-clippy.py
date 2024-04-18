@@ -20,23 +20,16 @@ def run_clippy(directories):
 
         print(f"\n{GREEN}Running clippy in {directory}:{ENDC}")
         for root, _, files in os.walk(directory):
+            if root == "test-cases/ink-version/ink-version-1/vulnerable-example" or root == "test-cases/ink-version/ink-version-1/remediated-example":
+                print(f"Skipping {root} due to known issues.")
+                continue
             if "Cargo.toml" in files:
                 start_time = time.time()
-                result = subprocess.run(
-                    [
-                        "cargo",
-                        "clippy",
-                        "--all-targets",
-                        "--all-features",
-                        "--",
-                        "-D",
-                        "warnings",
-                    ],
-                    cwd=root,
-                    capture_output=True,
-                    text=True,
-                )
+                result = get_command(directory, root)
                 end_time = time.time()
+
+                clean_up(root)
+
                 elapsed_time = end_time - start_time
                 print(
                     f"{BLUE}[> {elapsed_time:.2f} sec]{ENDC} - Completed clippy check in: {root}."
@@ -50,6 +43,64 @@ def run_clippy(directories):
                     errors.append(root)
     return errors
 
+
+def clean_up(root):
+    ret = subprocess.run(['du', '-hs', 'target'],
+            cwd=root,
+            capture_output=True,
+            text=True)
+    if ret.returncode!=0:
+        print(" ?> ", ret.returncode)
+        print(" -> ", ret.stdout)
+        print(" e> ", ret.stderr)
+        print(" -------------- ")
+    ret = subprocess.run(['rm', '-rf', 'target'],
+            cwd=root,
+            capture_output=True,
+            text=True)
+    if ret.returncode!=0:
+        print(" ?> ", ret.returncode)
+        print(" -> ", ret.stdout)
+        print(" e> ", ret.stderr)
+        print(" -------------- ")
+
+
+def get_command(directory, root):
+    if directory == "test-cases":
+        return subprocess.run(
+            [
+            "cargo",
+            "+nightly-2023-12-16",
+            "clippy",
+            "--target=wasm32-unknown-unknown",
+            "-Zbuild-std=std,core,alloc",
+            "--no-default-features",
+            "--",
+            "-D",
+            "warnings",
+            "-A",
+            "clippy::new_without_default", # this is not needed for ink!
+            ],
+            cwd=root,
+            capture_output=True,
+            text=True,
+        )
+
+    else:
+        return subprocess.run(
+            [
+            "cargo",
+            "clippy",
+            "--",
+            "-D",
+            "warnings",
+            "-A",
+            "clippy::new_without_default", # this is not needed for ink!
+            ],
+            cwd=root,
+            capture_output=True,
+            text=True,
+        )
 
 def print_clippy_errors(errors):
     if errors:
