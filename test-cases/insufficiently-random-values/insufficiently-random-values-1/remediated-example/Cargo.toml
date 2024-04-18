@@ -1,0 +1,14 @@
+[package]
+name = "insufficiently-random-values"
+version = "0.1.0"
+authors = ["[your_name] <[your_email]>"]
+edition = "2021"
+
+[lib]
+path = "src/lib.rs"
+
+[profile.dev]
+overflow-checks = false
+
+[profile.release]
+overflow-checks = false

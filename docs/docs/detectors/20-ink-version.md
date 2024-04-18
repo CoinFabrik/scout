@@ -12,7 +12,7 @@ Using an old version of ink! can be dangerous, as it may have bugs or security i
 
 ```toml
 [dependencies]
-    ink = { version = "=4.2.0", default-features = false }
+    ink = { version = "5.0.0", default-features = false }
 ```
 
 Instead, use the latest available version.
