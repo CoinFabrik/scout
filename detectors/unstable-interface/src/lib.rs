@@ -22,8 +22,8 @@ dylint_linting::declare_late_lint! {
         name: "Unstable Interface",
         long_message: LINT_MESSAGE,
         severity: "Medium",
-        help: "No hay link",
-        vulnerability_class: "Para completar",
+        help: "To complete",
+        vulnerability_class: "To complete",
     }
 }
 
