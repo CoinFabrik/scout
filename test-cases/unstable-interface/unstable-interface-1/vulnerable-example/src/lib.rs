@@ -55,7 +55,7 @@ mod unstable_interface {
         }
 
         #[ink(message)]
-        pub fn example(&self) {
+        pub fn example(&self) -> bool {
             let signature: [u8; 64] = [
                 184, 49, 74, 238, 78, 165, 102, 252, 22, 92, 156, 176, 124, 118, 168, 116, 247, 99,
                 0, 94, 2, 45, 9, 170, 73, 222, 182, 74, 60, 32, 75, 64, 98, 174, 69, 55, 83, 85,
@@ -68,8 +68,7 @@ mod unstable_interface {
                 133, 88, 133, 76, 205, 227, 154, 86, 132, 231, 165, 109, 162, 125,
             ];
 
-            let result = ink::env::sr25519_verify(&signature, message.as_slice(), &pub_key);
-            //assert!(result.is_ok())
+            ink::env::sr25519_verify(&signature, message.as_slice(), &pub_key).is_ok()
         }
     }
 }
