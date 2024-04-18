@@ -11,7 +11,9 @@ use rustc_hir::{
 };
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::{def_id::LocalDefId, Span};
-use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
+
+const LINT_MESSAGE: &str =
+    "In order to prevent a single transaction from consuming all the gas in a block, unbounded operations must be avoided";
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -38,7 +40,14 @@ dylint_linting::declare_late_lint! {
     /// ```
     pub DOS_UNBOUNDED_OPERATION,
     Warn,
-    scout_audit_internal::ink_lint_message::INK_DOS_UNBOUNDED_OPERATION_LINT_MESSAGE
+    LINT_MESSAGE,
+    {
+        name: "Denial of Service: Unbounded Operation",
+        long_message: "In order to prevent a single transaction from consuming all the gas in a block, unbounded operations must be avoided. This includes loops that do not have a bounded number of iterations, and recursive calls.    ",
+        severity: "Medium",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/dos-unbounded-operation",
+        vulnerability_class: "Denial of Service",
+    }
 }
 
 struct ForLoopVisitor {
@@ -88,10 +97,12 @@ impl<'tcx> LateLintPass<'tcx> for DosUnboundedOperation {
             walk_expr(&mut visitor, body.value);
 
             for span in visitor.span_constant {
-                Detector::DosUnboundedOperation.span_lint_and_help(
+                scout_audit_clippy_utils::diagnostics::span_lint_and_help(
                     cx,
                     DOS_UNBOUNDED_OPERATION,
                     span,
+                    LINT_MESSAGE,
+                    None,
                     "This loop seems to do not have a fixed number of iterations",
                 );
             }

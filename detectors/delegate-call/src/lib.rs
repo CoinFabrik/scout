@@ -13,7 +13,9 @@ use rustc_hir::{Body, FnDecl};
 use rustc_hir::{Expr, ExprKind, PatKind, QPath};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::Span;
-use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
+
+const LINT_MESSAGE: &str = "Passing arguments to the target of a delegate call is not safe, as it allows the caller to set a malicious hash as the target.";
+
 dylint_linting::declare_late_lint! {
     /// ### What it does
     /// Checks for delegated calls to contracts passed as arguments.
@@ -61,7 +63,14 @@ dylint_linting::declare_late_lint! {
 
     pub DELEGATE_CALL,
     Warn,
-    scout_audit_internal::ink_lint_message::INK_DELEGATE_CALL_LINT_MESSAGE
+    LINT_MESSAGE,
+    {
+        name: "Unsafe Delegate Call",
+        long_message: "It is important to validate and restrict delegate calls to trusted contracts, implement proper access control mechanisms, and carefully review external contracts to prevent unauthorized modifications, unexpected behavior, and potential exploits.",
+        severity: "Critical",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/delegate-call",
+        vulnerability_class: "Authorization ",
+    }
 }
 impl<'tcx> LateLintPass<'tcx> for DelegateCall {
     fn check_fn(
@@ -97,19 +106,15 @@ impl<'tcx> LateLintPass<'tcx> for DelegateCall {
                     for i in 0..arguments.len() {
                         arg_hir_ids.push(arguments[i].hir_id);
 
-                        if let ExprKind::Path(qpath) = &arguments[i].kind {
-                            match qpath {
-                                QPath::Resolved(_, path) => {
-                                    if let Res::Local(hir_id) = path.res {
-                                        arg_hir_ids.push(hir_id);
-                                    }
-                                    for j in 0..path.segments.len() {
-                                        arg_hir_ids.push(path.segments[j].hir_id);
-                                    }
-                                }
-                                _ => (),
+                        if let ExprKind::Path(QPath::Resolved(_, path)) = &arguments[i].kind {
+                            if let Res::Local(hir_id) = path.res {
+                                arg_hir_ids.push(hir_id);
+                            }
+                            for j in 0..path.segments.len() {
+                                arg_hir_ids.push(path.segments[j].hir_id);
                             }
                         }
+
                     }
 
                     for param_id in param_hir_ids {
@@ -144,10 +149,12 @@ impl<'tcx> LateLintPass<'tcx> for DelegateCall {
         walk_expr(&mut delegate_storage, body.value);
 
         if delegate_storage.has_vulnerable_delegate {
-            Detector::DelegateCall.span_lint_and_help(
+            scout_audit_clippy_utils::diagnostics::span_lint_and_help(
                 cx,
                 DELEGATE_CALL,
                 delegate_storage.span.unwrap(),
+                LINT_MESSAGE,
+                None,
                 "Consider using a memory value (self.target) as the target of the delegate call.",
             );
         }

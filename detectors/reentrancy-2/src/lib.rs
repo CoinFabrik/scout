@@ -22,7 +22,8 @@ use rustc_middle::ty::TyKind;
 use rustc_span::def_id::LocalDefId;
 use rustc_span::{Span, Symbol};
 use rustc_target::abi::VariantIdx;
-use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
+
+const LINT_MESSAGE:&str = "External calls could open the opportunity for a malicious contract to execute any arbitrary code";
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -88,7 +89,14 @@ dylint_linting::declare_late_lint! {
     /// ```
     pub REENTRANCY_2,
     Warn,
-    scout_audit_internal::ink_lint_message::INK_REENTRANCY_LINT_MESSAGE
+    LINT_MESSAGE,
+    {
+        name: "Reentrancy",
+        long_message: "An ink! smart contract can interact with other smart contracts. These operations imply (external) calls where control flow is passed to the called contract until the execution of the called code is over, then the control is delivered back to the caller. A reentrancy vulnerability may happen when a user calls a function, this function calls a malicious contract which again calls this same function, and this 'reentrancy' has unexpected reprecussions to the contract.",
+        severity: "Critical",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/reentrancy",
+        vulnerability_class: "Reentrancy",
+    }
 }
 
 const SET_ALLOW_REENTRY: &str = "set_allow_reentry";
@@ -272,11 +280,13 @@ impl<'tcx> LateLintPass<'tcx> for Reentrancy2 {
         // Iterate over all potential reentrancy spans and emit a warning for each.
         if reentrancy_visitor.has_insert_operation {
             reentrancy_visitor.reentrancy_spans.into_iter().for_each(|span| {
-                Detector::Reentrancy2.span_lint_and_help(
+                scout_audit_clippy_utils::diagnostics::span_lint_and_help(
                     cx,
                     REENTRANCY_2,
                     span,
-                    "This statement seems to call another contract after the flag set_allow_reentry was enabled [todo: check state changes after this statement]",
+                    LINT_MESSAGE,
+                    None,
+                    "This statement seems to call another contract after the flag set_allow_reentry was enabled [todo: check state changes after this statement]"
                 );
             })
         }
