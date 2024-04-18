@@ -2,9 +2,9 @@
 #![warn(unused_extern_crates)]
 
 extern crate rustc_hir;
+extern crate rustc_lint;
 extern crate rustc_span;
 
-use scout_audit_clippy_utils::diagnostics::span_lint_and_help;
 use rustc_hir::def_id::LocalDefId;
 use rustc_hir::intravisit::Visitor;
 use rustc_hir::intravisit::{walk_expr, FnKind};
@@ -12,6 +12,7 @@ use rustc_hir::{Body, FnDecl};
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::Span;
+use scout_audit_clippy_utils::diagnostics::span_lint_and_help;
 
 const LINT_MESSAGE: &str = "'^' It is not an exponential operator. It is a bitwise XOR one.";
 const LINT_HELP: &str = "If you want to use XOR, use bitxor(). If you want to raise a number use .checked_pow() or .pow() ";
@@ -23,11 +24,11 @@ dylint_linting::declare_late_lint! {
     {
         name: "Incorrect Exponentiation",
         long_message: LINT_MESSAGE,
-        severity: "High",
-        help: "To complete",
-        vulnerability_class: "Incorrect Exponentiation",
+        severity: "Critical",
+        help: "https://github.com/CoinFabrik/scout-soroban/tree/main/detectors/",
+        vulnerability_class: "Arithmetic",
     }
-   
+
 }
 
 impl<'tcx> LateLintPass<'tcx> for IncorrectExponentiation {
@@ -47,8 +48,7 @@ impl<'tcx> LateLintPass<'tcx> for IncorrectExponentiation {
 
         impl<'tcx> Visitor<'tcx> for IncorrectExponentiationStorage {
             fn visit_expr(&mut self, expr: &'tcx Expr<'_>) {
-
-                if let ExprKind::Binary(op,_,_) = &expr.kind {
+                if let ExprKind::Binary(op, _, _) = &expr.kind {
                     if op.node == rustc_hir::BinOpKind::BitXor {
                         self.incorrect_exponentiation = true;
                         self.span.push(expr.span);
@@ -62,13 +62,11 @@ impl<'tcx> LateLintPass<'tcx> for IncorrectExponentiation {
         let mut expon_storage = IncorrectExponentiationStorage {
             span: Vec::new(),
             incorrect_exponentiation: false,
-            
         };
 
         walk_expr(&mut expon_storage, body.value);
 
         if expon_storage.incorrect_exponentiation {
-
             for span in expon_storage.span.iter() {
                 span_lint_and_help(
                     cx,
@@ -79,7 +77,6 @@ impl<'tcx> LateLintPass<'tcx> for IncorrectExponentiation {
                     LINT_HELP,
                 );
             }
-            
         }
     }
 }
