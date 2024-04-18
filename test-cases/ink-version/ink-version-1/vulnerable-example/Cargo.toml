@@ -1,13 +1,14 @@
 [package]
-name = "ink_version"
+name = "ink_version-vulnerable"
 version = "0.1.0"
 authors = ["[your_name] <[your_email]>"]
 edition = "2021"
 
+
 [dependencies]
-ink = { version = "5.0.0", default-features = false }
-scale = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive"] }
-scale-info = { version = "2.6", default-features = false, features = ["derive"], optional = true }
+ink = { workspace = true }
+scale = { workspace = true }
+scale-info = { workspace = true }
 
 # Needed for compilation
 ink_env = "=5.0.0"
@@ -18,7 +19,7 @@ ink_primitives = "=5.0.0"
 ink_storage = "=5.0.0"
 
 [dev-dependencies]
-ink_e2e = "=5.0.0"
+ink_e2e = { workspace = true }
 
 [lib]
 path = "src/lib.rs"
@@ -33,8 +34,3 @@ std = [
 ink-as-dependency = []
 e2e-tests = []
 
-[profile.dev]
-overflow-checks = false
-
-[profile.release]
-overflow-checks = false
