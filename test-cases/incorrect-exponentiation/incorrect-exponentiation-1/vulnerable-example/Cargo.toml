@@ -25,8 +25,7 @@ scale-info = { version = "2.6", default-features = false, features = ["derive"],
 [dev-dependencies]
 ink_e2e = { version = "5" }
 
-[profile.dev]
-overflow-checks = false
-
-[profile.release]
-overflow-checks = false
+[workspace.metadata.dylint]
+libraries = [
+   { path = "/home/cami/Desktop/coinfabrik/scout/detectors/incorrect-exponentiation"},
+]
