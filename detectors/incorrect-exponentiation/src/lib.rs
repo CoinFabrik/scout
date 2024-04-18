@@ -24,7 +24,7 @@ dylint_linting::declare_late_lint! {
         name: "Incorrect Exponentiation",
         long_message: LINT_MESSAGE,
         severity: "High",
-        help: "Falta link",
+        help: "To complete",
         vulnerability_class: "Incorrect Exponentiation",
     }
    
