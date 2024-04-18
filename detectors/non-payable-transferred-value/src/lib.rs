@@ -57,7 +57,7 @@ impl EarlyLintPass for NonPayableTransferredValue {
         {
             let mut visitor = TransferredValueSearcher::default();
 
-            walk_block(&mut visitor, &it.body.as_ref().unwrap());
+            walk_block(&mut visitor, it.body.as_ref().unwrap());
 
             visitor.span.iter().for_each(|span| {
                 span_lint_and_help(
