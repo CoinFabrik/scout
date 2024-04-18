@@ -10,7 +10,8 @@ use rustc_hir::intravisit::{walk_expr, FnKind, Visitor};
 use rustc_hir::{Expr, ExprKind, QPath, TyKind};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::Span;
-use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
+
+const LINT_MESSAGE: &str = "Unused return enum";
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
@@ -63,7 +64,14 @@ dylint_linting::declare_late_lint! {
     /// ```
     pub UNUSED_RETURN_ENUM,
     Warn,
-    scout_audit_internal::ink_lint_message::INK_UNUSED_RETURN_ENUM_LINT_MESSAGE
+    LINT_MESSAGE,
+    {
+        name: "Unused Return Enum",
+        long_message: "Ink! messages can return a Result enum with a custom error type. This is useful for the caller to know what went wrong when the message fails. The definition of the Result type enum consists of two variants: Ok and Err. If any of the variants is not used, the code could be simplified or it could imply a bug.    ",
+        severity: "Minor",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/unused-return-enum",
+        vulnerability_class: "Validations and error handling",
+    }
 }
 
 struct CounterVisitor {
@@ -189,11 +197,13 @@ impl<'tcx> LateLintPass<'tcx> for UnusedReturnEnum {
             && (visitor.count_err == 0 || visitor.count_ok == 0)
         {
             visitor.span.iter().for_each(|span| {
-                Detector::UnusedReturnEnum.span_lint_and_help(
+                scout_audit_clippy_utils::diagnostics::span_lint_and_help(
                     cx,
                     UNUSED_RETURN_ENUM,
                     *span,
-                    "If any of the variants (Ok/Err) is not used, the code could be simplified or it could imply a bug",
+                    LINT_MESSAGE,
+                    None,
+                    "If any of the variants (Ok/Err) is not used, the code could be simplified or it could imply a bug"
                 );
             });
         }

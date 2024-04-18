@@ -12,8 +12,8 @@ use rustc_ast::{
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::{sym, Span};
 use scout_audit_clippy_utils::sym;
-use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
 
+const LINT_MESSAGE: &str = "Assert causes panic. Instead, return a proper error.";
 dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does
     /// Checks for `assert!` usage.
@@ -47,8 +47,15 @@ dylint_linting::impl_pre_expansion_lint! {
 
     pub ASSERT_VIOLATION,
     Warn,
-    scout_audit_internal::ink_lint_message::INK_ASSERT_VIOLATION_LINT_MESSAGE,
-    AssertViolation::default()
+    LINT_MESSAGE,
+    AssertViolation::default(),
+    {
+        name: "Unprotected Mapping Operation",
+        long_message: "Modifying mappings with an arbitrary key given by the user could lead to unintented modifications of critical data, modifying data belonging to other users, causing denial of service, unathorized access, and other potential issues.    ",
+        severity: "Critical",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/unprotected-mapping-operation",
+        vulnerability_class: "Validations and error handling",
+    }
 }
 
 #[derive(Default)]
@@ -112,10 +119,12 @@ fn check_macro_call(cx: &EarlyContext, span: Span, mac: &P<MacCall>) {
     .iter()
     .any(|sym| &mac.path == sym)
     {
-        Detector::AssertViolation.span_lint_and_help(
+        scout_audit_clippy_utils::diagnostics::span_lint_and_help(
             cx,
             ASSERT_VIOLATION,
             span,
+            LINT_MESSAGE,
+            None,
             "You could use instead an Error enum.",
         );
     }

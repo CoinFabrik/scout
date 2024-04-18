@@ -5,7 +5,7 @@ edition = "2021"
 authors = ["[your_name] <[your_email]>"]
 
 [lib]
-path = "lib.rs"
+path = "src/lib.rs"
 
 [features]
 default = ["std"]
@@ -18,14 +18,14 @@ ink-as-dependency = []
 e2e-tests = []
 
 [dependencies]
-ink = { version = "4.2.1", default-features = false }
+ink = { version = "5.0.0", default-features = false }
 scale = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive"] }
 scale-info = { version = "2.6", default-features = false, features = ["derive"], optional = true }
 
 [dev-dependencies]
 delegate-call-divider = { path = "../divider-example" }
 delegate-call-exploiter = { path = "../exploiter-example" }
-ink_e2e = "4.2.1"
+ink_e2e = "=5.0.0"
 
 [profile.dev]
 overflow-checks = false

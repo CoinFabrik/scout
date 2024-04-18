@@ -7,8 +7,9 @@ extern crate rustc_span;
 use std::fs;
 
 use rustc_lint::EarlyLintPass;
-use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
 use semver::*;
+
+const LINT_MESSAGE: &str = "Use the latest version of ink!";
 
 dylint_linting::declare_early_lint! {
     /// ### What it does
@@ -18,7 +19,14 @@ dylint_linting::declare_early_lint! {
     ///```
     pub CHECK_INK_VERSION,
     Warn,
-    scout_audit_internal::ink_lint_message::INK_INK_VERSION_LINT_MESSAGE
+    LINT_MESSAGE,
+    {
+        name: "Check Ink! version",
+        long_message: "Using a older version of ink! can be dangerous, as it may have bugs or security issues. Use the latest version available.",
+        severity: "Enhancement",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/ink-version",
+        vulnerability_class: "Best practices",
+    }
 }
 
 impl EarlyLintPass for CheckInkVersion {
@@ -45,11 +53,13 @@ impl EarlyLintPass for CheckInkVersion {
         let ink_version = VersionReq::parse(&ink_version.replace('\"', "")).unwrap();
 
         if !ink_version.matches(&req) {
-            Detector::InkVersion.span_lint_and_help(
+            scout_audit_clippy_utils::diagnostics::span_lint_and_help(
                 cx,
                 CHECK_INK_VERSION,
                 rustc_span::DUMMY_SP,
-                &format!("The latest ink! version is {latest_version}, and your version is {ink_version}"),
+                LINT_MESSAGE,
+                None,
+                &format!("The latest ink! version is {latest_version}, and your version is {ink_version}")
             );
         }
     }

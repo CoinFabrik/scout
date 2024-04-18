@@ -20,7 +20,8 @@ use rustc_middle::mir::{
 use rustc_middle::ty::{Ty, TyKind};
 use rustc_span::def_id::DefId;
 use rustc_span::Span;
-use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
+
+const LINT_MESSAGE: &str = "This vector operation is called without access control";
 
 dylint_linting::impl_late_lint! {
     /// ### What it does
@@ -52,8 +53,15 @@ dylint_linting::impl_late_lint! {
     /// ```
     pub UNEXPECTED_REVERT_WARN,
     Warn,
-    scout_audit_internal::ink_lint_message::INK_DOS_UNEXPECTED_REVERT_WITH_VECTOR_LINT_MESSAGE,
-    UnexpectedRevertWarn::default()
+    LINT_MESSAGE,
+    UnexpectedRevertWarn::default(),
+    {
+        name: "Unexpected Revert Inserting to Storage",
+        long_message: " It occurs by preventing transactions by other users from being successfully executed forcing the blockchain state to revert to its original state.",
+        severity: "Medium",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/dos-unexpected-revert-with-vector",
+        vulnerability_class: "Denial of Service",
+    }
 }
 
 #[derive(Default)]
@@ -208,10 +216,11 @@ impl<'tcx> LateLintPass<'tcx> for UnexpectedRevertWarn {
                 &mut HashSet::<BasicBlock>::default(),
             );
             for place in unchecked_places {
-                Detector::DosUnexpectedRevertWithVector.span_lint(
+                scout_audit_clippy_utils::diagnostics::span_lint(
                     cx,
                     UNEXPECTED_REVERT_WARN,
                     place.1,
+                    LINT_MESSAGE,
                 );
             }
         }

@@ -12,7 +12,8 @@ use rustc_ast::{
 };
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::Span;
-use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
+
+const LINT_MESSAGE: &str = "Delegate call with non-lazy, non-mapping storage";
 
 dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does
@@ -39,8 +40,15 @@ dylint_linting::impl_pre_expansion_lint! {
     ///```
     pub LAZY_DELEGATE,
     Warn,
-    scout_audit_internal::ink_lint_message::INK_LAZY_DELEGATE_LINT_MESSAGE,
-    LazyDelegate::default()
+    LINT_MESSAGE,
+    LazyDelegate::default(),
+    {
+        name: "Lazy Delegate",
+        long_message: "A bug in ink! causes delegated calls to not modify the caller's storage unless Lazy with ManualKey or Mapping is used.",
+        severity: "Critical",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/lazy-delegate",
+        vulnerability_class: "Known Bugs",
+    }
 }
 
 #[derive(Default)]
@@ -78,18 +86,22 @@ impl EarlyLintPass for LazyDelegate {
         }
 
         if !self.delegate_uses.is_empty() && !self.non_lazy_manual_storage_spans.is_empty() {
-            Detector::LazyDelegate.span_lint_and_help(
+            scout_audit_clippy_utils::diagnostics::span_lint_and_help(
                 cx,
                 LAZY_DELEGATE,
                 id.span,
+                LINT_MESSAGE,
+                None,
                 "Use lazy storage with manual keys",
             );
 
             for span in &self.non_lazy_manual_storage_spans {
-                Detector::LazyDelegate.span_lint_and_help(
+                scout_audit_clippy_utils::diagnostics::span_lint_and_help(
                     cx,
                     LAZY_DELEGATE,
                     *span,
+                    LINT_MESSAGE,
+                    None,
                     "Use lazy storage with manual keys. \nMore info in https://github.com/paritytech/ink/issues/1826 and https://github.com/paritytech/ink/issues/1825",
                 );
             }

@@ -12,7 +12,8 @@ use rustc_ast::{
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::{sym, Span};
 use scout_audit_clippy_utils::sym;
-use scout_audit_internal::{DetectorImpl, InkDetector as Detector};
+
+const LINT_MESSAGE: &str = "The format! macro should not be used.";
 
 dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does
@@ -45,8 +46,15 @@ dylint_linting::impl_pre_expansion_lint! {
     /// ```
     pub AVOID_FORMAT_STRING,
     Warn,
-    scout_audit_internal::ink_lint_message::INK_AVOID_FORMAT_STRING_LINT_MESSAGE,
-    AvoidFormatString::default()
+    LINT_MESSAGE,
+    AvoidFormatString::default(),
+    {
+        name: "Avoid format! macro",
+        long_message: "The format! macro is used to create a String from a given set of arguments. This macro is not recommended, it is better to use a custom error type enum.    ",
+        severity: "Enhancement",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/avoid-format-string",
+        vulnerability_class: "Validations and error handling",
+    }
 }
 
 #[derive(Default)]
@@ -85,10 +93,12 @@ impl EarlyLintPass for AvoidFormatString {
             if mac.path == sym!(format);
 
             then {
-                Detector::AvoidFormatString.span_lint_and_help(
+                scout_audit_clippy_utils::diagnostics::span_lint_and_help(
                     cx,
                     AVOID_FORMAT_STRING,
                     expr.span,
+                    LINT_MESSAGE,
+                    None,
                     "Instead, if this is returning an error, define a new error type",
                 );
             }
