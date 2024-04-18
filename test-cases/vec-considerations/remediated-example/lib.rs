@@ -3,15 +3,14 @@
 #[ink::contract]
 mod vec_considerations {
 
-    use ink::prelude::{string::String, format};
-    use ink::storage::{StorageVec, Mapping};
+    use ink::prelude::{format, string::String};
+    use ink::storage::{Mapping, StorageVec};
 
     #[derive(Default)]
     #[ink(storage)]
     pub struct MyContract {
         on_chain_log: Mapping<AccountId, String>,
         donations: StorageVec<String>,
-
     }
 
     #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
@@ -23,9 +22,7 @@ mod vec_considerations {
         ErrNone,
     }
 
-
     impl MyContract {
-
         #[ink(constructor)]
         pub fn new_default() -> Self {
             Self::default()
@@ -34,10 +31,10 @@ mod vec_considerations {
         #[ink(message)]
         pub fn do_something2(&mut self, data: String) -> Result<(), Error> {
             let caller = self.env().caller();
-    
+
             match self.on_chain_log.try_insert(caller, &data) {
                 Ok(_) => Ok(()),
-                Err(_) => Err(Error::InsertFailed)
+                Err(_) => Err(Error::InsertFailed),
             }
         }
 
@@ -47,22 +44,20 @@ mod vec_considerations {
             let endowment = self.env().transferred_value();
 
             let log_message = format!("{caller:?} donated {endowment}");
-            
+
             match self.donations.try_push(&log_message) {
                 Ok(_) => Ok(()),
-                Err(_) => Err(Error::PushFailed)
+                Err(_) => Err(Error::PushFailed),
             }
         }
 
         #[ink(message)]
-        pub fn last_donation(&self) -> Result<(), Error>{
-            
+        pub fn last_donation(&self) -> Result<(), Error> {
             match self.donations.try_peek() {
                 Some(Ok(_)) => Ok(()),
                 Some(Err(_)) => Err(Error::PeekFailed),
                 None => Err(Error::ErrNone),
             }
         }
-
     }
 }

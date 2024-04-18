@@ -11,9 +11,8 @@ pub mod vec_considerations {
         on_chain_log: Mapping<AccountId, String>,
         donations: StorageVec<String>,
     }
-    
-    impl VecConsiderations {
 
+    impl VecConsiderations {
         #[ink(constructor)]
         pub fn new() -> Self {
             Self::default()
