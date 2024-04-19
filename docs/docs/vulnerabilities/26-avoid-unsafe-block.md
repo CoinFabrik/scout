@@ -1,10 +1,9 @@
 # Avoid Unsafe Block
 ## Description 
 - Vulnerability Category: `Best practices`
-- Severity: `Enhancement`
+- Vulnerability Severity: `Enhancement`
 - Detectors: [`avoid-unsafe-block`](https://github.com/CoinFabrik/scout/tree/main/detectors/avoid-unsafe-block)
 - Test Cases: [`avoid-unsafe-block-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/avoid-unsafe-block/avoid-unsafe-block-1)
-
 
 
 ## Exploit Scenario
