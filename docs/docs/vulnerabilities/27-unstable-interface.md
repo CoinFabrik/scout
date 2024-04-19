@@ -21,6 +21,6 @@ The vulnerable code example can be found [`here`](https://github.com/CoinFabrik/
 ## Remediation
 
 
-The remediated code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/unstable-interface/unstable-interface-1/remediated-example)
+The remediated code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/unstable-interface/unstable-interface-1/remediated-example).
 ## References
 
