@@ -1,5 +1,5 @@
 [package]
-name = "psp22_base_contract"
+name = "psp22_base_contract-remediated"
 version = "0.1.0"
 authors = ["[your_name] <[your_email]>"]
 edition = "2021"
