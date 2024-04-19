@@ -49,4 +49,4 @@ Use instead:
 
 ### Implementation
 
-The detector's implementation can be found at [this link](https://github.com/CoinFabrik/scout/tree/main/detectors/iterators-over-indexing).
+The detector's implementation can be found at [this link](https://github.com/CoinFabrik/scout/tree/main/detectors/avoid-unsafe-block).
