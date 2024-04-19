@@ -83,8 +83,9 @@ impl<'tcx> AvoidAutokeyUpgradable {
         //check if the type is lazy
         if let TyKind::Path(QPath::Resolved(Some(ty), _)) = field.ty.kind
             && let TyKind::Path(QPath::Resolved(None, p)) = ty.kind
+            && let Some(did) = p.res.opt_def_id()
             && let def_path = cx
-                .get_def_path(p.res.def_id())
+                .get_def_path(did)
                 .iter()
                 .map(|x| x.to_string())
                 .join("::")
