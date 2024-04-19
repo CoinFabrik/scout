@@ -2,7 +2,7 @@
 
 ### What it does
 
-It tells not to use `Unsafe rust`.
+It tells not to use `Unsafe Rust`.
 
 ### Why is this bad?
 
