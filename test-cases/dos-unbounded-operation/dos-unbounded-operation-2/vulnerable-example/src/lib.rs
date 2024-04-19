@@ -1,5 +1,5 @@
 #![cfg_attr(not(feature = "std"), no_std)]
-
+#[allow(clippy::new_without_default)]
 #[ink::contract]
 mod dos_unbounded_operation_2 {
     use ink::prelude::vec::Vec;
