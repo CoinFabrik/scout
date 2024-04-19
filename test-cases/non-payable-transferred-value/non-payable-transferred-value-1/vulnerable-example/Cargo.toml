@@ -1,5 +1,5 @@
 [package]
-name = "non-payable-transferred-value"
+name = "non-payable-transferred-value-vulnerable"
 version = "0.1.0"
 edition = "2021"
 authors = ["[your_name] <[your_email]>"]
