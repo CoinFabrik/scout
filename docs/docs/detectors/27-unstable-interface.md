@@ -30,12 +30,9 @@ It is a function not available on production chains.
 
         ink::env::sr25519_verify(&signature, message.as_slice(), &pub_key).is_ok()
     }
-
-Use instead:
-
-```rust
-    //dont use it
 ```
+
+Do not use it
 
 ### Implementation
 
