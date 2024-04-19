@@ -19,7 +19,7 @@ It can introduce unexpected behaviour in the smart contract.
     pub fn exp_data_by_3(&mut self) {
         self.data ^= 3
     }
-
+```
 Use instead:
 
 ```rust
