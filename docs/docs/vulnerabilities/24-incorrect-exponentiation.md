@@ -1,4 +1,4 @@
-# Inconrrect Exponentiation
+# Incorrect Exponentiation
 
 ## Description
 
