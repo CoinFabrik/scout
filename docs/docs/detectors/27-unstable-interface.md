@@ -6,7 +6,7 @@ Warns about `sr25519()` usage.
 
 ### Why is this bad?
 
-It is a function not available io production chains.
+It is a function not available on production chains.
 
 #### More info
 
