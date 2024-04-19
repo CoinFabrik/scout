@@ -1,6 +1,6 @@
 [workspace]
 exclude = [".cargo", "target"]
-members = ["unstabl-interface-*/*"]
+members = ["unstable-interface-*/*"]
 resolver = "2"
 
 [workspace.dependencies]
