@@ -112,6 +112,7 @@ impl<'tcx> Visitor<'tcx> for AvoidAutokeyUpgradableVisitor<'tcx, '_> {
     fn visit_expr(&mut self, expr: &'tcx Expr<'tcx>) {
         if let Some(v) = expr.method_ident()
             && v.name.to_string() == SET_CODE_HASH_METHOD
+            && self.lazy_fields.len() > 0
         {
             let mut spans: MultiSpan = MultiSpan::from_spans(
                 self.lazy_fields
