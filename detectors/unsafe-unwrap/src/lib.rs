@@ -58,7 +58,7 @@ dylint_linting::declare_late_lint! {
         name: "Unsafe Unwrap",
         long_message: "This vulnerability class pertains to the inappropriate usage of the unwrap method in Rust, which is commonly employed for error handling. The unwrap method retrieves the inner value of an Option or Result, but if an error or None occurs, it triggers a panic and crashes the program.    ",
         severity: "Medium",
-        help: "https://github.com/CoinFabrik/scout-soroban/tree/main/detectors/unsafe-unwrap",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/unsafe-unwrap",
         vulnerability_class: "Validations and error handling",
     }
 }
