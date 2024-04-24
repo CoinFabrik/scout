@@ -1,0 +1,30 @@
+[package]
+name = "unrestricted_transfer_from-remediated"
+version = "0.1.0"
+authors = ["[your_name] <[your_email]>"]
+edition = "2021"
+
+[dependencies]
+ink = { workspace = true }
+scale = { workspace = true }
+scale-info = { workspace = true }
+#psp22 = { workspace = true }
+openbrush = { workspace = true }
+psp22_base_contract-remediated  = { workspace = true}
+
+[dev-dependencies]
+ink_e2e = { workspace = true }
+
+
+[lib]
+path = "src/lib.rs"
+
+[features]
+default = ["std"]
+std = [
+  "ink/std",
+  "scale/std",
+  "scale-info/std",
+]
+ink-as-dependency = []
+e2e-tests = []

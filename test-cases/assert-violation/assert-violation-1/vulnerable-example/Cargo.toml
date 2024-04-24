@@ -1,11 +1,11 @@
 [package]
-name = "assert_violation"
+name = "assert_violation_vulnerable-1"
 version = "0.1.0"
 authors = ["[your_name] <[your_email]>"]
 edition = "2021"
 
 [lib]
-path = "lib.rs"
+path = "src/lib.rs"
 
 [features]
 default = ["std"]
@@ -18,15 +18,10 @@ ink-as-dependency = []
 e2e-tests = []
 
 [dependencies]
-ink = { version = "4.2.1", default-features = false }
-scale = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive"] }
-scale-info = { version = "2.6", default-features = false, features = ["derive"], optional = true }
+ink = { workspace = true }
+scale = { workspace = true }
+scale-info = { workspace = true }
+
 
 [dev-dependencies]
-ink_e2e = "4.2.1"
-
-[profile.release]
-overflow-checks = false
-
-[profile.dev]
-overflow-checks = false
+ink_e2e = { workspace = true }

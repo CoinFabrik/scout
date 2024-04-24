@@ -1,0 +1,28 @@
+[package]
+name = "psp22_base_contract-vulnerable"
+version = "0.1.0"
+authors = ["[your_name] <[your_email]>"]
+edition = "2021"
+
+[dependencies]
+ink = { version = "5.0.0", default-features = false }
+openbrush = { git = "https://github.com/brushfam/openbrush-contracts", tag = "4.0.0", default-features = false, features = ["psp22"] }
+scale = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive"] }
+scale-info = { version = "2.3", default-features = false, features = ["derive"], optional = true }
+
+[dev-dependencies]
+ink_e2e = "=5.0.0"
+
+[lib]
+path = "src/lib.rs"
+
+[features]
+default = ["std"]
+std = [
+  "ink/std",
+  "scale/std",
+  "scale-info/std",
+  "openbrush/std",
+]
+ink-as-dependency = []
+e2e-tests = []
