@@ -8,7 +8,7 @@ use std::vec::Vec;
 
 use rustc_hir::{
     intravisit::{walk_expr, Visitor},
-    BlockCheckMode, Expr, ExprKind,
+    BlockCheckMode, Expr, ExprKind, UnsafeSource
 };
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::Span;
@@ -64,13 +64,12 @@ struct AvoidUnsafeBlockVisitor {
 
 impl<'tcx> Visitor<'tcx> for AvoidUnsafeBlockVisitor {
     fn visit_expr(&mut self, expr: &'tcx Expr<'tcx>) {
-        if let ExprKind::Block(block, _) = expr.kind
-            && let BlockCheckMode::UnsafeBlock(_) = block.rules
-        {
+        if let ExprKind::Block(block, _) = expr.kind {
+         if block.rules == BlockCheckMode::UnsafeBlock(UnsafeSource::UserProvided){
             self.is_unsafe = true;
             self.span.push(expr.span);
         }
-
+    }
         walk_expr(self, expr)
     }
 }
