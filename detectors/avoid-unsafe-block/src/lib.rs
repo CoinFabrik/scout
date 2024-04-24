@@ -8,7 +8,7 @@ use std::vec::Vec;
 
 use rustc_hir::{
     intravisit::{walk_expr, Visitor},
-    BlockCheckMode, Expr, ExprKind, UnsafeSource
+    BlockCheckMode, Expr, ExprKind, UnsafeSource,
 };
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::Span;
@@ -42,34 +42,29 @@ impl<'tcx> LateLintPass<'tcx> for AvoidUnsafeBlock {
         _: rustc_span::Span,
         _: rustc_span::def_id::LocalDefId,
     ) {
-        let mut unsafety = AvoidUnsafeBlockVisitor {
-            is_unsafe: false,
-            span: Vec::new(),
-        };
+        let mut unsafety = AvoidUnsafeBlockVisitor { span: Vec::new() };
 
         walk_expr(&mut unsafety, body.value);
 
-        if unsafety.is_unsafe {
-            for var in unsafety.span.iter() {
-                diagnostics::span_lint(cx, AVOID_UNSAFE_BLOCK, *var, LINT_MESSAGE)
-            }
-        }
+        unsafety
+            .span
+            .iter()
+            .for_each(|sp| diagnostics::span_lint(cx, AVOID_UNSAFE_BLOCK, *sp, LINT_MESSAGE));
     }
 }
 
 struct AvoidUnsafeBlockVisitor {
-    is_unsafe: bool,
     span: Vec<Span>,
 }
 
 impl<'tcx> Visitor<'tcx> for AvoidUnsafeBlockVisitor {
     fn visit_expr(&mut self, expr: &'tcx Expr<'tcx>) {
-        if let ExprKind::Block(block, _) = expr.kind {
-         if block.rules == BlockCheckMode::UnsafeBlock(UnsafeSource::UserProvided){
-            self.is_unsafe = true;
+        if let ExprKind::Block(block, _) = expr.kind
+            && block.rules == BlockCheckMode::UnsafeBlock(UnsafeSource::UserProvided)
+            && block.span.in_macro_expansion_with_collapse_debuginfo()
+        {
             self.span.push(expr.span);
         }
-    }
         walk_expr(self, expr)
     }
 }
