@@ -47,8 +47,10 @@ ink_e2e = { workspace = true }
 [profile.release]
 overflow-checks = false
 ```
+
 Use instead:
 
+```toml
 [package]
 name = "overflow-check-vulnerable-1"
 version = "0.1.0"
@@ -81,7 +83,7 @@ ink_e2e = { workspace = true }
 [profile.release]
 overflow-checks = true
 ```
-### Example
+
 
 ### Implementation
 
