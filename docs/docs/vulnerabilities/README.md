@@ -353,8 +353,14 @@ It's common to use `^` for exponentiation.  However in Rust, `^` is the XOR oper
 
 Check the following [documentation](24-incorrect-exponentiation.md) for a more detailed explanation of this vulnerability class.
 
-### 25 - Vec Considerations
+### 25 - Vec considerations
 
 The static buffer in ink! defaults to 16KB in size. If data overgrows this size, the contract will panic. Instead, when working with dynamically sized values, use faillible storage methods.
 
 Check the following [documentation](25-vec-considerations.md) for a more detailed explanation of this vulnerability class.
+
+### 26 - Avoid unsafe block
+
+Avoid using the `unsafe` block in Rust, as it can lead to memory unsafety and undefined behavior.
+
+Check the following [documentation](26-avoid-unsafe-block.md) for a more detailed explanation of this vulnerability class.
