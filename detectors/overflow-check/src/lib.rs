@@ -33,7 +33,7 @@ dylint_linting::declare_early_lint! {
         name: "Overflow Check",
         long_message: "An overflow/underflow is typically caught and generates an error. When it is not caught, the operation will result in an inexact result which could lead to serious problems.",
         severity: "Critical",
-        help: "https://github.com/CoinFabrik/scout-soroban/tree/main/detectors/overflow-check",
+        help: "TODO: ADD LINK",
         vulnerability_class: "Arithmetic",
     }
 }
