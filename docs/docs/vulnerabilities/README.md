@@ -376,3 +376,19 @@ Check the following [documentation](27-unstable-interface.md) for a more detaile
 When you’re compiling in release mode with the --release flag, Rust does not include checks for integer overflow that cause panics. This can lead to unexpected behavior in your contract because Rust will perform two’s complement wrapping and continue executing the program with the incorrect result.
 
 Check the following [documentation](28-overflow-check.md) for a more detailed explanation of this vulnerability class.
+
+### 29 - Avoid autokey upgradable
+
+
+
+Check the following [documentation](29-avoid-autokey-upgradable.md) for a more detailed explanation of this vulnerability class.
+
+### 30 - Non payable transferred value
+
+Check the following [documentation](30-non-payable-transferred-value.md) for a more detailed explanation of this vulnerability class.
+
+### 31 - Vector of tuples could be mapping
+
+Check the following [documentation](31-vec-could-be-mapping.md) for a more detailed explanation of this vulnerability class.
+
+
