@@ -364,3 +364,9 @@ Check the following [documentation](25-vec-considerations.md) for a more detaile
 Avoid using the `unsafe` block in Rust, as it can lead to memory unsafety and undefined behavior.
 
 Check the following [documentation](26-avoid-unsafe-block.md) for a more detailed explanation of this vulnerability class.
+
+### 27 - Unstable interface
+
+It is clear that any production code should not rely on unstable features, as they may change in future versions of the language. This is the case for `sr25529_verify` method.
+
+Check the following [documentation](27-unstable-interface.md) for a more detailed explanation of this vulnerability class.

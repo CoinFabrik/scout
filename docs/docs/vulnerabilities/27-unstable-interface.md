@@ -39,5 +39,5 @@ The vulnerable code example can be found [`here`](https://github.com/CoinFabrik/
 Because of that do not use the `sr25519_verify` function.
 
 The remediated code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/unstable-interface/unstable-interface-1/remediated-example).
-## References
+
 
