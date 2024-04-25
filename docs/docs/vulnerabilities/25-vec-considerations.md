@@ -8,6 +8,8 @@
 - Test Cases: [`vec-considerations-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/vec-considerations/vec-considerations-1)
 
 
+Since ink!'s static buffer defaults to 16KB in size, there can be issues when working with storage methods for data structures such as `Mapping` or `StorageVec`. To prevent the contract for panicking, use `try_` (fallible) storage methods.
+
 ## Exploit Scenario
 
 Consider the following `ink!` contract:
@@ -48,3 +50,5 @@ The remediated code example can be found [`here`](https://github.com/CoinFabrik/
 
 ## References
 
+- https://docs.rs/ink_storage/5.0.0/ink_storage/struct.StorageVec.html
+- https://use.ink/datastructures/storagevec/
