@@ -3,20 +3,17 @@
 #![feature(let_chains)]
 extern crate rustc_hir;
 extern crate rustc_span;
-
 use std::collections::HashMap;
 
 use rustc_hir::{
     intravisit::{walk_expr, Visitor},
-    Expr, ExprKind, QPath, TyKind,
+    Expr, ExprKind, GenericArg, QPath, Ty, TyKind,
 };
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::symbol::Ident;
 use rustc_span::Span;
 use scout_audit_clippy_utils::diagnostics::span_lint_and_help;
-
 const LINT_MESSAGE: &str = "Do not use these method with an unsized (dynamically sized) type.";
-
 dylint_linting::impl_late_lint! {
     pub VEC_CONSIDERATIONS,
     Warn,
@@ -30,47 +27,66 @@ dylint_linting::impl_late_lint! {
         vulnerability_class: "Best practices",
     }
 }
-
 const INK_MAPPING_TYPE: &str = "ink_storage::lazy::mapping::Mapping";
 const INK_VEC_STORAGE_TYPE: &str = "ink_storage::lazy::vec::StorageVec";
-const FUNCTIONS_TO_CHECK: [&str; 5] = ["insert", "pop", "push", "set", "peek"];
-
+const FUNCTIONS_TO_CHECK: [&str; 6] = ["insert", "pop", "push", "set", "peek", "get"];
+const UNSIZED_TYPES: [&str; 2] = ["String", "Vec"];
 pub fn method_is_wanted(method: &str) -> bool {
     FUNCTIONS_TO_CHECK.contains(&method)
 }
-
 #[derive(Default)]
 pub struct VecConsiderations {
     mapping_fields: HashMap<Ident, Span>,
 }
-
 impl VecConsiderations {
     pub fn new() -> Self {
         Self::default()
     }
 }
-
+fn is_lazy_type_with_unsized_generic_arg<'tcx>(
+    cx: &LateContext<'_>,
+    field: &'tcx rustc_hir::FieldDef<'tcx>,
+) -> Option<String> {
+    // first check if the ty is a lazy/buffered type
+    if let TyKind::Path(QPath::Resolved(Some(ty), _)) = field.ty.kind
+        && let TyKind::Path(QPath::Resolved(None, p)) = ty.kind
+        && p.res.opt_def_id().is_some()
+        // any generic arg of the type is a known unsized type
+        && p.segments.iter().any(|seg| {
+            seg.args().args.iter().any(|arg| {
+                if let GenericArg::Type(Ty { kind, .. }) = arg
+                    && let TyKind::Path(QPath::Resolved(_, pth)) = kind
+                {
+                    pth.segments.iter().any(|&pthsgs| {
+                        UNSIZED_TYPES.contains(&pthsgs.ident.name.to_string().as_str())
+                    })
+                } else {
+                    false
+                }
+            })
+        })
+    {
+        //if it is, return the def_path of the type
+        return cx
+            .get_def_path(p.res.def_id())
+            .iter()
+            .map(|x| x.to_string())
+            .reduce(|a, b| a + "::" + &b);
+    };
+    None
+}
 impl<'tcx> VecConsiderations {
     fn is_lazy_storage(
         &self,
         cx: &LateContext<'_>,
         field: &'tcx rustc_hir::FieldDef<'tcx>,
     ) -> bool {
-        if let TyKind::Path(QPath::Resolved(Some(ty), _)) = field.ty.kind
-            && let TyKind::Path(QPath::Resolved(None, p)) = ty.kind
-            && p.res.opt_def_id().is_some()
-            && let Some(def_path) = cx
-                .get_def_path(p.res.def_id())
-                .iter()
-                .map(|x| x.to_string())
-                .reduce(|a, b| a + "::" + &b)
-        {
+        if let Some(def_path) = is_lazy_type_with_unsized_generic_arg(cx, field) {
             return def_path == INK_MAPPING_TYPE || def_path == INK_VEC_STORAGE_TYPE;
         }
         false
     }
 }
-
 impl<'tcx> LateLintPass<'tcx> for VecConsiderations {
     fn check_fn(
         &mut self,
@@ -87,19 +103,16 @@ impl<'tcx> LateLintPass<'tcx> for VecConsiderations {
         };
         walk_expr(&mut aau_storage, body.value);
     }
-
     fn check_field_def(&mut self, cx: &LateContext<'tcx>, field: &'tcx rustc_hir::FieldDef<'tcx>) {
         if self.is_lazy_storage(cx, field) {
             self.mapping_fields.insert(field.ident, field.span);
         }
     }
 }
-
 struct VecConsiderationsVisitor<'tcx, 'tcx_ref> {
     cx: &'tcx_ref LateContext<'tcx>,
     mapping_fields: &'tcx_ref mut HashMap<Ident, Span>,
 }
-
 impl<'tcx> Visitor<'tcx> for VecConsiderationsVisitor<'tcx, '_> {
     fn visit_expr(&mut self, expr: &'tcx Expr<'tcx>) {
         if let ExprKind::MethodCall(p, q, _, _) = expr.kind
@@ -129,7 +142,6 @@ impl<'tcx> Visitor<'tcx> for VecConsiderationsVisitor<'tcx, '_> {
                 ),
             );
         }
-
         walk_expr(self, expr)
     }
 }
