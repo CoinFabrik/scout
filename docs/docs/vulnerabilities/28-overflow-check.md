@@ -3,8 +3,8 @@
 ## Description 
 - Vulnerability Category: `Arithmetic`
 - Vulnerability Severity: `Critical`
-- Detectors: [`oveflow-check`]()
-- Test Cases: [`overflow-check`]()
+- Detectors: [`oveflow-check`](https://github.com/CoinFabrik/scout/tree/main/detectors)
+- Test Cases: [`overflow-check`](https://github.com/CoinFabrik/scout/tree/main/test-cases)
 
 Relying on integer overflow rust’s wrapping behavior is considered an error. The program won't panic, but the result of the arithmetic operation will be incorrect.
 
