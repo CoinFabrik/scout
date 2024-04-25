@@ -357,4 +357,4 @@ Check the following [documentation](24-incorrect-exponentiation.md) for a more d
 
 The static buffer in ink! defaults to 16KB in size. If data overgrows this size, the contract will panic. Instead, when working with dynamically sized values, use faillible storage methods.
 
-Check the following [documentation](25-vec-consideration.md) for a more detailed explanation of this vulnerability class.
+Check the following [documentation](25-vec-considerations.md) for a more detailed explanation of this vulnerability class.
