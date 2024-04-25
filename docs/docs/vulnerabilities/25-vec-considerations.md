@@ -8,7 +8,7 @@
 - Test Cases: [`vec-considerations-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/vec-considerations/vec-considerations-1)
 
 
-Since ink!'s static buffer defaults to 16KB in size, there can be issues when working with storage methods for data structures such as `Mapping` or `StorageVec`. To prevent the contract for panicking, use `try_` (fallible) storage methods.
+Avoid using fallible methods like `insert`, `pop`, `push`, `set` or `peek`  with an unsized (dynamically sized) type. To prevent the contract for panicking, use `try_` (fallible) storage methods.
 
 ## Exploit Scenario
 
@@ -25,13 +25,13 @@ Consider the following `ink!` contract:
     }
 ```
 
-The problem arises from the use of `.insert()` since Ink!'s static buffer defaults to 16KB in size. If data overgrows this size, the contract will panic!.
+The problem arises from the use of `.insert()` since `ink!`'s static buffer defaults to 16KB in size. If data overgrows this size, the contract will `panic!`.
 
 The vulnerable code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/vec-considerations/vec-considerations-1/vulnerable-example).
 
 ## Remediation
 
-Instead, when working with dynamically sized values, use faillible storage methods. For instance:
+Instead, when working with dynamically sized values, use fallible storage methods. For instance:
 
 ```rust
     #[ink(message)]
