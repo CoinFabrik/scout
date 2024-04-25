@@ -1,14 +1,16 @@
 #![feature(rustc_private)]
 #![warn(unused_extern_crates)]
 
+extern crate rustc_ast;
 extern crate rustc_hir;
 extern crate rustc_span;
 
 use if_chain::if_chain;
+use rustc_ast::BinOpKind;
 use rustc_hir::def_id::LocalDefId;
 use rustc_hir::intravisit::{walk_expr, FnKind};
 use rustc_hir::intravisit::{walk_stmt, Visitor};
-use rustc_hir::{Body, FnDecl, Stmt};
+use rustc_hir::{Body, FnDecl, QPath, Stmt, TyKind};
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::Span;
@@ -117,21 +119,53 @@ impl<'tcx> LateLintPass<'tcx> for Reentrancy1 {
             }
             None
         }
+        fn check_reentry_flag<'tcx>(expr: &Expr) -> bool {
+            if_chain! {
+                if let ExprKind::Path(path) = expr.kind;
+                if let QPath::TypeRelative(ty, segment) = path;
+                if segment.ident.name.to_string() == "ALLOW_REENTRY";
+                if let TyKind::Path(QPath::Resolved(_, path)) = ty.kind;
+                if path.segments
+                    .iter()
+                    .map(|seg| seg.ident.name.to_string())
+                    .collect::<Vec<_>>()
+                    .eq(&["ink", "env", "CallFlags"]);
+                then {
+                    true
+                } else {
+                    false
+                }
+            }
+        }
         fn check_allow_reentrancy(expr: &Expr) -> bool {
             if_chain! {
             if let ExprKind::MethodCall(func, _, args, _) = &expr.kind;
             if let function_name = func.ident.name.to_string();
-            if function_name.contains("set_allow_reentry");
-            then {
+                then {
                     if_chain! {
+                        if function_name.contains("set_allow_reentry");
                         if let ExprKind::Lit(lit) = &args[0].kind;
                         if &lit.node.to_string() == "true";
                         then {
                             return true;
                         }
                     }
+                    if function_name.contains("call_flags") {
+                        if check_reentry_flag(&args[0]) {
+                            return true;
+                        }
+                        if_chain! {
+                            if let ExprKind::Binary(op, lval, rval) = &args[0].kind;
+                            if op.node == BinOpKind::BitOr || op.node == BinOpKind::BitXor;
+                            if check_reentry_flag(lval) || check_reentry_flag(rval);
+                            then {
+                                return true;
+                            }
+                        }
+                    }
                 }
             }
+
             false
         }
         fn check_state_change(s: &Stmt) -> bool {
