@@ -346,3 +346,15 @@ This vulnerability falls under the [Known Bugs](#vulnerability-categories) categ
 and has a Critical severity.
 
 Check the following [documentation](23-lazy-delegate.md) for a more detailed explanation of this vulnerability class.
+
+### 24 - Incorrect exponentiation
+
+It's common to use `^` for exponentiation.  However in Rust, `^` is the XOR operator. If the `^` operator is used, it could lead to unexpected behaviour in the contract. It's recommended to use the method `pow()` for exponentiation or `.bitxor()` for XOR operations.
+
+Check the following [documentation](24-incorrect-exponentiation.md) for a more detailed explanation of this vulnerability class.
+
+### 25 - Vec Considerations
+
+The static buffer in ink! defaults to 16KB in size. If data overgrows this size, the contract will panic. Instead, when working with dynamically sized values, use faillible storage methods.
+
+Check the following [documentation](25-vec-consideration.md) for a more detailed explanation of this vulnerability class.
