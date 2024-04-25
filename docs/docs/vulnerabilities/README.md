@@ -370,3 +370,9 @@ Check the following [documentation](26-avoid-unsafe-block.md) for a more detaile
 It is clear that any production code should not rely on unstable features, as they may change in future versions of the language. This is the case for `sr25529_verify` method.
 
 Check the following [documentation](27-unstable-interface.md) for a more detailed explanation of this vulnerability class.
+
+### 28 - Overflow check
+
+When you’re compiling in release mode with the --release flag, Rust does not include checks for integer overflow that cause panics. This can lead to unexpected behavior in your contract because Rust will perform two’s complement wrapping and continue executing the program with the incorrect result.
+
+Check the following [documentation](28-overflow-check.md) for a more detailed explanation of this vulnerability class.
