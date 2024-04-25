@@ -1,0 +1,23 @@
+[package]
+name = "vault-vulnerable-2"
+version = "0.1.0"
+edition = "2021"
+authors = ["[your_name] <[your_email]>"]
+
+[lib]
+path = "src/lib.rs"
+
+[features]
+default = ["std"]
+std = [
+    "ink/std",
+]
+ink-as-dependency = []
+e2e-tests = []
+
+
+[dependencies]
+ink = { version = "5.0.0", default-features = false }
+
+[dev-dependencies]
+ink_e2e = { version = "5.0.0" }
