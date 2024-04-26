@@ -1,19 +1,19 @@
 #![cfg_attr(not(feature = "std"), no_std, no_main)]
 
 #[ink::contract]
-pub mod vec_considerations {
+pub mod buffering_unsized_types {
     use ink::prelude::{format, string::String};
     use ink::storage::{Mapping, StorageVec};
 
     #[derive(Default)]
     #[ink(storage)]
-    pub struct VecConsiderations {
+    pub struct BufferingUnsizedTypes {
         on_chain_log: Mapping<AccountId, String>,
         donations: StorageVec<String>,
         test: Mapping<AccountId, Balance>,
     }
 
-    impl VecConsiderations {
+    impl BufferingUnsizedTypes {
         #[ink(constructor)]
         pub fn new() -> Self {
             Self::default()
