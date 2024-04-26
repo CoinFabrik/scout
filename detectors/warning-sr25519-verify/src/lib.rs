@@ -19,10 +19,10 @@ dylint_linting::declare_late_lint! {
     Warn,
     LINT_MESSAGE,
     {
-        name: "Warning sr25529 verify",
+        name: "Warning sr25519 verify",
         long_message: LINT_MESSAGE,
         severity: "Medium",
-        help: "https://github.com/CoinFabrik/scout-soroban/tree/main/detectors/warning-sr25529-verify",
+        help: "https://github.com/CoinFabrik/scout-soroban/tree/main/detectors/warning-sr25519-verify",
         vulnerability_class: "Known Bugs",
     }
 }
