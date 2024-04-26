@@ -25,7 +25,7 @@ mod vec_could_be_mapping {
         }
         /// Returns the percentage difference between two values.
         #[ink(message)]
-        pub fn get_percentage_difference(&mut self, acc: AccountId) -> Result<Balance, Error> {
+        pub fn get_balance(&mut self, acc: AccountId) -> Result<Balance, Error> {
             self.balances.get(&acc).ok_or(Error::NotFound)
         }
     }
