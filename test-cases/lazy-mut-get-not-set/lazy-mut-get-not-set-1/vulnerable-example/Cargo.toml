@@ -1,0 +1,32 @@
+[package]
+name = "lazy-mut-get-not-set-vulnerable"
+version = "0.1.0"
+edition = "2021"
+authors = ["[your_name] <[your_email]>"]
+
+[lib]
+path = "src/lib.rs"
+
+[features]
+default = ["std"]
+std = [
+    "ink/std",
+    "scale/std",
+    "scale-info/std",
+]
+ink-as-dependency = []
+e2e-tests = []
+
+
+[dependencies]
+ink = { workspace = true }
+scale = { workspace = true }
+scale-info = { workspace = true }
+
+[dev-dependencies]
+ink_e2e = { workspace = true }
+[profile.dev]
+overflow-checks = false
+
+[profile.release]
+overflow-checks = false
