@@ -1,5 +1,5 @@
 [package]
-name = "unstable-interface"
+name = "warning-sr25519-verify"
 version = "0.1.0"
 edition = "2021"
 

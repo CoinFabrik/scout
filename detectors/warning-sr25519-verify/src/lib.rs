@@ -15,19 +15,19 @@ use scout_audit_clippy_utils::diagnostics::span_lint_and_help;
 const LINT_MESSAGE: &str = "This function is from the unstable interface, which is unsafe and normally is not available on production chains.";
 
 dylint_linting::declare_late_lint! {
-    pub UNSTABLE_INTERFACE,
+    pub WARNING_SR25519_VERIFY,
     Warn,
     LINT_MESSAGE,
     {
-        name: "Unstable Interface",
+        name: "Warning sr25519 verify",
         long_message: LINT_MESSAGE,
         severity: "Medium",
-        help: "https://github.com/CoinFabrik/scout-soroban/tree/main/detectors/unstable-interface",
+        help: "https://github.com/CoinFabrik/scout-soroban/tree/main/detectors/warning-sr25519-verify",
         vulnerability_class: "Known Bugs",
     }
 }
 
-impl<'tcx> LateLintPass<'tcx> for UnstableInterface {
+impl<'tcx> LateLintPass<'tcx> for WarningSr25519Verify {
     fn check_fn(
         &mut self,
         cx: &rustc_lint::LateContext<'tcx>,
@@ -37,12 +37,12 @@ impl<'tcx> LateLintPass<'tcx> for UnstableInterface {
         _: rustc_span::Span,
         _: rustc_hir::def_id::LocalDefId,
     ) {
-        struct UnstableInterfaceVisitor {
+        struct WarningSr25519VerifyVisitor {
             has_sr25519_verify: bool,
             has_sr25519_verify_span: Vec<Span>,
         }
 
-        impl<'tcx> Visitor<'tcx> for UnstableInterfaceVisitor {
+        impl<'tcx> Visitor<'tcx> for WarningSr25519VerifyVisitor {
             fn visit_expr(&mut self, expr: &'tcx Expr<'_>) {
                 if let ExprKind::Path(QPath::Resolved(_, path)) = &expr.kind
                     && path
@@ -58,7 +58,7 @@ impl<'tcx> LateLintPass<'tcx> for UnstableInterface {
             }
         }
 
-        let mut visitor = UnstableInterfaceVisitor {
+        let mut visitor = WarningSr25519VerifyVisitor {
             has_sr25519_verify: false,
             has_sr25519_verify_span: Vec::new(),
         };
@@ -68,7 +68,7 @@ impl<'tcx> LateLintPass<'tcx> for UnstableInterface {
         for span in visitor.has_sr25519_verify_span {
             span_lint_and_help(
                 cx,
-                UNSTABLE_INTERFACE,
+                WARNING_SR25519_VERIFY,
                 span,
                 LINT_MESSAGE,
                 None,
