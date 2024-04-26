@@ -379,8 +379,6 @@ Check the following [documentation](28-overflow-check.md) for a more detailed ex
 
 ### 29 - Avoid autokey upgradable
 
-
-
 Check the following [documentation](29-avoid-autokey-upgradable.md) for a more detailed explanation of this vulnerability class.
 
 ### 30 - Non payable transferred value
@@ -391,4 +389,8 @@ Check the following [documentation](30-non-payable-transferred-value.md) for a m
 
 Check the following [documentation](31-vec-could-be-mapping.md) for a more detailed explanation of this vulnerability class.
 
+### 31 - Don't use invoke contract v1
 
+This is a low level way to evaluate another smart contract. Prefer to use the ink! guided and type safe approach to using this.
+
+Check the following [documentation](32-dont-use-invoke-contract-v1.md) for a more detailed explanation of this vulnerability class.
