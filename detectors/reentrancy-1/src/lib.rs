@@ -119,7 +119,7 @@ impl<'tcx> LateLintPass<'tcx> for Reentrancy1 {
             }
             None
         }
-        fn check_reentry_flag<'tcx>(expr: &Expr) -> bool {
+        fn check_reentry_flag(expr: &Expr) -> bool {
             if_chain! {
                 if let ExprKind::Path(path) = expr.kind;
                 if let QPath::TypeRelative(ty, segment) = path;
