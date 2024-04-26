@@ -1,66 +1,97 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-#[allow(clippy::new_without_default)]
-#[ink::contract]
-mod dos_unbounded_operation {
-    use ink::storage::Mapping;
+pub use self::vault::{Vault, VaultRef};
 
-    /// A payment to be made to an account.
-    #[derive(Debug, scale::Decode, scale::Encode)]
-    #[cfg_attr(
-        feature = "std",
-        derive(scale_info::TypeInfo, ink::storage::traits::StorageLayout)
-    )]
-    pub struct Payee {
-        /// The account to which the payment is to be made.
-        pub address: AccountId,
-        /// The amount to be paid.
-        pub value: Balance,
-    }
+#[ink::contract]
+mod vault {
+    use ink::{
+        env::call::{build_call, Selector},
+        storage::Mapping,
+    };
 
     #[ink(storage)]
-    pub struct DosUnboundedOperation {
-        /// The payees of the operation.
-        payees: Mapping<u128, Payee>,
-        /// The next payee index.
-        next_payee_ix: u128,
+    pub struct Vault {
+        /// Balances of accounts.
+        balances: Mapping<AccountId, Balance>,
     }
 
-    impl DosUnboundedOperation {
+    impl Vault {
         /// Creates a new instance of the contract.
         #[ink(constructor)]
         pub fn new() -> Self {
             Self {
-                payees: Mapping::new(),
-                next_payee_ix: 0,
+                balances: Mapping::default(),
             }
         }
 
-        /// Adds a new payee to the operation.
+        /// Deposits the sent amount into the vault.
         #[ink(message, payable)]
-        pub fn add_payee(&mut self) -> u128 {
-            let address = self.env().caller();
-            let value = self.env().transferred_value();
-            let new_payee = Payee { address, value };
-
-            self.payees.insert(self.next_payee_ix, &new_payee);
-            self.next_payee_ix.checked_add(1).unwrap();
-
-            // Return the index of the new payee
-            self.next_payee_ix.checked_sub(1).unwrap()
+        pub fn deposit(&mut self) -> Balance {
+            let caller_addr = self.env().caller();
+            let caller_balance = self.balances.get(caller_addr).unwrap_or(0);
+            let updated_balance = caller_balance + self.env().transferred_value();
+            self.balances.insert(caller_addr, &updated_balance);
+            updated_balance
         }
 
-        /// Returns the payee at the given index.
+        /// Returns the current balance of the given account.
         #[ink(message)]
-        pub fn get_payee(&self, id: u128) -> Option<Payee> {
-            self.payees.get(id)
+        pub fn balance(&mut self, account: AccountId) -> Balance {
+            self.balances.get(account).unwrap_or(0)
         }
 
-        /// Pays out to the payee at the given index.
+        /// Withdraws the given amount from the vault.
         #[ink(message)]
-        pub fn pay_out(&mut self, payee: u128) {
-            let payee = self.payees.get(payee).unwrap();
-            self.env().transfer(payee.address, payee.value).unwrap();
+        pub fn withdraw(&mut self, amount: Balance) -> Balance {
+            let caller_addr = self.env().caller();
+            let caller_balance = self.balances.get(caller_addr).unwrap_or(0);
+            if amount <= caller_balance {
+                let updated_balance = caller_balance - amount;
+                if self.env().transfer(self.env().caller(), amount).is_err() {
+                    panic!("requested transfer failed.")
+                }
+                self.balances.insert(caller_addr, &updated_balance);
+                updated_balance
+            } else {
+                panic!("amount > balance")
+            }
+        }
+
+        /// Calls the given address with the given amount and selector.
+        #[ink(message)]
+        pub fn call_with_value(
+            &mut self,
+            address: AccountId,
+            amount: Balance,
+            selector: u32,
+        ) -> Balance {
+            ink::env::debug_println!(
+                "call_with_value function called from {:?}",
+                self.env().caller()
+            );
+            let caller_addr = self.env().caller();
+            let caller_balance = self.balances.get(caller_addr).unwrap_or(0);
+            if amount <= caller_balance {
+                //The call is built without allowing reentrancy calls
+                let call = build_call::<ink::env::DefaultEnvironment>()
+                    .call(address)
+                    .transferred_value(amount)
+                    .exec_input(ink::env::call::ExecutionInput::new(Selector::new(
+                        selector.to_be_bytes(),
+                    )))
+                    .returns::<()>()
+                    .params();
+                self.env()
+                    .invoke_contract(&call)
+                    .unwrap_or_else(|err| panic!("Err {:?}", err))
+                    .unwrap_or_else(|err| panic!("LangErr {:?}", err));
+                self.balances
+                    .insert(caller_addr, &(caller_balance - amount));
+
+                caller_balance - amount
+            } else {
+                caller_balance
+            }
         }
     }
 }

@@ -1,87 +1,97 @@
-#![cfg_attr(not(feature = "std"), no_std, no_main)]
+#![cfg_attr(not(feature = "std"), no_std)]
+
+pub use self::vault::{Vault, VaultRef};
 
 #[ink::contract]
-mod delegate_call {
-
-    use ink::env::{
-        call::{build_call, ExecutionInput, Selector},
-        invoke_contract_v1, DefaultEnvironment,
+mod vault {
+    use ink::{
+        env::call::{build_call, Selector},
+        storage::Mapping,
     };
 
     #[ink(storage)]
-    pub struct DelegateCall {
-        admin: AccountId,
-        addresses: [AccountId; 3],
-        percent1: u128,
-        percent2: u128,
-        percent3: u128,
+    pub struct Vault {
+        /// Balances of accounts.
+        balances: Mapping<AccountId, Balance>,
     }
 
-    #[derive(Debug, PartialEq, Eq, Clone, scale::Encode, scale::Decode)]
-    #[cfg_attr(feature = "std", derive(::scale_info::TypeInfo))]
-    pub enum Error {
-        NotEnoughMoney,
-        DelegateCallFailed,
-        TransferFailed,
-    }
-
-    impl DelegateCall {
-        /// Creates a new instance of the contract
+    impl Vault {
+        /// Creates a new instance of the contract.
         #[ink(constructor)]
-        pub fn new(
-            address1: AccountId,
-            address2: AccountId,
-            address3: AccountId,
-            percent1: u128,
-            percent2: u128,
-            percent3: u128,
-        ) -> Self {
+        pub fn new() -> Self {
             Self {
-                admin: Self::env().caller(),
-                addresses: [address1, address2, address3],
-                percent1,
-                percent2,
-                percent3,
+                balances: Mapping::default(),
             }
         }
 
-        /// Returns the addresses of the payees
-        #[ink(message)]
-        pub fn get_addresses(&self) -> [AccountId; 3] {
-            self.addresses
-        }
-
-        /// Returns the percentages of the payees
-        #[ink(message)]
-        pub fn get_percentages(&self) -> (u128, u128, u128) {
-            (self.percent1, self.percent2, self.percent3)
-        }
-
-        /// Delegates the fee calculation and pays the results to the corresponding addresses
+        /// Deposits the sent amount into the vault.
         #[ink(message, payable)]
-        pub fn ask_payouts(&mut self, target: Hash) -> Result<(), Error> {
-            let amount = self.env().transferred_value();
+        pub fn deposit(&mut self) -> Balance {
+            let caller_addr = self.env().caller();
+            let caller_balance = self.balances.get(caller_addr).unwrap_or(0);
+            let updated_balance = caller_balance + self.env().transferred_value();
+            self.balances.insert(caller_addr, &updated_balance);
+            updated_balance
+        }
 
-            let accounts = ink::env::tests
+        /// Returns the current balance of the given account.
+        #[ink(message)]
+        pub fn balance(&mut self, account: AccountId) -> Balance {
+            self.balances.get(account).unwrap_or(0)
+        }
 
-            invoke_contract_v1(&accounts);
+        /// Withdraws the given amount from the vault.
+        #[ink(message)]
+        pub fn withdraw(&mut self, amount: Balance) -> Balance {
+            let caller_addr = self.env().caller();
+            let caller_balance = self.balances.get(caller_addr).unwrap_or(0);
+            if amount <= caller_balance {
+                let updated_balance = caller_balance - amount;
+                if self.env().transfer(self.env().caller(), amount).is_err() {
+                    panic!("requested transfer failed.")
+                }
+                self.balances.insert(caller_addr, &updated_balance);
+                updated_balance
+            } else {
+                panic!("amount > balance")
+            }
+        }
 
-            //let total = result.0 + result.1 + result.2;
-            //if total > amount {
-            //    return Err(Error::NotEnoughMoney);
-            //}
+        /// Calls the given address with the given amount and selector.
+        #[ink(message)]
+        pub fn call_with_value(
+            &mut self,
+            address: AccountId,
+            amount: Balance,
+            selector: u32,
+        ) -> Balance {
+            ink::env::debug_println!(
+                "call_with_value function called from {:?}",
+                self.env().caller()
+            );
+            let caller_addr = self.env().caller();
+            let caller_balance = self.balances.get(caller_addr).unwrap_or(0);
+            if amount <= caller_balance {
+                //The call is built without allowing reentrancy calls
+                let call = build_call::<ink::env::DefaultEnvironment>()
+                    .call_v1(address)
+                    .transferred_value(amount)
+                    .exec_input(ink::env::call::ExecutionInput::new(Selector::new(
+                        selector.to_be_bytes(),
+                    )))
+                    .returns::<()>()
+                    .params();
+                self.env()
+                    .invoke_contract_v1(&call)
+                    .unwrap_or_else(|err| panic!("Err {:?}", err))
+                    .unwrap_or_else(|err| panic!("LangErr {:?}", err));
+                self.balances
+                    .insert(caller_addr, &(caller_balance - amount));
 
-            //self.env()
-            //    .transfer(self.addresses[0], result.0)
-            //    .map_err(|_| Error::TransferFailed)?;
-            //self.env()
-            //    .transfer(self.addresses[1], result.1)
-            //    .map_err(|_| Error::TransferFailed)?;
-            //self.env()
-            //    .transfer(self.addresses[2], result.2)
-            //    .map_err(|_| Error::TransferFailed)?;
-
-            Ok(())
+                caller_balance - amount
+            } else {
+                caller_balance
+            }
         }
     }
 }

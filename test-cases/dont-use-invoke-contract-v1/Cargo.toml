@@ -22,9 +22,3 @@ strip = "symbols"
 [profile.release-with-logs]
 debug-assertions = true
 inherits = "release"
-
-[workspace.metadata.dylint]
-libraries = [
-
-   { path = "/home/cami/Desktop/coinfabrik/scout/detectors/dont-use-invoke-contract-v1"},
-]
