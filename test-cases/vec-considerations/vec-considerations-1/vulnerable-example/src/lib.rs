@@ -4,7 +4,6 @@
 pub mod vec_considerations {
     use ink::prelude::{format, string::String};
     use ink::storage::{Mapping, StorageVec};
-    use scale_info::prelude::vec::Vec;
 
     #[derive(Default)]
     #[ink(storage)]
