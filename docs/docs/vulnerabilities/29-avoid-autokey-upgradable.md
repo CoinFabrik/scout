@@ -12,7 +12,6 @@
 Consider the following contract:
 
 ```rust
-
     #[ink(storage)]
     pub struct AvoidAutoKeyUpgradable {
         balances: Mapping<AccountId, Balances>,
@@ -49,7 +48,6 @@ When you have a contract that has any kind of `Lazy` storage (`Lazy`, `Mapping` 
 Use `ManualKey` to ensure that the `Lazy` storage has a fixed key. You can use either a literal value or an Enum variant.
 
 ```rust
-
     pub enum Keys {
         TotalSupply,
     }
@@ -80,9 +78,8 @@ Use `ManualKey` to ensure that the `Lazy` storage has a fixed key. You can use e
         }
         /* --- snip --- */
     }
-
+```
 
 ## References
 
 - https://use.ink/datastructures/storage-layout
-```
