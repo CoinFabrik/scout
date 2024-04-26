@@ -21,9 +21,9 @@ dylint_linting::declare_late_lint! {
     {
         name: "Dont use invoke_contract_v1",
         long_message: LINT_MESSAGE,
-        severity: " ",
+        severity: "Enhancement",
         help: "https://github.com/CoinFabrik/scout-soroban/tree/main/detectors/dont-use-invoke-contract-v1",
-        vulnerability_class: " ",
+        vulnerability_class: "Best practices",
     }
 }
 
