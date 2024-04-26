@@ -19,10 +19,10 @@ dylint_linting::declare_late_lint! {
     Warn,
     LINT_MESSAGE,
     {
-        name: "Unstable Interface",
+        name: "Warning sr25529 verify",
         long_message: LINT_MESSAGE,
         severity: "Medium",
-        help: "https://github.com/CoinFabrik/scout-soroban/tree/main/detectors/unstable-interface",
+        help: "https://github.com/CoinFabrik/scout-soroban/tree/main/detectors/warning-sr25529-verify",
         vulnerability_class: "Known Bugs",
     }
 }
