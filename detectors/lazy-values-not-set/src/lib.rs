@@ -119,21 +119,14 @@ impl<'tcx> LateLintPass<'tcx> for LazyValuesNotSet {
             self.mapping_get_defid = visitor.mapping_get_defid;
         }
 
-        //save function defid in a vec
-        self.funcs_defids.push(id.to_def_id());
-    }
-
-    fn check_crate_post(&mut self, cx: &LateContext<'tcx>) {
-        for func_defid in self.funcs_defids.clone() {
-            let (_, hm) = self.get_func_info(cx, func_defid, &vec![], &vec![], &mut vec![]);
-            for val in hm.values() {
-                scout_audit_clippy_utils::diagnostics::span_lint(
-                    cx,
-                    LAZY_VALUES_NOT_SET,
-                    *val,
-                    LINT_MESSAGE,
-                );
-            }
+        let (_, hm) = self.get_func_info(cx, id.to_def_id(), &vec![], &vec![], &mut vec![]);
+        for val in hm.values() {
+            scout_audit_clippy_utils::diagnostics::span_lint(
+                cx,
+                LAZY_VALUES_NOT_SET,
+                *val,
+                LINT_MESSAGE,
+            );
         }
     }
 }
