@@ -1,0 +1,26 @@
+[workspace]
+exclude = [".cargo", "target"]
+members = ["lazy-values-not-set-*/*"]
+resolver = "2"
+
+[workspace.dependencies]
+ink = { version = "5.0.0", default-features = false }
+scale = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive"] }
+scale-info = { version = "2.6", default-features = false, features = ["derive"]}
+ink_e2e = { version = "=5.0.0" }
+
+
+[profile.release]
+codegen-units = 1
+debug = 0
+debug-assertions = false
+lto = true
+opt-level = "z"
+overflow-checks = false
+panic = "abort"
+strip = "symbols"
+
+[profile.release-with-logs]
+debug-assertions = true
+inherits = "release"
+
