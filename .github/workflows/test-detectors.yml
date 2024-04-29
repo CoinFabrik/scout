@@ -118,17 +118,10 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cargo
-<<<<<<< HEAD
-          key: ${{ runner.os }}-tests-${{ hashFiles('**/Cargo.lock') }}
-
-      - name: Run unit and integration tests
-        run: python scripts/run-tests.py --detector=${{ matrix.detector }}
-=======
           key: ${{ runner.os }}-tests-${{ hashFiles('**/Cargo.lock') }}.
-# This is broken until ink! solves stdsimd problem.
-#      - name: Run unit and integration tests
-#        run: python scripts/run-tests.py --detector=${{ matrix.detector }}
->>>>>>> main
+  # This is broken until ink! solves stdsimd problem.
+  #      - name: Run unit and integration tests
+  #        run: python scripts/run-tests.py --detector=${{ matrix.detector }}
 
   comment-on-pr:
     name: Comment on PR
