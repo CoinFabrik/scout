@@ -34,19 +34,11 @@ class ClippyRunner(Runner):
 
 def print_clippy_errors(errors):
     if errors:
-<<<<<<< HEAD
-        print(f"{RED}\nClippy errors detected in the following directories:{ENDC}")
-        for error_dir in errors:
-            print(f"• {error_dir}")
-    else:
-        print(f"{GREEN}\nNo clippy issues found across all directories.{ENDC}")
-=======
         print(Red(f"\nClippy errors detected in the following directories:"))
         for error_dir in errors:
             print(f"• {error_dir}")
     else:
         print(Green(f"\nNo clippy issues found across all directories."))
->>>>>>> main
 
 
 if __name__ == "__main__":
@@ -61,12 +53,7 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-<<<<<<< HEAD
-
-    errors = run_clippy(args.dir)
-=======
     errors = ClippyRunner().run(args.dir)   # errors = run_clippy(args.dir)
->>>>>>> main
     print_clippy_errors(errors)
     if errors:
         exit(1)
