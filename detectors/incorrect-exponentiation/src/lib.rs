@@ -13,7 +13,7 @@ use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::Span;
 use scout_audit_clippy_utils::diagnostics::span_lint_and_help;
 
-const LINT_MESSAGE: &str = "'^' It is not an exponential operator. It is a bitwise XOR one.";
+const LINT_MESSAGE: &str = "'^' It is not an exponential operator. It is a bitwise XOR.";
 const LINT_HELP: &str = "If you want to use XOR, use bitxor(). If you want to raise a number use .checked_pow() or .pow() ";
 
 dylint_linting::declare_late_lint! {
@@ -24,7 +24,7 @@ dylint_linting::declare_late_lint! {
         name: "Incorrect Exponentiation",
         long_message: LINT_MESSAGE,
         severity: "Critical",
-        help: "https://github.com/CoinFabrik/scout-soroban/tree/main/detectors/",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/incorrect-exponentiation",
         vulnerability_class: "Arithmetic",
     }
 

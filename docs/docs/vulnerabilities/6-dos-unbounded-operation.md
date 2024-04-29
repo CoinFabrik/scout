@@ -2,7 +2,7 @@
 ## Description
 - Vulnerability Category: `Denial of Service`
 - Severity: `Medium`
-- Detectors: [`dos-unbounded-operation`](https://github.com/CoinFabrik/scout/tree/main/test-cases/dos-unbounded-operation/dos-unbounded-operation-1)
+- Detectors: [`dos-unbounded-operation`](https://github.com/CoinFabrik/scout/tree/main/detectors/dos-unbounded-operation/src)
 - Test Cases: [`dos-unbounded-operation-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/dos-unbounded-operation/dos-unbounded-operation-1)
 
 Each block in a Substrate Blockchain has an upper bound on the amount of gas 
@@ -41,7 +41,7 @@ pub fn add_payee(&mut self) -> u128 {
     self.next_payee_ix.checked_sub(1).unwrap()
 }
 ```
-The vulnerable code example can be found [here](https://github.com/CoinFabrik/scout/blob/main/test-cases/dos-unbounded-operation/dos-unbounded-operation-1/vulnerable-example/lib.rs).
+The vulnerable code example can be found [here](https://github.com/CoinFabrik/scout/blob/main/test-cases/dos-unbounded-operation/dos-unbounded-operation-1/vulnerable-example/src/lib.rs).
 
 ### Deployment
 An example can be found under the directory 
@@ -58,7 +58,7 @@ If looping over an array of unknown size is absolutely necessary, then it
 should be planned to potentially take multiple blocks, and therefore require
 multiple transactions.
 
-The remediated code example can be found [here](https://github.com/CoinFabrik/scout/blob/main/test-cases/dos-unbounded-operation/dos-unbounded-operation-1/remediated-example/lib.rs).
+The remediated code example can be found [here](https://github.com/CoinFabrik/scout/blob/main/test-cases/dos-unbounded-operation/dos-unbounded-operation-1/remediated-example/src/lib.rs).
 
 ## References
 - https://consensys.github.io/smart-contract-best-practices/attacks/denial-of-service

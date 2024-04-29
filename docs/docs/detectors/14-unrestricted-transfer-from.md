@@ -10,7 +10,7 @@ An user Alice can approve a contract to spend their tokens. An user Bob can call
 
 ### Known problems
 
-None.
+Could generate false positives when using [Cardinal Cryptography's PSP22](https://github.com/Cardinal-Cryptography/PSP22).
 
 ### Example
 
@@ -48,6 +48,7 @@ Use instead:
 
 ```rust
 // build_call example
+    #[ink(message)]
     pub fn deposit(&mut self) -> Result<(), Error> {
         let call_params = build_call::<DefaultEnvironment>()
             .exec_input(
@@ -62,6 +63,7 @@ Use instead:
     }
 
 // ContractRef example
+    #[ink(message)]
     pub fn deposit(&mut self) -> Result<(), Error> {
         let res = PSP22Ref::transfer_from(
             &self.psp22_address,

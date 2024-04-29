@@ -6,7 +6,7 @@ Checks for non-lazy storage when using delegate calls.
 
 ### Why is this bad?
 
-ink! has a bug that makes delegated calls not modify the storage of the caller.
+`ink!` has a bug that prevents delegate calls from modifying the storage of the caller.
 
 #### More info
 

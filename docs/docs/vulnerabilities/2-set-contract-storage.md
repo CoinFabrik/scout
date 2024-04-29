@@ -38,14 +38,14 @@ impl MisusedSetContractStorage for Erc20 {
 }
 ```
 
-The vulnerable code example can be found [here](https://github.com/CoinFabrik/scout/blob/main/test-cases/set-contract-storage/set-contract-storage-1/vulnerable-example/lib.rs).
+The vulnerable code example can be found [here](https://github.com/CoinFabrik/scout/blob/main/test-cases/set-contract-storage/set-contract-storage-1/vulnerable-example/src/lib.rs).
 
 ### Deployment
 To compile this example, `cargo-contract` v2.0.1 (or above) is required.
 
 In order to run this exploit, [download](https://github.com/paritytech/substrate-contracts-node/releases), unzip and run a substrate node with `./substrate-contract-node`. Download the contents of the `example` folder associated to this detector and compile the contract running `cargo contract build` and build the binary.
 
-Afterwards, upload the the binary into the running network with the account `Alice` using `cargo contract upload --suri //Alice ./target/ink/my_contract.contract`.
+Afterwards, upload the binary into the running network with the account `Alice` using `cargo contract upload --suri //Alice ./target/ink/my_contract.contract`.
 
 
 ```bash
@@ -261,7 +261,7 @@ fn misused_set_contract_storage(&mut self, user_input_key: [u8; 68], user_input_
 }
 ```
 
-The remediated code example can be found [here](https://github.com/CoinFabrik/scout/blob/main/test-cases/set-contract-storage/set-contract-storage-1/remediated-example/lib.rs).
+The remediated code example can be found [here](https://github.com/CoinFabrik/scout/blob/main/test-cases/set-contract-storage/set-contract-storage-1/remediated-example/src/lib.rs).
 
 ## References
 * https://use.ink/datastructures/storage-layout

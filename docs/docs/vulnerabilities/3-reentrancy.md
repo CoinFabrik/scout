@@ -3,7 +3,7 @@
 * Vulnerability Category: `Reentrancy`
 * Severity: `Critical`
 * Detectors: [`reentrancy-1`](https://github.com/CoinFabrik/scout/tree/main/detectors/reentrancy-1), [`reentrancy-2`](https://github.com/CoinFabrik/scout/tree/main/detectors/reentrancy-2)
-* Test Cases: [`reentrancy-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy-1/reentrancy-1), [`reentrancy-2`](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy-1/reentrancy-2), [`reentrancy-3`](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy-2/reentrancy-1)
+* Test Cases: [`reentrancy-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy-1/reentrancy-1-1), [`reentrancy-2`](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy-1/reentrancy-1-2), [`reentrancy-3`](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy-2/reentrancy-2-1)
 
 Smart contracts can call other contracts and send tokens to them. These
 operations imply external calls where control flow is passed to the called
@@ -110,12 +110,12 @@ pub fn exploit(&mut self) {
 
 ```
 
-The vulnerable code example can be found [here](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy-1/reentrancy-1/vulnerable-example).
+The vulnerable code example can be found [here](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy-1/reentrancy-1-1/vulnerable-example).
 
 ### Deployment
-Vault and Exploit files can be found under the directories
-[vulnerable-example/exploit](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy-1/reentrancy-1/vulnerable-example/exploit) and
-[vulnerable-example/vault](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy-1/reentrancy-1/vulnerable-example/vault).
+Exploit and Vault files can be found under the directories
+[vulnerable-example/exploit](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy-1/reentrancy-1-1/vulnerable-example/exploit) and
+[vulnerable-example/src](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy-1/reentrancy-1-1/vulnerable-example/src).
 The whole exploit example can be run automatically using the `deploy.sh` file.
 
 ## Recommendation
@@ -123,7 +123,7 @@ In general, risks associated to reentrancy can be addressed with the
 Check-Effect-Interaction pattern, a best practice that indicates that external
 calls should be the last thing to be executed in a function. In this example,
 this can be done by inserting the balance before transferring the value (see
-[remediated-example-1](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy-1/reentrancy-1/remediated-example)).
+[remediated-example-1](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy-1/reentrancy-1-1/remediated-example)).
 
 
 ```rust
@@ -156,11 +156,11 @@ pub fn call_with_value(&mut self, address: AccountId, amount: Balance, selector:
 }
 ```
 
-The remediated code example can be found [here](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy-1/reentrancy-1/remediated-example).
+The remediated code example can be found [here](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy-1/reentrancy-1-1/remediated-example).
 
 Alternatively, if reentrancy by an external contract is not needed, the
 `set_allow_reentry(true)` should be removed altogether (see
-[remediated-example-2](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy-1/reentrancy-2/remediated-example)). This is equivalent in Substrate to using a
+[remediated-example-2](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy-1/reentrancy-1-2/remediated-example)). This is equivalent in Substrate to using a
 [reentrancy guard](https://github.com/Supercolony-net/openbrush-contracts/tree/main/contracts/src/security/reentrancy_guard)
 like the one offered by [OpenBrush](https://github.com/Supercolony-net/openbrush-contracts).
 
@@ -191,7 +191,7 @@ pub fn call_with_value(&mut self, address: AccountId, amount: Balance, selector:
 }
 ```
 
-The remediated code example can be found [here](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy-1/reentrancy-2/remediated-example).
+The remediated code example can be found [here](https://github.com/CoinFabrik/scout/tree/main/test-cases/reentrancy-1/reentrancy-1-2/remediated-example).
 
 ## References
 * https://use.ink/datastructures/storage-layout

@@ -3,7 +3,7 @@
 ## Description
 
 - Vulnerability Category: `Best practices`
-- Vulnerability Severity: `Enhacement`
+- Vulnerability Severity: `Enhancement`
 - Detectors: [`iterators-over-indexing`](https://github.com/CoinFabrik/scout/tree/main/detectors/iterators-over-indexing)
 - Test Cases: [`iterators-over-indexing-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/iterators-over-indexing/iterators-over-indexing-1)
 
@@ -34,4 +34,4 @@ The remediated code example can be found [`here`](https://github.com/CoinFabrik/
 
 ## References
 
-- [Memory management](https://docs.alephzero.org/aleph-zero/security-course-by-kudelski-security/ink-developers-security-guideline#memory-management)
+- [Aleph Zero ink! Developer security guidelines](https://docs.alephzero.org/aleph-zero/security-course-by-kudelski-security/ink-developers-security-guideline#memory-management)

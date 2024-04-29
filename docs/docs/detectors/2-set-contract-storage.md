@@ -2,15 +2,15 @@
 
 ### What it does
 
-Checks for calls to env::set_contract_storage.
+Checks for calls to `env::set_contract_storage`.
 
 ### Why is this bad?
 
-Functions using keys as variables without proper access control or input sanitation can allow users to perform changes in arbitrary memory locations.
+Functions using keys as variables without proper access control or input sanitization can allow users to perform changes in arbitrary memory locations.
 
 ### Known problems
 
-Only check the function call, so false positives could result.
+Only checks the function call, so false positives could result.
 
 ### Example
 

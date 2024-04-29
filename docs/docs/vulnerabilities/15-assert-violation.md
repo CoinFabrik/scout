@@ -3,7 +3,7 @@
 ## Description
 
 - Vulnerability Category: `Validations and error handling`
-- Vulnerability Severity: `Enhacement`
+- Vulnerability Severity: `Enhancement`
 - Detectors: [`assert-violation`](https://github.com/CoinFabrik/scout/tree/main/detectors/assert-violation)
 - Test Cases: [`assert-violation-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/assert-violation/assert-violation-1)
 

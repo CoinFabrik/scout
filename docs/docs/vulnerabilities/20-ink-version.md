@@ -3,7 +3,7 @@
 ## Description
 
 - Vulnerability Category: `Best practices`
-- Vulnerability Severity: `Enhacement`
+- Vulnerability Severity: `Enhancement`
 - Detectors: [`ink-version`](https://github.com/CoinFabrik/scout/tree/main/detectors/ink-version)
 - Test Cases: [`ink-version-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/ink-version/ink-version-1)
 

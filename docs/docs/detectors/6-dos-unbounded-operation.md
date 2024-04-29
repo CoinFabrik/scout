@@ -2,7 +2,7 @@
 
 ### What it does
 
-This detector checks that when using for or while loops, their conditions limit the execution to a constant number of iterations.
+This detector checks that when using `for` or `while` loops, their conditions limit the execution to a constant number of iterations.
 
 ### Why is this bad?
 

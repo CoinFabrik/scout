@@ -346,3 +346,49 @@ This vulnerability falls under the [Known Bugs](#vulnerability-categories) categ
 and has a Critical severity.
 
 Check the following [documentation](23-lazy-delegate.md) for a more detailed explanation of this vulnerability class.
+
+### 24 - Incorrect exponentiation
+
+It's common to use `^` for exponentiation.  However in Rust, `^` is the XOR operator. If the `^` operator is used, it could lead to unexpected behaviour in the contract. It's recommended to use the method `pow()` for exponentiation or `.bitxor()` for XOR operations.
+
+Check the following [documentation](24-incorrect-exponentiation.md) for a more detailed explanation of this vulnerability class.
+
+### 25 - Buffering unsized types
+
+The static buffer in ink! defaults to 16KB in size. If data overgrows this size, the contract will panic. Instead, when working with dynamically sized values, use fallible storage methods.
+
+Check the following [documentation](25-buffering-unsized-types.md) for a more detailed explanation of this vulnerability class.
+
+### 26 - Avoid unsafe block
+
+Avoid using the `unsafe` block in Rust, as it can lead to memory unsafety and undefined behavior.
+
+Check the following [documentation](26-avoid-unsafe-block.md) for a more detailed explanation of this vulnerability class.
+
+### 27 - Warning sr25519_verify
+
+It is clear that any production code should not rely on unstable features, as they may change in future versions of the language. This is the case for `sr25529_verify` method.
+
+Check the following [documentation](27-warning-sr25519-verify.md) for a more detailed explanation of this vulnerability class.
+
+### 28 - Lazy values not set
+
+Check the following [documentation](28-lazy-values-not-set.md) for a more detailed explanation of this vulnerability class.
+
+### 29 - Avoid autokey upgradable
+
+Check the following [documentation](29-avoid-autokey-upgradable.md) for a more detailed explanation of this vulnerability class.
+
+### 30 - Non payable transferred value
+
+Check the following [documentation](30-non-payable-transferred-value.md) for a more detailed explanation of this vulnerability class.
+
+### 31 - Vector of tuples could be mapping
+
+Check the following [documentation](31-vec-could-be-mapping.md) for a more detailed explanation of this vulnerability class.
+
+### 32 - Don't use invoke contract v1
+
+This is a low level way to evaluate another smart contract. Prefer to use the `ink!` guided and type safe approach to using this.
+
+Check the following [documentation](32-dont-use-invoke-contract-v1.md) for a more detailed explanation of this vulnerability class.

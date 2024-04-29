@@ -2,16 +2,16 @@
 
 ### What it does
 
-The panic! macro is used to stop execution when a condition is not met.
-This is useful for testing and prototyping, but should be avoided in production code
+The `panic!` macro is used to stop execution when a condition is not met.
+This is useful for testing and prototyping, but should be avoided in production code.
 
 ### Why is this bad?
 
-The usage of panic! is not recommended because it will stop the execution of the caller contract.
+The usage of `panic!` is not recommended because it will stop the execution of the caller contract.
 
 ### Known problems
 
-While this linter detects explicit calls to panic!, there are some ways to raise a panic such as unwrap() or expect().
+While this linter detects explicit calls to `panic!`, there are some ways to raise a panic such as `unwrap()` or `expect()`.
 
 ### Example
 
@@ -25,7 +25,7 @@ pub fn add(&mut self, value: u32)   {
 }
 ```
 
-// example code that does not raise a warning
+Here is an example of code that does not raise a warning:
 
 ```rust
 #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]

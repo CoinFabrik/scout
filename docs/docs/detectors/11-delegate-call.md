@@ -1,10 +1,10 @@
 # Delegate call
 
 ### What it does
-Checks for delegated calls to contracts passed as arguments.
+Checks for delegate calls to contracts passed as arguments.
 
 ### Why is this bad?
-Delegated calls to contracts passed as arguments can be used to change the expected behavior of the contract. If you need to change the target of a delegated call, you should use a storage variable, and make a function with proper access control to change it.
+Delegate calls to contracts passed as arguments can be used to change the expected behavior of the contract. If you need to change the target of a delegate call, you should use a storage variable, and make a function with proper access control to change it.
 
 ### Example
 

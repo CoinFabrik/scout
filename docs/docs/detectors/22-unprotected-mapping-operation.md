@@ -8,13 +8,11 @@ It warns you if a mapping operation (`insert`, `take`, `remove`) function is cal
 
 Modifying mappings with an arbitrary key given by users can be a significant vulnerability for several reasons:
 
-- Unintended Modifications: Allowing users to provide arbitrary keys can lead to unintended modifications of critical data within the smart contract. If the input validation and sanitation are not done properly, users may be able to manipulate the data in ways that were not intended by the contract's author.
+- Unintended Modifications: Allowing users to provide arbitrary keys can lead to unintended modifications of critical data within the smart contract. If the input validation and sanitization are not done properly, users may be able to manipulate the data in ways that were not intended by the contract's author.
 
 - Data Corruption: Malicious users could intentionally provide keys that result in the corruption or manipulation of important data stored in the mapping. This could lead to incorrect calculations, unauthorized access, or other undesirable outcomes.
 
 - Denial-of-Service (DoS) Attacks: If users can set arbitrary keys, they may be able to create mappings with a large number of entries, potentially causing the contract to exceed its gas limit. This could lead to denial-of-service attacks, making the contract unusable for other users.
-
-### Known problems
 
 ### Example
 

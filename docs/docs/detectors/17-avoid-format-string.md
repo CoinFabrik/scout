@@ -6,7 +6,7 @@ Checks for `format!` macro usage.
 
 ### Why is this bad?
 
-The usage of format! is not recommended.
+The usage of `format!` is not recommended.
 
 ### Example
 
@@ -35,4 +35,4 @@ Use instead:
 
 ### Implementation
 
-The detector's implementation can be found at [this link](https://github.com/CoinFabrik/scout/tree/main/detectors/avoid-format!-string).
+The detector's implementation can be found at [this link](https://github.com/CoinFabrik/scout/tree/main/detectors/avoid-format-string).

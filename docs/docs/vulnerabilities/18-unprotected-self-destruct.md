@@ -19,9 +19,6 @@ Allowing users to call `terminate_contract` can be a significant vulnerability d
 
 Consider the following `ink!` contract:
 
-### Example
-
-
 ```rust
     #[ink(message)]
     pub fn delete_contract(&mut self, beneficiary: AccountId) {

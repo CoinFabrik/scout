@@ -5,7 +5,7 @@
 - Vulnerability Category: `Authorization`
 - Vulnerability Severity: `Critical`
 - Detectors: [`unprotected-mapping-operation`](https://github.com/CoinFabrik/scout/tree/main/detectors/unprotected-mapping-operation)
-- Test Cases: [`unprotected-mapping-operation-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/unprotected-mapping-operation/unprotected-mapping-operation1)
+- Test Cases: [`unprotected-mapping-operation-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/unprotected-mapping-operation/unprotected-mapping-operation-1)
 
 Modifying mappings with an arbitrary key given by users can be a significant vulnerability for several reasons:
 
@@ -37,7 +37,7 @@ Consider the following `ink!` contract:
 The vulnerability in this `withdraw` function arises from the use of `from`, an user-defined parameter used as key in the mapping without prior sanitizing. Alice can withdraw tokens from any user to the user balance. 
  
 
-The vulnerable code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/unprotected-mapping-operation/unprotected-mapping-operation1/vulnerable-example).
+The vulnerable code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/unprotected-mapping-operation/unprotected-mapping-operation-1/vulnerable-example).
 ## Remediation
 
 Avoid using user-given arguments as `key` parameter in mapping. Instead, use `self.env().caller()` or sanitize the values.
