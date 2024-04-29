@@ -56,4 +56,4 @@ Use the `.set(...)` or `.insert(...)` method after using `.get(...)` to flush th
 
 ## Known Issues
 
-If you have a `.get(...)` function that you don't mutate (e.g., used as a const value), this detector triggers, if you want to ignore the lint you could add #[allow(lazy_values_not_set)] immediately before the function definition.
+If you have a `.get(...)` function that you don't mutate (e.g., used as a const value), this detector triggers, if you want to ignore the lint you could add `#[allow(lazy_values_not_set)]` immediately before the function definition.
