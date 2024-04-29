@@ -1,0 +1,134 @@
+name: Test Detectors
+
+on:
+  push:
+    branches:
+      - "main"
+    paths:
+      - "detectors/**"
+      - "test-cases/**"
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: full
+  PYTHONUNBUFFERED: 1
+
+jobs:
+  validate-detectors:
+    name: Validate
+    runs-on: ubuntu-latest
+    outputs:
+      status: ${{ job.status }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Install dependencies
+        run: pip install fuzzywuzzy
+
+      - name: Validate detectors
+        run: python scripts/validate-detectors.py
+
+  build:
+    name: Build
+    needs: validate-detectors
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+    #          - macos-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache cargo dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo
+          key: ${{ runner.os }}-tests-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install Rust stable
+        run: rustup install stable --profile minimal
+
+      - name: Update Rust Toolchain
+        run: rustup update
+
+      - name: Install Rust nightly
+        run: rustup install nightly --profile minimal
+
+      - name: Install dylint, dylint-link and cargo-scout-audit
+        run: cargo +nightly install cargo-dylint dylint-link cargo-scout-audit
+
+      - name: Determine build status and write to file
+        run: echo "${{ job.status }}" > status-${{ matrix.os }}.txt
+
+      - name: Upload build status artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-status-${{ matrix.os }}
+          path: status-${{ matrix.os }}.txt
+
+  prepare-detector-matrix:
+    name: Prepare Detector Matrix
+    runs-on: ubuntu-latest
+    needs: build
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - id: set-matrix
+        working-directory: test-cases
+        run: echo "matrix=$(find . -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | jq -R -cs 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+
+  test:
+    name: Test detector
+    needs: [build, prepare-detector-matrix]
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+        #          - macos-latest
+        detector: ${{fromJson(needs.prepare-detector-matrix.outputs.matrix)}}
+    runs-on: ${{ matrix.os }}
+    outputs:
+      status: ${{ job.status }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Cache cargo dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo
+          key: ${{ runner.os }}-tests-${{ hashFiles('**/Cargo.lock') }}.
+  # This is broken until ink! solves stdsimd problem.
+  #      - name: Run unit and integration tests
+  #        run: python scripts/run-tests.py --detector=${{ matrix.detector }}
+
+  comment-on-pr:
+    name: Comment on PR
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    needs: [validate-detectors, build, test]
+    steps:
+      - name: Download build status artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Read Ubuntu build status
+        id: ubuntu_status
+        working-directory: build-status-ubuntu-latest
+        run: echo "status=$(cat status-ubuntu-latest.txt)" >> $GITHUB_OUTPUT
