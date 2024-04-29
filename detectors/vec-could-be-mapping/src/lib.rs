@@ -76,7 +76,6 @@ impl<'tcx> LateLintPass<'tcx> for VecCouldBeMapping {
     }
 
     fn check_field_def(&mut self, _: &LateContext<'tcx>, fdef: &'tcx rustc_hir::FieldDef<'tcx>) {
-        println!("{:#?}", fdef);
         if is_vec_type_with_tuple_of_2_elems(fdef) {
             self.storage_names
                 .insert(fdef.ident.name.to_string(), fdef.span);
