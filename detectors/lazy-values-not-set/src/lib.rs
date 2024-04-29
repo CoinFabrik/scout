@@ -41,7 +41,6 @@ pub struct LazyValuesNotSet {
     lazy_get_defid: Option<DefId>,
     mapping_insert_defid: Option<DefId>,
     mapping_get_defid: Option<DefId>,
-    funcs_defids: Vec<DefId>,
 }
 
 struct FunFinderVisitor<'a, 'tcx: 'a> {
@@ -119,7 +118,7 @@ impl<'tcx> LateLintPass<'tcx> for LazyValuesNotSet {
             self.mapping_get_defid = visitor.mapping_get_defid;
         }
 
-        let (_, hm) = self.get_func_info(cx, id.to_def_id(), &vec![], &vec![], &mut vec![]);
+        let (_, hm) = self.get_func_info(cx, id.to_def_id(), &[], &[], &mut vec![]);
         for val in hm.values() {
             scout_audit_clippy_utils::diagnostics::span_lint(
                 cx,
@@ -149,8 +148,8 @@ impl LazyValuesNotSet {
         &mut self,
         cx: &LateContext,
         func_defid: DefId,
-        tainted_get_map: &Vec<Local>,
-        tainted_get_lazy: &Vec<Local>,
+        tainted_get_map: &[Local],
+        tainted_get_lazy: &[Local],
         visited_funs: &mut Vec<DefId>,
     ) -> (Vec<Local>, HashMap<Local, Span>) {
         if visited_funs.contains(&func_defid) {
@@ -158,13 +157,13 @@ impl LazyValuesNotSet {
         }
         visited_funs.push(func_defid);
         let mir = cx.tcx.optimized_mir(func_defid);
-        let mut mir_preorder = preorder(mir);
-        let mut mapping_get_tainted_args: Vec<Local> = tainted_get_map.clone();
-        let mut lazy_get_tainted_args: Vec<Local> = tainted_get_lazy.clone();
+        let mir_preorder = preorder(mir);
+        let mut mapping_get_tainted_args: Vec<Local> = tainted_get_map.to_owned();
+        let mut lazy_get_tainted_args: Vec<Local> = tainted_get_lazy.to_owned();
         let mut span_local: HashMap<Local, Span> = HashMap::new();
         let mut locals_dependencies: HashMap<Local, Vec<Local>> = HashMap::new();
         let mut locals_to_clean: Vec<Local> = vec![];
-        while let Some(basicblock) = mir_preorder.next() {
+        for basicblock in mir_preorder {
             for stmt in basicblock.1.statements.iter().rev() {
                 if let rustc_middle::mir::StatementKind::Assign(box_) = &stmt.kind {
                     let locals = get_locals_in_rvalue(&box_.1);
@@ -233,16 +232,10 @@ impl LazyValuesNotSet {
                                             match arg {
                                                 Operand::Copy(a) | Operand::Move(a) => {
                                                     //clean the taints
-                                                    mapping_get_tainted_args =
-                                                        mapping_get_tainted_args
-                                                            .into_iter()
-                                                            .filter(|i| a.local != *i)
-                                                            .collect();
-                                                    lazy_get_tainted_args = lazy_get_tainted_args
-                                                        .into_iter()
-                                                        .filter(|i| a.local != *i)
-                                                        .collect();
-                                                    //push locals to be cleaned befor
+                                                    mapping_get_tainted_args
+                                                        .retain(|i| a.local != *i);
+                                                    lazy_get_tainted_args.retain(|i| a.local != *i);
+                                                    //push locals to be cleaned before
                                                     locals_to_clean.push(a.local)
                                                 }
                                                 Operand::Constant(_) => {}
@@ -319,9 +312,7 @@ fn get_locals_in_rvalue(rvalue: &Rvalue) -> Vec<Local> {
         rustc_middle::mir::Rvalue::Use(op)
         | rustc_middle::mir::Rvalue::Repeat(op, _)
         | rustc_middle::mir::Rvalue::Cast(_, op, _)
-        | rustc_middle::mir::Rvalue::UnaryOp(_, op) => {
-            return op_local(op);
-        }
+        | rustc_middle::mir::Rvalue::UnaryOp(_, op) => op_local(op),
         rustc_middle::mir::Rvalue::Ref(_, _, p)
         | rustc_middle::mir::Rvalue::AddressOf(_, p)
         | rustc_middle::mir::Rvalue::Len(p)
@@ -332,7 +323,7 @@ fn get_locals_in_rvalue(rvalue: &Rvalue) -> Vec<Local> {
         | rustc_middle::mir::Rvalue::CheckedBinaryOp(_, ops) => {
             let mut v = op_local(&ops.0);
             v.extend(op_local(&ops.1));
-            return v;
+            v
         }
         _ => vec![],
     }
