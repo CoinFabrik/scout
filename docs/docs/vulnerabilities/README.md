@@ -353,11 +353,11 @@ It's common to use `^` for exponentiation.  However in Rust, `^` is the XOR oper
 
 Check the following [documentation](24-incorrect-exponentiation.md) for a more detailed explanation of this vulnerability class.
 
-### 25 - Vec considerations
+### 25 - Buffering unsized types
 
-The static buffer in ink! defaults to 16KB in size. If data overgrows this size, the contract will panic. Instead, when working with dynamically sized values, use faillible storage methods.
+The static buffer in ink! defaults to 16KB in size. If data overgrows this size, the contract will panic. Instead, when working with dynamically sized values, use fallible storage methods.
 
-Check the following [documentation](25-vec-considerations.md) for a more detailed explanation of this vulnerability class.
+Check the following [documentation](25-buffering-unsized-types.md) for a more detailed explanation of this vulnerability class.
 
 ### 26 - Avoid unsafe block
 
@@ -365,17 +365,15 @@ Avoid using the `unsafe` block in Rust, as it can lead to memory unsafety and un
 
 Check the following [documentation](26-avoid-unsafe-block.md) for a more detailed explanation of this vulnerability class.
 
-### 27 - Unstable interface
+### 27 - Warning sr25519_verify
 
 It is clear that any production code should not rely on unstable features, as they may change in future versions of the language. This is the case for `sr25529_verify` method.
 
-Check the following [documentation](27-unstable-interface.md) for a more detailed explanation of this vulnerability class.
+Check the following [documentation](27-warning-sr25519-verify.md) for a more detailed explanation of this vulnerability class.
 
-### 28 - Overflow check
+### 28 - Lazy values not set
 
-When you’re compiling in release mode with the --release flag, Rust does not include checks for integer overflow that cause panics. This can lead to unexpected behavior in your contract because Rust will perform two’s complement wrapping and continue executing the program with the incorrect result.
-
-Check the following [documentation](28-overflow-check.md) for a more detailed explanation of this vulnerability class.
+Check the following [documentation](28-lazy-values-not-set.md) for a more detailed explanation of this vulnerability class.
 
 ### 29 - Avoid autokey upgradable
 
@@ -391,6 +389,6 @@ Check the following [documentation](31-vec-could-be-mapping.md) for a more detai
 
 ### 32 - Don't use invoke contract v1
 
-This is a low level way to evaluate another smart contract. Prefer to use the ink! guided and type safe approach to using this.
+This is a low level way to evaluate another smart contract. Prefer to use the `ink!` guided and type safe approach to using this.
 
 Check the following [documentation](32-dont-use-invoke-contract-v1.md) for a more detailed explanation of this vulnerability class.
