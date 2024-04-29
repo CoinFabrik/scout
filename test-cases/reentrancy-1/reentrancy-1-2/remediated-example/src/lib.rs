@@ -5,6 +5,7 @@ pub use self::vault::{Vault, VaultRef};
 #[ink::contract]
 mod vault {
     use core::result::Result;
+
     use ink::{
         env::call::{build_call, Selector},
         storage::Mapping,
