@@ -2,7 +2,7 @@
 
 ### What it does
 
-This linting rule checks whether the 'check-effect' interaction pattern has been properly followed by code that invokes a contract that may call back the original one.
+This linting rule checks whether the 'check-effects-interaction' pattern has been properly followed by any code that invokes a contract that may call back to the original one.
 
 ### Why is this bad?
 
@@ -11,7 +11,7 @@ If state modifications are made after a contract call, reentrant calls may not d
 ### Known problems
 
 If called method does not perform a malicious reentrancy (i.e. known method from known contract) false positives will arise.
-If the usage of set_allow_reentry(true) or later state changes are performed in an auxiliary function, this detector will not detect the reentrancy.
+If the usage of `set_allow_reentry(true)` or later state changes are performed in an auxiliary function, this detector will not detect the reentrancy.
 
 ### Example
 

@@ -56,7 +56,6 @@ To prevent this, the function should be restricted to administrators or authoriz
     }
 ```
 
-
 ## References
 
 - [Slither: Unprotected upgradeable contract](https://github.com/crytic/slither/wiki/Detector-Documentation#unprotected-upgradeable-contract)

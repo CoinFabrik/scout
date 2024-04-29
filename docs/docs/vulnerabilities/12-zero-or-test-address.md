@@ -33,7 +33,7 @@ The vulnerable code example can be found [`here`](https://github.com/CoinFabrik/
 
 ## Remediation
 
-To remediate this problem, verify in your code whether the `admin` provided is the zero address and return an Error if this is the case.
+To remediate this problem, verify in your code whether the `admin` provided is the zero address and return an `Error` if this is the case.
 
 ```rust
 #[ink(message)]

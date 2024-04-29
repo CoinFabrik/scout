@@ -1,11 +1,11 @@
-# Vec Considerations
+# Buffering Unsized Types
 
 ## Description
 
 - Vulnerability Category: `Best practices`
 - Vulnerability Severity: `Enhancement`
-- Detectors: [`vec-considerations`](https://github.com/CoinFabrik/scout/tree/main/detectors/vec-considerations)
-- Test Cases: [`vec-considerations-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/vec-considerations/vec-considerations-1)
+- Detectors: [`vec-considerations`](https://github.com/CoinFabrik/scout/tree/main/detectors/buffering-unsized-types)
+- Test Cases: [`vec-considerations-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/buffering-unsized-types/buffering-unsized-types-1)
 
 
 Avoid using fallible methods like `insert`, `pop`, `push`, `set` or `peek`  with an unsized (dynamically sized) type. To prevent the contract for panicking, use `try_` (fallible) storage methods.
@@ -27,7 +27,7 @@ Consider the following `ink!` contract:
 
 The problem arises from the use of `.insert()` since `ink!`'s static buffer defaults to 16KB in size. If data overgrows this size, the contract will `panic!`.
 
-The vulnerable code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/vec-considerations/vec-considerations-1/vulnerable-example).
+The vulnerable code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/buffering-unsized-types/buffering-unsized-types-1/vulnerable-example).
 
 ## Remediation
 
@@ -46,7 +46,7 @@ Instead, when working with dynamically sized values, use fallible storage method
 ```
 
 
-The remediated code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/vec-considerations/vec-considerations-1/remediated-example).
+The remediated code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/buffering-unsized-types/buffering-unsized-types-1/remediated-example).
 
 ## References
 

@@ -50,7 +50,7 @@ To enforce memory safety, it's recommended not to use `unsafe`.
     }
 ```
 
-The remediated code example can be found [here](https://github.com/CoinFabrik/scout/blob/main/test-cases/avoid-unsafe-block/avoid-unsafe-block-1/remediated-example/src/lib.rs).
+The remediated code example can be found [`here`](https://github.com/CoinFabrik/scout/blob/main/test-cases/avoid-unsafe-block/avoid-unsafe-block-1/remediated-example/src/lib.rs).
 
 ## References
 

@@ -3,8 +3,8 @@
 ## Description 
 - Vulnerability Category: `Best Practices`
 - Vulnerability Severity: `Enhancement`
-- Detectors: [`dont-use-invoke-contract-v1`](https://github.com/CoinFabrik/scout/tree/main/detectors)
-- Test Cases: [`dont-use-invoke-contract-v1`](https://github.com/CoinFabrik/scout/tree/main/test-cases)
+- Detectors: [`dont-use-invoke-contract-v1`](https://github.com/CoinFabrik/scout/tree/main/detectors/dont-use-invoke-contract-v1)
+- Test Cases: [`dont-use-invoke-contract-v1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/dont-use-invoke-contract-v1)
 
 Avoid using `invoke_contract_v1` as it is a low level way to evaluate another smart contract. If needed, use `invoke_contract` instead.
 
@@ -93,7 +93,6 @@ Consider the following example
             }
         }
 ```
-
 
 ## References
 

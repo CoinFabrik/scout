@@ -50,10 +50,10 @@ dylint_linting::impl_pre_expansion_lint! {
     LINT_MESSAGE,
     AssertViolation::default(),
     {
-        name: "Unprotected Mapping Operation",
-        long_message: "Modifying mappings with an arbitrary key given by the user could lead to unintented modifications of critical data, modifying data belonging to other users, causing denial of service, unathorized access, and other potential issues.    ",
-        severity: "Critical",
-        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/unprotected-mapping-operation",
+        name: "Assert violation",
+        long_message: "The assert! macro can cause the contract to panic. This is not a good practice.",
+        severity: "Enhancement",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/assert-violation",
         vulnerability_class: "Validations and error handling",
     }
 }

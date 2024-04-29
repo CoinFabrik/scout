@@ -8,11 +8,11 @@
 - Test Cases: [`incorrect-exponentiation-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/incorrect-exponentiation/incorrect-exponentiation-1)
 
 
-The operator '^' is not an exponential operator, it is a bitwise XOR. Make sure to use `pow()` instead for exponentiation. In case of performing a XOR operation, use `.bitxor()` for clarity.
+The operator `^` is not an exponential operator, it is a bitwise XOR. Make sure to use `pow()` instead for exponentiation. In case of performing a XOR operation, use `.bitxor()` for clarity.
 
 ## Exploit Scenario
 
-In the following example, the `^` operand is being used for exponentiation. But in Rust, `^` it's the operand for a XOR operation. If misused,
+In the following example, the `^` operand is being used for exponentiation. But in Rust, `^` is the operand for an XOR operation. If misused,
 this could lead to unexpected behaviour in our contract.
 
 ```rust

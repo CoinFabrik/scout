@@ -2,18 +2,13 @@
 
 ### What it does
 
-It warns you if `set_code_hash` function is called without a previous check of the address of the caller.
+It warns you if `set_code_hash` function is called without previously checking the address of the caller.
 
 ### Why is this bad?
 
-If users are allowed to call `terminate_contract`, they can intentionally modify the contract behaviour, leading to the loss of all associated data/tokens and functionalities given by this contract or by others that depend on it.
-
-### Known problems
-
-None.
+If users are allowed to call `set_code_hash`, they can intentionally modify the contract behaviour, leading to the loss of all associated data/tokens and functionalities given by this contract or by others that depend on it.
 
 ### Example
-
 
 ```rust
     #[ink(message)]

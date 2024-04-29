@@ -1,12 +1,13 @@
-# Unstable Interface
+# Warning sr25519_verify
 
 ## Description
 
 - Vulnerability Category: `Known Bugs`
 - Vulnerability Severity: `Medium`
-- Detectors: [`unstable-interface`](https://github.com/CoinFabrik/scout/tree/main/detectors/unstable-interface)
-- Test Cases: [`unstable-interface-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/unstable-interface/unstable-interface-1)
+- Detectors: [`warning-sr25519-verify`](https://github.com/CoinFabrik/scout/tree/main/detectors/warning-sr25519-verify)
+- Test Cases: [`warning-sr25519-verify-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/warning-sr25519-verify/warning-sr25519-verify-1)
 
+This function is from the unstable interface, which is unsafe and normally is not available on production chains.
 
 ## Exploit Scenario
 
@@ -30,14 +31,14 @@ Consider the following `ink!` contract:
         ink::env::sr25519_verify(&signature, message.as_slice(), &pub_key).is_ok()
     }
 ```
-sr25519_verify is a function not available on production chains. If used, it will cause the contract to fail.
+`sr25519_verify` is a function not available on production chains. If used, it will cause the contract to fail.
 
-The vulnerable code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/unstable-interface/unstable-interface-1/vulnerable-example).
+The vulnerable code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/warning-sr25519-verify/warning-sr25519-verify-1/vulnerable-example).
 
 ## Remediation
 
 Because of that do not use the `sr25519_verify` function.
 
-The remediated code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/unstable-interface/unstable-interface-1/remediated-example).
+The remediated code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/warning-sr25519-verify/warning-sr25519-verify-1/remediated-example).
 
 

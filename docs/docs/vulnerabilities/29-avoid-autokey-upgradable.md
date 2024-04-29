@@ -7,6 +7,8 @@
 - Detectors: [`avoid-autokey-upgradable`](https://github.com/CoinFabrik/scout/tree/main/detectors/avoid-autokey-upgradable)
 - Test Cases: [`avoid-autokey-upgradable-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/avoid-autokey-upgradable/avoid-autokey-upgradable-1)
 
+
+
 ## Exploit Scenario
 
 Consider the following contract:

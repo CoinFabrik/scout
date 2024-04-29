@@ -22,7 +22,7 @@ dylint_linting::declare_late_lint! {
         name: "Unstable Interface",
         long_message: LINT_MESSAGE,
         severity: "Medium",
-        help: "https://github.com/CoinFabrik/scout-soroban/tree/main/detectors/unstable-interface",
+        help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/unstable-interface",
         vulnerability_class: "Known Bugs",
     }
 }

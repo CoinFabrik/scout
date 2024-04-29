@@ -1,12 +1,16 @@
-# Unstable Interface
+# Warning sr25519_verify
 
 ### What it does
 
-Warns about `sr25519()` usage.  
+Warns about `sr25519_verify()` usage.
 
 ### Why is this bad?
 
-It is a function not available on production chains.
+This function is not available on production chains.
+
+#### More info
+
+- https://docs.rs/ink_env/5.0.0/ink_env/fn.sr25519_verify.html
 
 ### Example
 
@@ -29,12 +33,8 @@ It is a function not available on production chains.
     }
 ```
 
-Do not use it
+Do not use it.
 
 ### Implementation
 
-The detector's implementation can be found at [this link](https://github.com/CoinFabrik/scout/tree/main/detectors/unstable-interface).
-
-#### More info
-
-- https://docs.rs/ink_env/5.0.0/ink_env/fn.sr25519_verify.html 
+The detector's implementation can be found at [this link](https://github.com/CoinFabrik/scout/tree/main/detectors/warning-sr25519-verify).

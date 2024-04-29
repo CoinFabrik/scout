@@ -70,5 +70,5 @@ The remediated code example can be found [`here`](https://github.com/CoinFabrik/
 - https://solidity-by-example.org/hacks/delegatecall/
 - https://blog.sigmaprime.io/solidity-security.html#delegatecall
 - [SWC-112](https://swcregistry.io/docs/SWC-112)
-- [Ethernaut: Delegation](https://ethernaut.openzeppelin.com/level/0x9451961b7Aea1Df57bc20CC68D72f662241b5493)
+- [Ethernaut: Delegation](https://github.com/OpenZeppelin/ethernaut/blob/master/contracts/src/levels/Delegation.sol)
 - [Slither: Delegatecall](https://github.com/crytic/slither/wiki/Detector-Documentation#controlled-delegatecall)

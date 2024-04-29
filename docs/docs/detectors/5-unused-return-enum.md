@@ -10,7 +10,7 @@ If any of the variants (Ok/Err) is not used, the code could be simplified or it 
 
 ### Known problems
 
-If definitions of Err() and/or Ok() are in the code but do not flow to the return value due to the definition of a variable or because they are defined in a dead code block, the warning will not be shown. If the definitions are made in an auxiliary method, the warning will be shown, resulting in a false positive.
+If definitions of `Err()` and/or `Ok()` are in the code but do not flow to the return value due to the definition of a variable or because they are defined in a dead code block, the warning will not be shown. If the definitions are made in an auxiliary method, the warning will be shown, resulting in a false positive.
 
 ### Example
 

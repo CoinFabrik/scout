@@ -2,11 +2,11 @@
 
 ### What it does
 
-Warns you if you are using an old version of ink!.
+Warns you if you are using an old version of `ink!`.
 
 ### Why is this bad?
 
-Using an old version of ink! can be dangerous, as it may have bugs or security issues.
+Using an old version of `ink!` can be dangerous, as it may have bugs or security issues.
 
 ### Example
 

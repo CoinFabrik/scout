@@ -265,7 +265,7 @@ candidate, getting the total votes, getting the total number of candidates,
 getting a candidate by index, checking if an account has voted, and voting for
 a candidate.
 
-The #[cfg(test)] block contains a single test that adds 512 candidates to the
+The `#[cfg(test)]` block contains a single test that adds 512 candidates to the
 smart contract. It initializes the contract with the current timestamp + 10
 minutes and then uses a loop to add each candidate. The test verifies that
 the function to add a candidate fails with an error indicating that the vote
@@ -289,7 +289,7 @@ is indicated by the `#[should_panic(expected = "add_candidate failed: CallDryRun
 attribute on the test function. This test _does_ trigger an unexpected revert
 due to the contract's storage size.
 
-The vulnerable code example can be found [here](https://github.com/CoinFabrik/scout/blob/main/test-cases/dos-unexpected-revert-with-vector/dos-unexpected-revert-with-vector-1/vulnerable-example/lib.rs).
+The vulnerable code example can be found [here](https://github.com/CoinFabrik/scout/blob/main/test-cases/dos-unexpected-revert-with-vector/dos-unexpected-revert-with-vector-1/vulnerable-example/src/lib.rs).
 
 ### Deployment (of the vulnerable contract)
 
@@ -585,7 +585,7 @@ mod unexpected_revert {
 }
 ```
 
-The remediated code example can be found [here](https://github.com/CoinFabrik/scout/blob/main/test-cases/dos-unexpected-revert-with-vector/dos-unexpected-revert-with-vector-1/remediated-example/lib.rs).
+The remediated code example can be found [here](https://github.com/CoinFabrik/scout/blob/main/test-cases/dos-unexpected-revert-with-vector/dos-unexpected-revert-with-vector-1/remediated-example/src/lib.rs).
 
 ### Deployment (of the remediated contract)
 
@@ -630,4 +630,4 @@ test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 
 - [SWC-113](https://swcregistry.io/docs/SWC-113)
 - https://consensys.github.io/smart-contract-best-practices/attacks/denial-of-service/#dos-with-unexpected-revert
-- [Ethernaut: King](https://ethernaut.openzeppelin.com/level/0x43BA674B4fbb8B157b7441C2187bCdD2cdF84FD5)
+- [Ethernaut: King](https://github.com/OpenZeppelin/ethernaut/blob/master/contracts/src/levels/King.sol)

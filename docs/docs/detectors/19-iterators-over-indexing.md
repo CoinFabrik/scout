@@ -2,7 +2,7 @@
 
 ### What it does
 
-It warns if for loop uses indexing instead of iterator. If the indexing goes to `.len()` it will not warn.
+It warns if a `for` loop uses indexing instead of an iterator. If the indexing goes to `.len()` it will not warn.
 
 ### Why is this bad?
 

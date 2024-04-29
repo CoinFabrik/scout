@@ -48,6 +48,6 @@ Avoid using block attributes like `block_timestamp` or `block_number` for random
 - https://blog.sigmaprime.io/solidity-security.html#SP-6
 - [SWC-120](https://swcregistry.io/docs/SWC-120)
 - [SWC-116](https://swcregistry.io/docs/SWC-116)
-- [Ethernaut: Coinflip](https://ethernaut.openzeppelin.com/level/0x4dF32584890A0026e56f7535d0f2C6486753624f)
+- [Ethernaut: Coinflip](https://github.com/OpenZeppelin/ethernaut/blob/master/contracts/src/levels/CoinFlip.sol)
 - [Slither: Weak PRNG](https://github.com/crytic/slither/wiki/Detector-Documentation#weak-PRNG)
 - [Slither: Dangerous usage of block.timestamp](https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp)

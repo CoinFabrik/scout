@@ -1,12 +1,12 @@
-# Vec Consideration
+# Buffering Unsized Types
 
 ### What it does
 
-It checks for the correct use of fallible methods when reading/writing data into StorageVec type variables.
+It checks for the correct use of fallible methods when reading/writing data into `StorageVec` type variables.
 
 ### Why is this bad?
  
-StorageVec is a Lazy type. Hence the static buffer to store the encoded data is of limited size. Because of that, reading/writing methods can fail and trap the contract.
+`StorageVec` is a Lazy type. Hence the static buffer to store the encoded data is of limited size. Because of that, reading/writing methods can fail and trap the contract.
 
 ### Example
 
@@ -38,4 +38,4 @@ Use instead:
 
 ### Implementation
 
-The detector's implementation can be found at [this link](https://github.com/CoinFabrik/scout/blob/main/detectors/vec-considerations).
+The detector's implementation can be found at [this link](https://github.com/CoinFabrik/scout/blob/main/detectors/buffering-unsized-types).

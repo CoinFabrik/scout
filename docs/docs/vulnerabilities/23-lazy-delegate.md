@@ -7,7 +7,7 @@
 - Detectors: [`lazy-delegate`](https://github.com/CoinFabrik/scout/tree/main/detectors/lazy-delegate)
 - Test Cases: [`lazy-delegate-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/lazy-delegate/lazy-delegate-1)
 
-ink! has a bug that makes delegated calls not modify the storage of the caller, unless it's using `Lazy` with `ManualKey` or `Mapping`.
+`ink!` has a bug that makes delegated calls not modify the storage of the caller, unless it's using `Lazy` with `ManualKey` or `Mapping`.
 
 ## Exploit Scenario
 

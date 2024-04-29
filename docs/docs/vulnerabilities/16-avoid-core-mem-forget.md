@@ -3,7 +3,7 @@
 ## Description
 
 - Vulnerability Category: `Best practices`
-- Vulnerability Severity: `Enhacement`
+- Vulnerability Severity: `Enhancement`
 - Detectors: [`avoid-core-mem-forget`](https://github.com/CoinFabrik/scout/tree/main/detectors/avoid-core-mem-forget)
 - Test Cases: [`avoid-core-mem-forget-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/avoid-core-mem-forget/avoid-core-mem-forget-1)
 

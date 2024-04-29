@@ -3,9 +3,9 @@
 ## Description
 
 - Vulnerability Category: `Validations and error handling`
-- Vulnerability Severity: `Enhacement`
-- Detectors: [`avoid-format!-string`](https://github.com/CoinFabrik/scout/tree/main/detectors/avoid-format!-string)
-- Test Cases: [`avoid-format!-string-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/avoid-format!-string/avoid-format!-string-1)
+- Vulnerability Severity: `Enhancement`
+- Detectors: [`avoid-format!-string`](https://github.com/CoinFabrik/scout/tree/main/detectors/avoid-format-string)
+- Test Cases: [`avoid-format!-string-1`](https://github.com/CoinFabrik/scout/tree/main/test-cases/avoid-format-string/avoid-format-string-1)
 
 The `format!` macro is not recommended. A custom error is recommended instead.
 
@@ -25,7 +25,7 @@ Consider the following `ink!` contract:
 The problem arises from the use of the `format!` macro. This is used to format a string with the given arguments. Returning a custom error is desirable.
 
 
-The vulnerable code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/avoid-format!-string/avoid-format!-string-1/vulnerable-example).
+The vulnerable code example can be found [`here`](https://github.com/CoinFabrik/scout/tree/main/test-cases/avoid-format-string/avoid-format-string-1/vulnerable-example).
 
 ## Remediation
 
