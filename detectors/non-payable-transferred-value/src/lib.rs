@@ -52,7 +52,8 @@ impl<'tcx> Visitor<'tcx> for TransferredValueSearcher {
 impl EarlyLintPass for NonPayableTransferredValue {
     fn check_impl_item(&mut self, cx: &EarlyContext<'_>, item: &AssocItem) {
         if let AssocItemKind::Fn(it) = &item.kind
-            && !any_attr_is_payable(&item.attrs)
+            && !attr_is_present(&item.attrs, "payable")
+            && attr_is_present(&item.attrs, "message")
             && it.body.is_some()
         {
             let mut visitor = TransferredValueSearcher::default();
@@ -86,13 +87,13 @@ fn is_self_env_transferred_value(met: &MethodCall) -> bool {
     false
 }
 
-fn any_attr_is_payable(attrs: &[Attribute]) -> bool {
+fn attr_is_present(attrs: &[Attribute], find: &str) -> bool {
     for attr in attrs {
         if let AttrKind::Normal(nattr) = &attr.kind
             && nattr.item.path.segments.len() == 1
             && nattr.item.path.segments[0].ident.name.to_string() == "ink"
             && let AttrArgs::Delimited(DelimArgs { tokens, .. }) = &nattr.item.args
-            && is_payable_token_present(tokens)
+            && is_token_present(tokens, find)
         {
             return true;
         }
@@ -100,11 +101,11 @@ fn any_attr_is_payable(attrs: &[Attribute]) -> bool {
     false
 }
 
-fn is_payable_token_present(token_stream: &TokenStream) -> bool {
+fn is_token_present(token_stream: &TokenStream, find: &str) -> bool {
     token_stream.trees().any(|tree| match tree {
         TokenTree::Token(token, _) => token
             .ident()
-            .map_or(false, |ident| ident.0.name.to_string() == "payable"),
-        TokenTree::Delimited(_, _, _, token_stream) => is_payable_token_present(token_stream),
+            .map_or(false, |ident| ident.0.name.to_string() == find),
+        TokenTree::Delimited(_, _, _, token_stream) => is_token_present(token_stream, find),
     })
 }
