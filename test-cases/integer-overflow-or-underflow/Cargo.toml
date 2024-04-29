@@ -22,4 +22,3 @@ strip = "symbols"
 [profile.release-with-logs]
 debug-assertions = true
 inherits = "release"
-

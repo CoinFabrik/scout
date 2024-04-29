@@ -10,6 +10,7 @@ pub mod vec_considerations {
     pub struct VecConsiderations {
         on_chain_log: Mapping<AccountId, String>,
         donations: StorageVec<String>,
+        test: Mapping<AccountId, Balance>,
     }
 
     impl VecConsiderations {
@@ -21,9 +22,7 @@ pub mod vec_considerations {
         #[ink(message)]
         pub fn do_something(&mut self, data: String) {
             let caller = self.env().caller();
-
             let example = format!("{caller:?}: {data}");
-
             // Panics if data overgrows the static buffer size!
             self.on_chain_log.insert(caller, &example);
         }
@@ -34,13 +33,17 @@ pub mod vec_considerations {
             let endowment = self.env().transferred_value();
 
             let log_message = format!("{caller:?} donated {endowment}");
-
             self.donations.push(&log_message);
         }
 
         #[ink(message)]
         pub fn last_donation(&self) -> Option<String> {
             self.donations.peek()
+        }
+
+        #[ink(message)]
+        pub fn shouldnt_turn_on(&mut self, person: AccountId, balance: Balance) {
+            self.test.insert(person, &balance);
         }
     }
 }

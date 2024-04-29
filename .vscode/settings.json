@@ -1,8 +1,5 @@
 {
   "rust-analyzer.rustfmt.extraArgs": ["+nightly"],
   "rust-analyzer.showUnlinkedFileNotification": false,
-  "rust-analyzer.linkedProjects": [
-    "apps/cargo-scout-audit/Cargo.toml",
-    "detectors/Cargo.toml"
-  ]
+  "rust-analyzer.linkedProjects": ["detectors/Cargo.toml"]
 }
