@@ -31,7 +31,7 @@ dylint_linting::impl_late_lint! {
         long_message: "When a get is performed, a copy of the value is received; if that copy is modified, the new value must be set afterwards.",
         severity: "Critical",
         help: "https://coinfabrik.github.io/scout/docs/vulnerabilities/lazy-values-not-set",
-        vulnerability_class: "Known Bugs",
+        vulnerability_class: "Best practices",
     }
 }
 
