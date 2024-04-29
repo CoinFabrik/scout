@@ -119,9 +119,9 @@ jobs:
         with:
           path: ~/.cargo
           key: ${{ runner.os }}-tests-${{ hashFiles('**/Cargo.lock') }}.
-# This is broken until ink! solves stdsimd problem.
-#      - name: Run unit and integration tests
-#        run: python scripts/run-tests.py --detector=${{ matrix.detector }}
+  # This is broken until ink! solves stdsimd problem.
+  #      - name: Run unit and integration tests
+  #        run: python scripts/run-tests.py --detector=${{ matrix.detector }}
 
   comment-on-pr:
     name: Comment on PR
