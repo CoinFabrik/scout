@@ -1,3 +1,5 @@
+#![cfg_attr(not(feature = "std"), no_std, no_main)]
+// This is an example from ink docs.
 #[ink::contract]
 pub mod my_contract {
     // In order for this to actually work with another contract we'd need a way
