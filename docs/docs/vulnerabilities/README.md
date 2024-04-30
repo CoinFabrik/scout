@@ -97,7 +97,7 @@ Critical severity.
 In `ink!` the function `set_contract_storage(key: &K, value: &V)` can be used
 to modify the contract storage under a given key. When a smart contract uses
 this function, the contract needs to check if the caller should be able to
-alter this storage. If this does not happen, an arbitary caller may modify
+alter this storage. If this does not happen, an arbitrary caller may modify
 balances and other relevant contract storage.
 
 Check the following [documentation](2-set-contract-storage.md) for a more detailed explanation of this vulnerability class.
@@ -109,7 +109,7 @@ operations imply (external) calls where control flow is passed to the called
 contract until the execution of the called code is over, then the control is
 delivered back to the caller. A _reentrancy_ vulnerability may happen when a
 user calls a function, this function calls a malicious contract which again
-calls this same function, and this 'reentrancy' has unexpected reprecussions
+calls this same function, and this 'reentrancy' has unexpected repercussions
 to the contract.
 
 This kind of attack was used in Ethereum for
@@ -124,7 +124,7 @@ _reentrancy guards_ which prevent the marked piece of code to be called twice
 from the same contract call. When the vulnerability may be exercised, the
 successive calls to the contract may allow the malicious contract to execute a
 function partially many times, e.g., transfering funds many times but
-substracting the funds only once.
+subtracting the funds only once.
 
 We classified this type of vulnerability under
 the [Reentrancy](#vulnerability-categories) category and assigned it a
@@ -219,13 +219,13 @@ In our example, we see an exploit scenario involving a contract using the `expec
 
 Check the following [documentation](8-unsafe-expect.md) for a more detailed explanation of this vulnerability class.
 
-### 9 - Unsafe unrwap
+### 9 - Unsafe unwrap
 
 This vulnerability class pertains to the inappropriate usage of the `unwrap` method in Rust, which is commonly employed for error handling. The `unwrap` method retrieves the inner value of an `Option` or `Result`, but if an error or `None` occurs, it triggers a panic and crashes the program.
 
 This vulnerability again falls under the [Validations and error handling](#vulnerability-categories) category and has a Medium severity.
 
-In our example, we consider an contract that utilizes the `unwrap` method to retrieve the balance of an account from a mapping. If there is no entry for the specified account, the contract will panic and abruptly halt execution, opening avenues for malicious exploitation.
+In our example, we consider a contract that utilizes the `unwrap` method to retrieve the balance of an account from a mapping. If there is no entry for the specified account, the contract will panic and abruptly halt execution, opening avenues for malicious exploitation.
 
 Check the following [documentation](9-unsafe-unwrap.md) for a more detailed explanation of this vulnerability class.
 
@@ -322,7 +322,7 @@ security implications, under the [Best practices](#vulnerability-categories) cat
 
 ### 21 - Unprotected set code hash
 
-If users are allowed to call `set_code_hash`, they can intentionally modify the contract behaviour, leading to the loss of all associated data/tokens and functionalities given by this contract or by others that depend on it. To prevent this, the function should be restricted to administrators or authorized users only.
+If users are allowed to call `set_code_hash`, they can intentionally modify the contract behavior, leading to the loss of all associated data/tokens and functionalities given by this contract or by others that depend on it. To prevent this, the function should be restricted to administrators or authorized users only.
 
 This vulnerability falls under the [Authorization](#vulnerability-categories) category
 and has a Critical severity.
@@ -331,7 +331,7 @@ Check the following [documentation](21-unprotected-set-code-hash.md) for a more 
 
 ### 22 - Unprotected mapping operation
 
-Modifying mappings with an arbitrary key given by the user could lead to unintented modifications of critical data, modifying data belonging to other users, causing denial of service, unathorized access, and other potential issues.
+Modifying mappings with an arbitrary key given by the user could lead to unintended modifications of critical data, modifying data belonging to other users, causing denial of service, unauthorized access, and other potential issues.
 
 This vulnerability falls under the [Validations and error handling](#vulnerability-categories) category
 and has a Critical severity.
@@ -349,7 +349,7 @@ Check the following [documentation](23-lazy-delegate.md) for a more detailed exp
 
 ### 24 - Incorrect exponentiation
 
-It's common to use `^` for exponentiation.  However in Rust, `^` is the XOR operator. If the `^` operator is used, it could lead to unexpected behaviour in the contract. It's recommended to use the method `pow()` for exponentiation or `.bitxor()` for XOR operations.
+It's common to use `^` for exponentiation.  However in Rust, `^` is the XOR operator. If the `^` operator is used, it could lead to unexpected behavior in the contract. It's recommended to use the method `pow()` for exponentiation or `.bitxor()` for XOR operations.
 
 Check the following [documentation](24-incorrect-exponentiation.md) for a more detailed explanation of this vulnerability class.
 
@@ -367,7 +367,7 @@ Check the following [documentation](26-avoid-unsafe-block.md) for a more detaile
 
 ### 27 - Warning sr25519_verify
 
-It is clear that any production code should not rely on unstable features, as they may change in future versions of the language. This is the case for `sr25529_verify` method.
+It is clear that any production code should not rely on unstable features, as they may change in future versions of the language. This is the case for the `sr25529_verify` method.
 
 Check the following [documentation](27-warning-sr25519-verify.md) for a more detailed explanation of this vulnerability class.
 
