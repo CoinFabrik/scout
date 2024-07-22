@@ -11,7 +11,7 @@ use semver::*;
 
 const LINT_MESSAGE: &str = "Use the latest version of ink!";
 
-dylint_linting::declare_early_lint! {
+scout_audit_dylint_linting::declare_early_lint! {
     /// ### What it does
     /// Checks the ink! version of the contract
     /// ### Why is this bad?
@@ -53,7 +53,7 @@ impl EarlyLintPass for CheckInkVersion {
         let ink_version = VersionReq::parse(&ink_version.replace('\"', "")).unwrap();
 
         if !ink_version.matches(&req) {
-            scout_audit_clippy_utils::diagnostics::span_lint_and_help(
+            clippy_utils::diagnostics::span_lint_and_help(
                 cx,
                 CHECK_INK_VERSION,
                 rustc_span::DUMMY_SP,

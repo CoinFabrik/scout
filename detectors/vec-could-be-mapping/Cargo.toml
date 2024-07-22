@@ -1,19 +1,16 @@
 [package]
+edition = "2021"
 name = "vec-could-be-mapping"
 version = "0.1.0"
-edition = "2021"
 
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
-scout-audit-clippy-utils = { workspace = true }
-dylint_linting = { workspace = true }
+clippy_utils = { workspace = true }
 if_chain = { workspace = true }
-itertools = {workspace = true}
-
-[dev-dependencies]
-dylint_testing = { workspace = true }
+itertools = { workspace = true }
+scout-audit-dylint-linting = { workspace = true }
 
 [package.metadata.rust-analyzer]
 rustc_private = true

@@ -16,7 +16,7 @@ use rustc_span::Span;
 
 const LINT_MESSAGE:&str = "Abitrary users should not have control over keys because it implies writing any value of left mapping, lazy variable, or the main struct of the contract located in position 0 of the storage";
 
-dylint_linting::declare_late_lint! {
+scout_audit_dylint_linting::declare_late_lint! {
     /// ### What it does
     /// Checks for calls to env::set_contract_storage.
     ///
@@ -144,7 +144,7 @@ impl<'tcx> LateLintPass<'tcx> for SetStorageWarn {
         walk_expr(&mut reentrant_storage, body.value);
 
         if reentrant_storage.has_set_contract && reentrant_storage.unprotected {
-            scout_audit_clippy_utils::diagnostics::span_lint_and_help(
+            clippy_utils::diagnostics::span_lint_and_help(
                 cx,
                 SET_STORAGE_WARN,
                 reentrant_storage.span.unwrap(),

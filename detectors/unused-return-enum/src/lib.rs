@@ -13,7 +13,7 @@ use rustc_span::Span;
 
 const LINT_MESSAGE: &str = "Unused return enum";
 
-dylint_linting::declare_late_lint! {
+scout_audit_dylint_linting::declare_late_lint! {
     /// ### What it does
     /// It warns if a fuction that returns a Result type does not return a Result enum variant (Ok/Err)
     ///
@@ -197,7 +197,7 @@ impl<'tcx> LateLintPass<'tcx> for UnusedReturnEnum {
             && (visitor.count_err == 0 || visitor.count_ok == 0)
         {
             visitor.span.iter().for_each(|span| {
-                scout_audit_clippy_utils::diagnostics::span_lint_and_help(
+                clippy_utils::diagnostics::span_lint_and_help(
                     cx,
                     UNUSED_RETURN_ENUM,
                     *span,

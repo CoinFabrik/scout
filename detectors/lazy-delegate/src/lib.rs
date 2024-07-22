@@ -15,7 +15,7 @@ use rustc_span::Span;
 
 const LINT_MESSAGE: &str = "Delegate call with non-lazy, non-mapping storage";
 
-dylint_linting::impl_pre_expansion_lint! {
+scout_audit_dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does
     /// Checks for non-lazy storage when using delegate calls.
     /// ### Why is this bad?
@@ -86,7 +86,7 @@ impl EarlyLintPass for LazyDelegate {
         }
 
         if !self.delegate_uses.is_empty() && !self.non_lazy_manual_storage_spans.is_empty() {
-            scout_audit_clippy_utils::diagnostics::span_lint_and_help(
+            clippy_utils::diagnostics::span_lint_and_help(
                 cx,
                 LAZY_DELEGATE,
                 id.span,
@@ -96,7 +96,7 @@ impl EarlyLintPass for LazyDelegate {
             );
 
             for span in &self.non_lazy_manual_storage_spans {
-                scout_audit_clippy_utils::diagnostics::span_lint_and_help(
+                clippy_utils::diagnostics::span_lint_and_help(
                     cx,
                     LAZY_DELEGATE,
                     *span,

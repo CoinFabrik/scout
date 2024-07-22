@@ -24,7 +24,7 @@ use rustc_span::Span;
 
 const LINT_MESSAGE: &str = "This mapping operation is called without access control on a different key than the caller's address";
 
-dylint_linting::impl_late_lint! {
+scout_audit_dylint_linting::impl_late_lint! {
     pub UNPROTECTED_MAPPING_OPERATION,
     Warn,
     LINT_MESSAGE,
@@ -172,7 +172,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
                 &mut HashSet::<BasicBlock>::default(),
             );
             for place in unchecked_places {
-                scout_audit_clippy_utils::diagnostics::span_lint(
+                clippy_utils::diagnostics::span_lint(
                     cx,
                     UNPROTECTED_MAPPING_OPERATION,
                     place.1,

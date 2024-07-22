@@ -11,12 +11,12 @@ use rustc_hir::{Body, FnDecl};
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::Span;
-use scout_audit_clippy_utils::diagnostics::span_lint_and_help;
+use clippy_utils::diagnostics::span_lint_and_help;
 
 const LINT_MESSAGE: &str = "'^' It is not an exponential operator. It is a bitwise XOR.";
 const LINT_HELP: &str = "If you want to use XOR, use bitxor(). If you want to raise a number use .checked_pow() or .pow() ";
 
-dylint_linting::declare_late_lint! {
+scout_audit_dylint_linting::declare_late_lint! {
     pub INCORRECT_EXPONENTIATION,
     Warn,
     LINT_MESSAGE,

@@ -11,7 +11,7 @@ use rustc_span::sym;
 
 const LINT_MESSAGE: &str = "Using `core::mem::forget` is not recommended.";
 
-dylint_linting::impl_pre_expansion_lint! {
+scout_audit_dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does
     /// Checks for `core::mem::forget` usage.
     /// ### Why is this bad?
@@ -79,7 +79,7 @@ impl EarlyLintPass for AvoidStdCoreMemForget {
             if path.segments[1].ident.name.to_string() == "mem";
             if path.segments[2].ident.name.to_string() == "forget";
             then {
-                scout_audit_clippy_utils::diagnostics::span_lint_and_help(
+                clippy_utils::diagnostics::span_lint_and_help(
                     cx,
                     AVOID_STD_CORE_MEM_FORGET,
                     expr.span,

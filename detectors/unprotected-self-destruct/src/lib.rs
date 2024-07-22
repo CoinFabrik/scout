@@ -21,7 +21,7 @@ use rustc_span::Span;
 
 const LINT_MESSAGE: &str = "This terminate_contract is called without access control";
 
-dylint_linting::impl_late_lint! {
+scout_audit_dylint_linting::impl_late_lint! {
     pub UNPROTECTED_SELF_DESTRUCT,
     Warn,
     LINT_MESSAGE,
@@ -145,7 +145,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
             if caller_and_terminate.callers.is_empty() {
                 for terminate in caller_and_terminate.terminates {
                     if let TerminatorKind::Call { fn_span, .. } = terminate.0.terminator().kind {
-                        scout_audit_clippy_utils::diagnostics::span_lint(
+                        clippy_utils::diagnostics::span_lint(
                             cx,
                             UNPROTECTED_SELF_DESTRUCT,
                             fn_span,
@@ -162,7 +162,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
                     &mut vec![],
                 );
                 for place in unchecked_places {
-                    scout_audit_clippy_utils::diagnostics::span_lint(
+                    clippy_utils::diagnostics::span_lint(
                         cx,
                         UNPROTECTED_SELF_DESTRUCT,
                         place.1,

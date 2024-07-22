@@ -23,7 +23,7 @@ use rustc_span::Span;
 
 const LINT_MESSAGE: &str = "This vector operation is called without access control";
 
-dylint_linting::impl_late_lint! {
+scout_audit_dylint_linting::impl_late_lint! {
     /// ### What it does
     /// Checks for array pushes without access control.
     /// ### Why is this bad?
@@ -216,7 +216,7 @@ impl<'tcx> LateLintPass<'tcx> for UnexpectedRevertWarn {
                 &mut HashSet::<BasicBlock>::default(),
             );
             for place in unchecked_places {
-                scout_audit_clippy_utils::diagnostics::span_lint(
+                clippy_utils::diagnostics::span_lint(
                     cx,
                     UNEXPECTED_REVERT_WARN,
                     place.1,

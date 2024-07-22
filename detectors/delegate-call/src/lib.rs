@@ -16,7 +16,7 @@ use rustc_span::Span;
 
 const LINT_MESSAGE: &str = "Passing arguments to the target of a delegate call is not safe, as it allows the caller to set a malicious hash as the target.";
 
-dylint_linting::declare_late_lint! {
+scout_audit_dylint_linting::declare_late_lint! {
     /// ### What it does
     /// Checks for delegated calls to contracts passed as arguments.
     /// ### Why is this bad?
@@ -149,7 +149,7 @@ impl<'tcx> LateLintPass<'tcx> for DelegateCall {
         walk_expr(&mut delegate_storage, body.value);
 
         if delegate_storage.has_vulnerable_delegate {
-            scout_audit_clippy_utils::diagnostics::span_lint_and_help(
+            clippy_utils::diagnostics::span_lint_and_help(
                 cx,
                 DELEGATE_CALL,
                 delegate_storage.span.unwrap(),

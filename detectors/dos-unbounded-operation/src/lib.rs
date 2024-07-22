@@ -15,7 +15,7 @@ use rustc_span::{def_id::LocalDefId, Span};
 const LINT_MESSAGE: &str =
     "In order to prevent a single transaction from consuming all the gas in a block, unbounded operations must be avoided";
 
-dylint_linting::declare_late_lint! {
+scout_audit_dylint_linting::declare_late_lint! {
     /// ### What it does
     /// This detector checks that when using for or while loops, their conditions limit the execution to a constant number of iterations.
     /// ### Why is this bad?
@@ -97,7 +97,7 @@ impl<'tcx> LateLintPass<'tcx> for DosUnboundedOperation {
             walk_expr(&mut visitor, body.value);
 
             for span in visitor.span_constant {
-                scout_audit_clippy_utils::diagnostics::span_lint_and_help(
+                clippy_utils::diagnostics::span_lint_and_help(
                     cx,
                     DOS_UNBOUNDED_OPERATION,
                     span,
