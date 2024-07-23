@@ -7,12 +7,12 @@ use rustc_hir::{self as hir, Body, Expr, ExprKind, UnOp};
 use rustc_lint::LateContext;
 use rustc_lint::LateLintPass;
 use rustc_span::Span;
-use scout_audit_clippy_utils::consts::constant_simple;
-use scout_audit_clippy_utils::is_integer_literal;
+use clippy_utils::consts::constant_simple;
+use clippy_utils::is_integer_literal;
 
 pub const LINT_MESSAGE: &str = "Potential for integer arithmetic overflow/underflow. Consider checked, wrapping or saturating arithmetic.";
 
-dylint_linting::impl_late_lint! {
+scout_audit_dylint_linting::impl_late_lint! {
     /// ### What it does
     /// Checks for integer arithmetic operations which could overflow or panic.
     ///
@@ -138,7 +138,7 @@ impl ArithmeticContext {
                     hir::ExprKind::Lit(_lit) => (),
                     hir::ExprKind::Unary(hir::UnOp::Neg, expr) => {
                         if is_integer_literal(expr, 1) {
-                            scout_audit_clippy_utils::diagnostics::span_lint_and_help(
+                            clippy_utils::diagnostics::span_lint_and_help(
                                 cx,
                                 INTEGER_OVERFLOW_UNDERFLOW,
                                 expr.span,
@@ -150,7 +150,7 @@ impl ArithmeticContext {
                         }
                     }
                     _ => {
-                        scout_audit_clippy_utils::diagnostics::span_lint_and_help(
+                        clippy_utils::diagnostics::span_lint_and_help(
                             cx,
                             INTEGER_OVERFLOW_UNDERFLOW,
                             expr.span,
@@ -162,7 +162,7 @@ impl ArithmeticContext {
                     }
                 },
                 _ => {
-                    scout_audit_clippy_utils::diagnostics::span_lint_and_help(
+                    clippy_utils::diagnostics::span_lint_and_help(
                         cx,
                         INTEGER_OVERFLOW_UNDERFLOW,
                         expr.span,
@@ -187,7 +187,7 @@ impl ArithmeticContext {
         }
         let ty = cx.typeck_results().expr_ty(arg);
         if constant_simple(cx, cx.typeck_results(), expr).is_none() && ty.is_integral() {
-            scout_audit_clippy_utils::diagnostics::span_lint_and_help(
+            clippy_utils::diagnostics::span_lint_and_help(
                 cx,
                 INTEGER_OVERFLOW_UNDERFLOW,
                 expr.span,

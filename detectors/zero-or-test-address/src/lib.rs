@@ -22,7 +22,7 @@ use rustc_span::Span;
 
 const LINT_MESSAGE: &str = "Not checking for a zero-address could lead to a locked contract";
 
-dylint_linting::declare_late_lint! {
+scout_audit_dylint_linting::declare_late_lint! {
     /// ### What it does
     ///
     /// Checks if function parameters of type `AccountId` are being compared with a zero address.
@@ -189,7 +189,7 @@ impl<'tcx> LateLintPass<'tcx> for ZeroOrTestAddress {
 
         for param in zerocheck_storage.acc_id_params {
             if !zerocheck_storage.checked_params.contains(&param.hir_id) {
-                scout_audit_clippy_utils::diagnostics::span_lint_and_help(
+                clippy_utils::diagnostics::span_lint_and_help(
                     cx,
                     ZERO_OR_TEST_ADDRESS,
                     param.span,

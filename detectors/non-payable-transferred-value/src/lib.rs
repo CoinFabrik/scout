@@ -10,12 +10,12 @@ use rustc_ast::{
 };
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::Span;
-use scout_audit_clippy_utils::diagnostics::span_lint_and_help;
+use clippy_utils::diagnostics::span_lint_and_help;
 
 const LINT_MESSAGE: &str =
     "Using `transferred_value` without #[ink(payable)] will always return 0.";
 
-dylint_linting::impl_pre_expansion_lint! {
+scout_audit_dylint_linting::impl_pre_expansion_lint! {
     pub NON_PAYABLE_TRANSFERRED_VALUE,
     Warn,
     LINT_MESSAGE,

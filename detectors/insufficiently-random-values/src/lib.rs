@@ -8,7 +8,7 @@ use rustc_lint::{LateContext, LateLintPass};
 
 const LINT_MESSAGE: &str = "In order to prevent randomness manipulations by validators block_timestamp should not be used as random number source";
 
-dylint_linting::declare_late_lint! {
+scout_audit_dylint_linting::declare_late_lint! {
     /// ### What it does
     /// This detector prevents the usage of timestamp/block number and modulo operator as a random number source.
     ///
@@ -41,7 +41,7 @@ impl<'tcx> LateLintPass<'tcx> for InsufficientlyRandomValues {
             if path.ident.as_str() == "block_timestamp" ||
             path.ident.as_str() == "block_number";
             then {
-                scout_audit_clippy_utils::diagnostics::span_lint_and_help(
+                clippy_utils::diagnostics::span_lint_and_help(
                     cx,
                     INSUFFICIENTLY_RANDOM_VALUES,
                     expr.span,

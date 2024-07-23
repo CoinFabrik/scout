@@ -17,7 +17,7 @@ use rustc_span::Span;
 
 const LINT_MESSAGE:&str = "External calls could open the opportunity for a malicious contract to execute any arbitrary code";
 
-dylint_linting::declare_late_lint! {
+scout_audit_dylint_linting::declare_late_lint! {
     /// ### What it does
     /// This linting rule checks whether the 'check-effect' interaction pattern has been properly followed by code that invokes a contract that may call back the original one.
     /// ### Why is this bad?
@@ -240,7 +240,7 @@ impl<'tcx> LateLintPass<'tcx> for Reentrancy1 {
             && reentrant_storage.allow_reentrancy_flag
             && reentrant_storage.state_change
         {
-            scout_audit_clippy_utils::diagnostics::span_lint_and_help(
+            clippy_utils::diagnostics::span_lint_and_help(
                 cx,
                 REENTRANCY_1,
                 reentrant_storage.span.unwrap(),

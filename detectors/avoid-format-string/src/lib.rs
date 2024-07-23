@@ -11,11 +11,11 @@ use rustc_ast::{
 };
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::{sym, Span};
-use scout_audit_clippy_utils::sym;
+use clippy_utils::sym;
 
 const LINT_MESSAGE: &str = "The format! macro should not be used.";
 
-dylint_linting::impl_pre_expansion_lint! {
+scout_audit_dylint_linting::impl_pre_expansion_lint! {
     /// ### What it does
     /// Detects the usage of `format!` macro.
     ///
@@ -93,7 +93,7 @@ impl EarlyLintPass for AvoidFormatString {
             if mac.path == sym!(format);
 
             then {
-                scout_audit_clippy_utils::diagnostics::span_lint_and_help(
+                clippy_utils::diagnostics::span_lint_and_help(
                     cx,
                     AVOID_FORMAT_STRING,
                     expr.span,

@@ -24,7 +24,7 @@ use rustc_span::Span;
 
 const LINT_MESSAGE: &str = "Division before multiplication might result in a loss of precision";
 
-dylint_linting::declare_late_lint! {
+scout_audit_dylint_linting::declare_late_lint! {
     /// ### What it does
     /// Checks the existence of a division before a multiplication.
     ///
@@ -365,7 +365,7 @@ impl<'tcx> LateLintPass<'tcx> for DivideBeforeMultiply {
             );
 
             for span in spans {
-                scout_audit_clippy_utils::diagnostics::span_lint_and_help(
+                clippy_utils::diagnostics::span_lint_and_help(
                     cx,
                     DIVIDE_BEFORE_MULTIPLY,
                     span,
@@ -382,7 +382,7 @@ impl<'tcx> LateLintPass<'tcx> for DivideBeforeMultiply {
             if BinOpKind::Mul == op.node;
             then{
                 for division in get_divisions_inside_expr(expr) {
-                    scout_audit_clippy_utils::diagnostics::span_lint_and_help(
+                    clippy_utils::diagnostics::span_lint_and_help(
                         cx,
                         DIVIDE_BEFORE_MULTIPLY,
                         division,

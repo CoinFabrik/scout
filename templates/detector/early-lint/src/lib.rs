@@ -9,7 +9,7 @@ use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::Span;
 use scout_audit_clippy_utils::diagnostics::span_lint_and_help;
 
-dylint_linting::declare_early_lint! {
+scout_audit_dylint_linting::declare_early_lint! {
     /// ### What it does
     /// Describe what the lint does.
     ///

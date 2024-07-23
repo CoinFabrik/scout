@@ -10,11 +10,11 @@ use rustc_hir::{
 };
 use rustc_lint::LateLintPass;
 use rustc_span::Span;
-use scout_audit_clippy_utils::diagnostics::span_lint_and_help;
+use clippy_utils::diagnostics::span_lint_and_help;
 
 const LINT_MESSAGE: &str = "This function is from the unstable interface, which is unsafe and normally is not available on production chains.";
 
-dylint_linting::declare_late_lint! {
+scout_audit_dylint_linting::declare_late_lint! {
     pub WARNING_SR25519_VERIFY,
     Warn,
     LINT_MESSAGE,

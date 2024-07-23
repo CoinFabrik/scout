@@ -14,7 +14,7 @@ use rustc_span::{Span, Symbol};
 const LINT_MESSAGE: &str =
     "This is a low level way to instantiate another smart contract, calling the legacy `instantiate_v1` host function.";
 
-dylint_linting::declare_late_lint! {
+scout_audit_dylint_linting::declare_late_lint! {
     pub DONT_USE_INSTANTIATE_CONTRACT_V1,
     Warn,
     LINT_MESSAGE,
@@ -60,7 +60,7 @@ impl<'tcx> LateLintPass<'tcx> for DontUseInstantiateContractV1 {
 
         visitor.has_instantiate_contract_v1_span.iter().for_each(|span| {
             if let Some(span) = span {
-                scout_audit_clippy_utils::diagnostics::span_lint_and_help(
+                clippy_utils::diagnostics::span_lint_and_help(
                     cx,
                     DONT_USE_INSTANTIATE_CONTRACT_V1,
                     *span,

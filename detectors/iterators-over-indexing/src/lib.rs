@@ -17,7 +17,7 @@ use rustc_span::Span;
 const LINT_MESSAGE: &str =
     "Hardcoding an index could lead to panic if the top bound is out of bounds.";
 
-dylint_linting::declare_late_lint! {
+scout_audit_dylint_linting::declare_late_lint! {
     pub ITERATOR_OVER_INDEXING,
     Warn,
     LINT_MESSAGE,
@@ -118,7 +118,7 @@ impl<'tcx> LateLintPass<'tcx> for IteratorOverIndexing {
             walk_expr(&mut visitor, body.value);
 
             for span in visitor.span_constant {
-                scout_audit_clippy_utils::diagnostics::span_lint_and_help(
+                clippy_utils::diagnostics::span_lint_and_help(
                     cx,
                     ITERATOR_OVER_INDEXING,
                     span,
