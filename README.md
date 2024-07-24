@@ -15,23 +15,25 @@ To improve coverage and precision, we´ll persist in research efforts on static 
 
 ## Quick Start
 
-For a quick start, make sure that [Cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html) is installed on your computer. Then, install Scout dependencies by running the following command:
+**Install Scout Audit:**
 
-```bash
-cargo install cargo-dylint dylint-link
-```
-
-Afterwards, install Scout with the following command:
+Make sure that [Cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html) is installed on your computer. Then, install Scout with the following command:
 
 ```bash
 cargo install cargo-scout-audit
 ```
 
-To run Scout on your project, navigate to its root directory and execute the following command:
+**Run Scout Audit:**
+
+To run Scout on your project execute the following command:
 
 ```bash
 cargo scout-audit
 ```
+
+:bulb: Scout supports [Cargo Workspaces](https://doc.rust-lang.org/book/ch14-03-cargo-workspaces.html). When run on a workspace, Scout will be executed on all packages specified as members of the workspace.
+
+:warning: Make sure that your smart contracts compile properly. Scout won't run if any compilation errors exist.
 
 For more information on installation and usage, please refer to the [Getting Started](https://coinfabrik.github.io/scout/docs/intro) section in our documentation below.
 
