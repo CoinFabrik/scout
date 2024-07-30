@@ -12,7 +12,7 @@ use rustc_hir::{
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::symbol::Ident;
 use rustc_span::Span;
-use clippy_utils::diagnostics::span_lint_and_help;
+use clippy_wrappers::span_lint_and_help;
 const LINT_MESSAGE: &str = "Do not use these method with an unsized (dynamically sized) type.";
 scout_audit_dylint_linting::impl_late_lint! {
     pub BUFFERING_UNSIZED_TYPES,

@@ -60,7 +60,7 @@ impl<'tcx> LateLintPass<'tcx> for DontUseInvokeContractV1 {
 
         visitor.has_invoke_contract_v1_span.iter().for_each(|span| {
             if let Some(span) = span {
-                clippy_utils::diagnostics::span_lint_and_help(
+                clippy_wrappers::span_lint_and_help(
                     cx,
                     DONT_USE_INVOKE_CONTRACT_V1,
                     *span,

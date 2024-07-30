@@ -15,7 +15,8 @@ use rustc_hir::{
 };
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::{sym, Span, Symbol};
-use clippy_utils::{diagnostics::span_lint_and_help, higher};
+use clippy_utils::higher;
+use clippy_wrappers::span_lint_and_help;
 
 const LINT_MESSAGE: &str = "Unsafe usage of `unwrap`";
 const PANIC_INDUCING_FUNCTIONS: [&str; 2] = ["panic", "bail"];

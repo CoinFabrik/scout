@@ -172,7 +172,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedMappingOperation {
                 &mut HashSet::<BasicBlock>::default(),
             );
             for place in unchecked_places {
-                clippy_utils::diagnostics::span_lint(
+                clippy_wrappers::span_lint(
                     cx,
                     UNPROTECTED_MAPPING_OPERATION,
                     place.1,

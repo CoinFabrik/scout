@@ -119,7 +119,7 @@ fn check_macro_call(cx: &EarlyContext, span: Span, mac: &P<MacCall>) {
     .iter()
     .any(|sym| &mac.path == sym)
     {
-        clippy_utils::diagnostics::span_lint_and_help(
+        clippy_wrappers::span_lint_and_help(
             cx,
             ASSERT_VIOLATION,
             span,

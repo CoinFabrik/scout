@@ -86,7 +86,7 @@ impl EarlyLintPass for LazyDelegate {
         }
 
         if !self.delegate_uses.is_empty() && !self.non_lazy_manual_storage_spans.is_empty() {
-            clippy_utils::diagnostics::span_lint_and_help(
+            clippy_wrappers::span_lint_and_help(
                 cx,
                 LAZY_DELEGATE,
                 id.span,
@@ -96,7 +96,7 @@ impl EarlyLintPass for LazyDelegate {
             );
 
             for span in &self.non_lazy_manual_storage_spans {
-                clippy_utils::diagnostics::span_lint_and_help(
+                clippy_wrappers::span_lint_and_help(
                     cx,
                     LAZY_DELEGATE,
                     *span,

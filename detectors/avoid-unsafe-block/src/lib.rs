@@ -5,7 +5,7 @@ extern crate rustc_span;
 
 use rustc_ast::{BlockCheckMode, Expr, ExprKind, UnsafeSource};
 use rustc_lint::{EarlyContext, EarlyLintPass};
-use clippy_utils::diagnostics::span_lint;
+use clippy_wrappers::span_lint;
 
 const LINT_MESSAGE: &str = "Avoid using unsafe blocks as it may lead to undefined behavior.";
 scout_audit_dylint_linting::impl_pre_expansion_lint! {

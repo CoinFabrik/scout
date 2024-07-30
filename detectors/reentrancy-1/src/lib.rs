@@ -240,7 +240,7 @@ impl<'tcx> LateLintPass<'tcx> for Reentrancy1 {
             && reentrant_storage.allow_reentrancy_flag
             && reentrant_storage.state_change
         {
-            clippy_utils::diagnostics::span_lint_and_help(
+            clippy_wrappers::span_lint_and_help(
                 cx,
                 REENTRANCY_1,
                 reentrant_storage.span.unwrap(),

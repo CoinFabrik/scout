@@ -1,9 +1,10 @@
 [workspace]
-exclude = [".cargo", "target"]
+exclude = [".cargo", "target", ".vscode"]
 members = ["*"]
 
 [workspace.dependencies]
 clippy_utils = { git = "https://github.com/rust-lang/rust-clippy", rev = "99c7838" }
+clippy_wrappers = { package = "scout-audit-clippy-wrappers", git = "https://github.com/CoinFabrik/scout-audit/", rev = "af3ef9c298b46ea46a01c00d385e6b2326c9b5bb" }
 if_chain = "=1.0.2"
 itertools = { version = "=0.13" }
 scout-audit-dylint-linting = { git = "https://github.com/CoinFabrik/scout-audit", rev = "e03ede4" }

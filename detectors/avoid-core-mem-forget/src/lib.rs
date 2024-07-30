@@ -79,7 +79,7 @@ impl EarlyLintPass for AvoidStdCoreMemForget {
             if path.segments[1].ident.name.to_string() == "mem";
             if path.segments[2].ident.name.to_string() == "forget";
             then {
-                clippy_utils::diagnostics::span_lint_and_help(
+                clippy_wrappers::span_lint_and_help(
                     cx,
                     AVOID_STD_CORE_MEM_FORGET,
                     expr.span,

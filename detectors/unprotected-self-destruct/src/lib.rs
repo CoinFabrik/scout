@@ -145,7 +145,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
             if caller_and_terminate.callers.is_empty() {
                 for terminate in caller_and_terminate.terminates {
                     if let TerminatorKind::Call { fn_span, .. } = terminate.0.terminator().kind {
-                        clippy_utils::diagnostics::span_lint(
+                        clippy_wrappers::span_lint(
                             cx,
                             UNPROTECTED_SELF_DESTRUCT,
                             fn_span,
@@ -162,7 +162,7 @@ impl<'tcx> LateLintPass<'tcx> for UnprotectedSelfDestruct {
                     &mut vec![],
                 );
                 for place in unchecked_places {
-                    clippy_utils::diagnostics::span_lint(
+                    clippy_wrappers::span_lint(
                         cx,
                         UNPROTECTED_SELF_DESTRUCT,
                         place.1,

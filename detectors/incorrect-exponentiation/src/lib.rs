@@ -11,7 +11,7 @@ use rustc_hir::{Body, FnDecl};
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::Span;
-use clippy_utils::diagnostics::span_lint_and_help;
+use clippy_wrappers::span_lint_and_help;
 
 const LINT_MESSAGE: &str = "'^' It is not an exponential operator. It is a bitwise XOR.";
 const LINT_HELP: &str = "If you want to use XOR, use bitxor(). If you want to raise a number use .checked_pow() or .pow() ";

@@ -9,7 +9,7 @@ crate-type = ["cdylib"]
 [dependencies]
 if_chain = { workspace = true }
 scout-audit-dylint-linting = { workspace = true }
-
+clippy_wrappers = { workspace = true }
 clippy_utils = { workspace = true }
 
 [package.metadata.rust-analyzer]

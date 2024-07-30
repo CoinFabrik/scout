@@ -14,7 +14,7 @@ use rustc_hir::{
 };
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::Span;
-use clippy_utils::diagnostics::span_lint_and_note;
+use clippy_wrappers::span_lint_and_note;
 
 scout_audit_dylint_linting::impl_late_lint! {
     pub AVOID_AUTOKEY_UPGRADABLE,
