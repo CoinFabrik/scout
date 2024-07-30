@@ -4,7 +4,7 @@ members = ["*"]
 
 [workspace.dependencies]
 clippy_utils = { git = "https://github.com/rust-lang/rust-clippy", rev = "99c7838" }
-clippy_wrappers = { package = "scout-audit-clippy-wrappers", git = "https://github.com/CoinFabrik/scout-audit/", rev = "af3ef9c298b46ea46a01c00d385e6b2326c9b5bb" }
+clippy_wrappers = { package = "scout-audit-clippy-wrappers-ink", git = "https://github.com/CoinFabrik/scout-audit/", rev = "e68a1bcccd0c3c65c8bbe3d6e7aa76f75abe8f92" }
 if_chain = "=1.0.2"
 itertools = { version = "=0.13" }
 scout-audit-dylint-linting = { git = "https://github.com/CoinFabrik/scout-audit", rev = "e03ede4" }
