@@ -4,6 +4,7 @@
 extern crate rustc_ast;
 extern crate rustc_span;
 
+use clippy_utils::sym;
 use if_chain::if_chain;
 use rustc_ast::{
     tokenstream::{TokenStream, TokenTree},
@@ -11,7 +12,6 @@ use rustc_ast::{
 };
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::{sym, Span};
-use clippy_utils::sym;
 
 const LINT_MESSAGE: &str = "The format! macro should not be used.";
 

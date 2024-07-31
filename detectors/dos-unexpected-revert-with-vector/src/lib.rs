@@ -216,12 +216,7 @@ impl<'tcx> LateLintPass<'tcx> for UnexpectedRevertWarn {
                 &mut HashSet::<BasicBlock>::default(),
             );
             for place in unchecked_places {
-                clippy_wrappers::span_lint(
-                    cx,
-                    UNEXPECTED_REVERT_WARN,
-                    place.1,
-                    LINT_MESSAGE,
-                );
+                clippy_wrappers::span_lint(cx, UNEXPECTED_REVERT_WARN, place.1, LINT_MESSAGE);
             }
         }
 

@@ -3,12 +3,12 @@
 extern crate rustc_hir;
 extern crate rustc_span;
 
+use clippy_utils::consts::constant_simple;
+use clippy_utils::is_integer_literal;
 use rustc_hir::{self as hir, Body, Expr, ExprKind, UnOp};
 use rustc_lint::LateContext;
 use rustc_lint::LateLintPass;
 use rustc_span::Span;
-use clippy_utils::consts::constant_simple;
-use clippy_utils::is_integer_literal;
 
 pub const LINT_MESSAGE: &str = "Potential for integer arithmetic overflow/underflow. Consider checked, wrapping or saturating arithmetic.";
 

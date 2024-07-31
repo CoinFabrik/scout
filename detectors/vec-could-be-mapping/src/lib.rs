@@ -8,6 +8,7 @@ extern crate rustc_span;
 
 use std::collections::HashMap;
 
+use clippy_wrappers::span_lint_and_help;
 use itertools::Itertools;
 use rustc_hir::intravisit::{walk_expr, FnKind, Visitor};
 use rustc_hir::{Body, Expr, ExprKind, FnDecl, GenericArg, GenericArgs, PathSegment, QPath};
@@ -15,7 +16,6 @@ use rustc_hir::{Ty, TyKind};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::def_id::LocalDefId;
 use rustc_span::Span;
-use clippy_wrappers::span_lint_and_help;
 
 const LINT_MESSAGE: &str =
     "You are iterating over a vector of tuples using `find`. Consider using a mapping instead.";

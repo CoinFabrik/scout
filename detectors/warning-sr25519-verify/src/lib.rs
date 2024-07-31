@@ -4,13 +4,13 @@ extern crate rustc_ast;
 extern crate rustc_hir;
 extern crate rustc_span;
 
+use clippy_wrappers::span_lint_and_help;
 use rustc_hir::{
     intravisit::{walk_body, walk_expr, Visitor},
     Expr, ExprKind, QPath,
 };
 use rustc_lint::LateLintPass;
 use rustc_span::Span;
-use clippy_wrappers::span_lint_and_help;
 
 const LINT_MESSAGE: &str = "This function is from the unstable interface, which is unsafe and normally is not available on production chains.";
 
