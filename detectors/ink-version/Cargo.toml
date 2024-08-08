@@ -8,6 +8,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 clippy_utils = { workspace = true }
+clippy_wrappers = { workspace = true }
 if_chain = { workspace = true }
 scout-audit-dylint-linting = { workspace = true }
 semver = "1.0.4"

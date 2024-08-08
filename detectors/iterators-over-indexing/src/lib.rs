@@ -118,7 +118,7 @@ impl<'tcx> LateLintPass<'tcx> for IteratorOverIndexing {
             walk_expr(&mut visitor, body.value);
 
             for span in visitor.span_constant {
-                clippy_utils::diagnostics::span_lint_and_help(
+                clippy_wrappers::span_lint_and_help(
                     cx,
                     ITERATOR_OVER_INDEXING,
                     span,

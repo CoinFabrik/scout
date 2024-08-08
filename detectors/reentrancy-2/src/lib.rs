@@ -280,7 +280,7 @@ impl<'tcx> LateLintPass<'tcx> for Reentrancy2 {
         // Iterate over all potential reentrancy spans and emit a warning for each.
         if reentrancy_visitor.has_insert_operation {
             reentrancy_visitor.reentrancy_spans.into_iter().for_each(|span| {
-                clippy_utils::diagnostics::span_lint_and_help(
+                clippy_wrappers::span_lint_and_help(
                     cx,
                     REENTRANCY_2,
                     span,

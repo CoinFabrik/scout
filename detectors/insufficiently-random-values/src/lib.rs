@@ -41,7 +41,7 @@ impl<'tcx> LateLintPass<'tcx> for InsufficientlyRandomValues {
             if path.ident.as_str() == "block_timestamp" ||
             path.ident.as_str() == "block_number";
             then {
-                clippy_utils::diagnostics::span_lint_and_help(
+                clippy_wrappers::span_lint_and_help(
                     cx,
                     INSUFFICIENTLY_RANDOM_VALUES,
                     expr.span,

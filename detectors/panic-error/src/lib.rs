@@ -4,6 +4,7 @@
 extern crate rustc_ast;
 extern crate rustc_span;
 
+use clippy_utils::sym;
 use if_chain::if_chain;
 use rustc_ast::{
     ptr::P,
@@ -13,7 +14,6 @@ use rustc_ast::{
 };
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::{sym, Span};
-use clippy_utils::sym;
 
 const LINT_MESSAGE: &str = "The panic! macro is used to stop execution when a condition is not met. This is useful for testing and prototyping, but should be avoided in production code";
 
@@ -111,7 +111,7 @@ fn check_macro_call(cx: &EarlyContext, span: Span, mac: &P<MacCall>) {
         if let TokenKind::Literal(lit) = token.kind;
         if lit.kind == LitKind::Str;
         then {
-            clippy_utils::diagnostics::span_lint_and_help(
+            clippy_wrappers::span_lint_and_help(
                 cx,
                 PANIC_ERROR,
                 span,

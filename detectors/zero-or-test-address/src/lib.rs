@@ -189,7 +189,7 @@ impl<'tcx> LateLintPass<'tcx> for ZeroOrTestAddress {
 
         for param in zerocheck_storage.acc_id_params {
             if !zerocheck_storage.checked_params.contains(&param.hir_id) {
-                clippy_utils::diagnostics::span_lint_and_help(
+                clippy_wrappers::span_lint_and_help(
                     cx,
                     ZERO_OR_TEST_ADDRESS,
                     param.span,

@@ -3,6 +3,7 @@
 #![feature(let_chains)]
 extern crate rustc_ast;
 extern crate rustc_span;
+use clippy_wrappers::span_lint_and_help;
 use rustc_ast::{
     tokenstream::{TokenStream, TokenTree},
     visit::{walk_block, walk_expr, Visitor},
@@ -10,7 +11,6 @@ use rustc_ast::{
 };
 use rustc_lint::{EarlyContext, EarlyLintPass};
 use rustc_span::Span;
-use clippy_utils::diagnostics::span_lint_and_help;
 
 const LINT_MESSAGE: &str =
     "Using `transferred_value` without #[ink(payable)] will always return 0.";

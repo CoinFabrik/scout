@@ -97,7 +97,7 @@ impl<'tcx> LateLintPass<'tcx> for DosUnboundedOperation {
             walk_expr(&mut visitor, body.value);
 
             for span in visitor.span_constant {
-                clippy_utils::diagnostics::span_lint_and_help(
+                clippy_wrappers::span_lint_and_help(
                     cx,
                     DOS_UNBOUNDED_OPERATION,
                     span,

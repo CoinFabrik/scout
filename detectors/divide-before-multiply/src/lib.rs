@@ -365,7 +365,7 @@ impl<'tcx> LateLintPass<'tcx> for DivideBeforeMultiply {
             );
 
             for span in spans {
-                clippy_utils::diagnostics::span_lint_and_help(
+                clippy_wrappers::span_lint_and_help(
                     cx,
                     DIVIDE_BEFORE_MULTIPLY,
                     span,
@@ -382,7 +382,7 @@ impl<'tcx> LateLintPass<'tcx> for DivideBeforeMultiply {
             if BinOpKind::Mul == op.node;
             then{
                 for division in get_divisions_inside_expr(expr) {
-                    clippy_utils::diagnostics::span_lint_and_help(
+                    clippy_wrappers::span_lint_and_help(
                         cx,
                         DIVIDE_BEFORE_MULTIPLY,
                         division,

@@ -5,6 +5,7 @@ extern crate rustc_error_messages;
 extern crate rustc_hir;
 extern crate rustc_span;
 
+use clippy_wrappers::span_lint_and_note;
 use itertools::Itertools;
 use rustc_error_messages::MultiSpan;
 use rustc_hir::GenericArg;
@@ -14,7 +15,6 @@ use rustc_hir::{
 };
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_span::Span;
-use clippy_utils::diagnostics::span_lint_and_note;
 
 scout_audit_dylint_linting::impl_late_lint! {
     pub AVOID_AUTOKEY_UPGRADABLE,

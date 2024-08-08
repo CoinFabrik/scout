@@ -149,7 +149,7 @@ impl<'tcx> LateLintPass<'tcx> for DelegateCall {
         walk_expr(&mut delegate_storage, body.value);
 
         if delegate_storage.has_vulnerable_delegate {
-            clippy_utils::diagnostics::span_lint_and_help(
+            clippy_wrappers::span_lint_and_help(
                 cx,
                 DELEGATE_CALL,
                 delegate_storage.span.unwrap(),
