@@ -126,9 +126,9 @@ impl<'tcx> LateLintPass<'tcx> for LazyValuesNotSet {
     }
 }
 
-fn clean_local_upwards(local: Local, hm: &HashMap<Local, Vec<Local>>, visited_locals: &mut HashSet<Local>) -> Vec<Local> {
+fn clean_local_upwards(local: Local, hm: &HashMap<Local, Vec<Local>>, visited_locals: &mut HashSet<Local>) -> HashSet<Local> {
     let val = hm.get(&local);
-    let mut ret_vec: Vec<Local> = vec![];
+    let mut ret_vec: HashSet<Local> = HashSet::new();
     if ! visited_locals.contains(&local) {
         visited_locals.insert(local);
         if let Some(locals_vec) = val {
@@ -137,7 +137,6 @@ fn clean_local_upwards(local: Local, hm: &HashMap<Local, Vec<Local>>, visited_lo
                 ret_vec.extend(clean_local_upwards(*local, hm, visited_locals))
             }
         }
-        ret_vec.dedup();
     }
     ret_vec
 }
@@ -161,7 +160,7 @@ impl LazyValuesNotSet {
         let mut lazy_get_tainted_args: Vec<Local> = tainted_get_lazy.to_owned();
         let mut span_local: HashMap<Local, Span> = HashMap::new();
         let mut locals_dependencies: HashMap<Local, Vec<Local>> = HashMap::new();
-        let mut locals_to_clean: Vec<Local> = vec![];
+        let mut locals_to_clean: HashSet<Local> = HashSet::new();
         for basicblock in mir_preorder {
             for stmt in basicblock.1.statements.iter().rev() {
                 if let rustc_middle::mir::StatementKind::Assign(box_) = &stmt.kind {
@@ -235,7 +234,7 @@ impl LazyValuesNotSet {
                                                         .retain(|i| a.local != *i);
                                                     lazy_get_tainted_args.retain(|i| a.local != *i);
                                                     //push locals to be cleaned before
-                                                    locals_to_clean.push(a.local)
+                                                    locals_to_clean.insert(a.local);
                                                 }
                                                 Operand::Constant(_) => {}
                                             }
@@ -247,7 +246,7 @@ impl LazyValuesNotSet {
                                     for arg in args {
                                         match arg {
                                             Operand::Copy(a) | Operand::Move(a) => {
-                                                locals_to_clean.push(a.local);
+                                                locals_to_clean.insert(a.local);
                                             }
                                             Operand::Constant(_) => {}
                                         }
@@ -257,7 +256,7 @@ impl LazyValuesNotSet {
                                     for arg in args {
                                         match arg {
                                             Operand::Copy(a) | Operand::Move(a) => {
-                                                locals_to_clean.push(a.local);
+                                                locals_to_clean.insert(a.local);
                                             }
                                             Operand::Constant(_) => {}
                                         }
@@ -283,7 +282,6 @@ impl LazyValuesNotSet {
         for local in locals_to_clean.clone() {
             locals_to_clean.extend(clean_local_upwards(local, &locals_dependencies, &mut HashSet::new()));
         }
-        locals_to_clean.dedup();
         for local in &locals_to_clean {
             span_local.remove(local);
         }
